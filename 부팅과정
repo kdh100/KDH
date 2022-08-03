@@ -1,0 +1,24 @@
+1. Firmware 단계 - BIOS(Basic Input/Output System)
+	* 자체진단기능(POST(Power On Self Test))
+		- 각종 H/W(CPU, Mem, 키보드, 마우스 등)의 이상 유무 검사 및 초기화 진행
+		- 부팅 매체(HDD, CD, 플로피디스크 등) 검색 후 해당 매체의 부팅파티션 0번 섹터(aka. MBR)에 있는 부트로더를 메모리에 올림
+		- 부트로더(LILO(Linux Loader), GRUB) 실행 시 BIOS 종료 후 제어권을 넘김
+2. 부트로더 단계 - GRUB(Grand Unified Bootloader)
+	* /boot/grub2/grub.cfg 파일을 읽어 어떤 부팅메뉴(커널, kernel)로 부팅할 지 결정 후 메모리에 올림
+		- 자동결정 혹은 사용자선택으로 결정 후 제어권을 넘김
+3. 커널 단계
+	* systemd(데몬) 실행
+4. systemd 단계
+	* runlevel(target) 에 따른 TUI/GUI 방식으로 화면 출력
+		- 이전 버전(6.x 이하)에서는 init 에서 runlevel 구성
+		- 현재 버전(7.x 이상)에서는 systemd 에서 target 구성
+	* 서비스 시작 및 서비스 관리를 포함한 Linux 시작을 관리
+		- 유닛(Unit) 을 사용하여 다양한 유형의 개체를 관리(.service, .socket 등)
+	* systemctl CDM
+		- systemctl -a		# 활성화 유닛 확인(-a : 비활성화 유닛까지 확인)
+		- systemctl list-unit-files | grep $		# 유닛 이름 확인
+		- systemctl status $.UNIT		# $.유닛 상태 확인
+		- systemctl enable | disable --now $		# 서비스 활성화 | 비활성화(--now 서비스 시작/중지까지 동시 진행)
+		- systemctl --failed		# 서비스 fail 상태 확인
+		- systemctl list-jobs		# 서비스 active(wait) 상태 확인(ex_프린터)
+			

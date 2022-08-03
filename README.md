@@ -1,2 +1,0 @@
-# KDH
-Hello world!

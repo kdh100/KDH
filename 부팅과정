@@ -9,9 +9,9 @@
 3. 커널 단계
 	* systemd(데몬) 실행
 4. systemd 단계
-	* runlevel(target) 에 따른 TUI/GUI 방식으로 화면 출력
-		- 이전 버전(6.x 이하)에서는 init 에서 runlevel 구성
-		- 현재 버전(7.x 이상)에서는 systemd 에서 target 구성
+	* TUI/GUI 출력
+		- 이전 버전(6.x 이하)에서는 init > runlevel 3|5
+		- 현재 버전(7.x 이상)에서는 systemd > target multi-user.target|graphical.target
 	* 서비스 시작 및 서비스 관리를 포함한 Linux 시작을 관리
 		- 유닛(Unit) 을 사용하여 다양한 유형의 개체를 관리(.service, .socket 등)
 	* systemctl CDM
@@ -21,4 +21,9 @@
 		- systemctl enable | disable --now $		# 서비스 활성화 | 비활성화(--now 서비스 시작/중지까지 동시 진행)
 		- systemctl --failed		# 서비스 fail 상태 확인
 		- systemctl list-jobs		# 서비스 active(wait) 상태 확인(ex_프린터)
-			
+		- systemctl list-dependencies --reverse		# 서비스 의존성 확인
+		- systemctl mask | unmask		# 서로 다른 동일 서비스(ex_ntpd <> chronyd)의 충돌 방지를 위해 서비스 null 처리
+		- systemctl set-default multi-user.target | graphical.target		# 부팅시 출력 유닛 변경
+		- systemctl isolate multi-user.target | graphical.target		# 현재 출력 유닛 변경
+			\ systemctl get-default		# 부팅시 출력 유닛 확인
+			\ who -r		# 현재 출력 유닛 확인

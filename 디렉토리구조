@@ -3,23 +3,25 @@
 2. /root
 	*시스템 관리자(root)의 홈 디렉토리
 		- '.bash_profile', '.bashrc'
-3. /bin, /sbin
-	* /bin : 사용자 명령어 디렉토리(ex_ls, cp, mv 등)
-	* /sbin : 관리자 명령어 디렉토리(ex_fsck, fdisk 등)
-4. /etc
+3. /etc
 	* 시스템 전반에 걸친 환경설정 관련 디렉토리
-5. /boot
+4. /boot
 	* 리눅스 커널이 저장된 디렉토리(ex_GRUB, vmlinuz 등)
-6. /mnt, /run/media, /dev
+5. /mnt, /run/media, /dev
 	* /mnt : 외부 H/W(ex_CDROM, SAMBA 등)를 마운트하기 위해 임시로 사용되는 디렉토리
 		- /etc/fstab 파일을 수정하여 부팅 시 자동인식할 수 있도록 지정
 	* /run/media : 외부 H/W 를 마운트하기 위해 사용되는 디렉토리로 장비를 자동인식하여 해당 디렉토리에 위치함
 	* /dev : 내장 H/W 를 자동인식하여 생성된 파일들의 디렉토리
-7. /usr
-	* 각종 프로그램과 관련된 명령어, 라이브러리가 위치한 디렉토리
-8. /home
+6. /usr
+	* 각종 프로그램과 관련된 명령어, 라이브러리가 위치한 디렉토리(bin, lib 에 대한 심볼릭 링크 설정되어있음)
+	* /bin, /sbin(= /usr/bin, /usr/sbin)
+		- /bin : 사용자 명령어 디렉토리(ex_ls, cp, mv 등)
+		- /sbin : 관리자 명령어 디렉토리(ex_fsck, fdisk 등)
+	* /lib, /lib64(= /usr/lib, /usr/lib64)
+		- /lib : 프로그램들의 각종 라이브러리가 존재하는 디렉토리(32bit= /lib, 64bit= /lib64)		
+7. /home
 	* 사용자 계정의 홈 디렉토리가 저장되는 디렉토리
-9. /proc
+8. /proc
 	* 시스템의 각종 프로세서, 프로그램이나 하드웨어의 정보들이 저장되는 디렉토리
 		- 디렉토리 내 파일들은 커널에 의해 메모리에 저장된다.
-10. /var
+9. /var

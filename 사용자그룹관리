@@ -1,0 +1,22 @@
+1. 사용자 정보 파일
+	* /etc/passwd : 사용자 기본 정보 파일
+		- A:x:B:C:D:E:F
+			\ A : 
+			\ x : 
+			\ B : 
+			\ C : 
+			\ D : 
+			\ E : 
+			\ F : 
+	* /etc/shadow : 사용자 암호 파일
+		- A:B($a$b$c):C:D:E:F:G:H:I:J
+			\ A : 
+			\ x : 
+			\ B : 
+			\ C : 
+			\ D : 
+			\ E : 
+			\ F : 
+			\ G : 
+			\ H : 
+			\ I : 

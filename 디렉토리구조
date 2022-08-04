@@ -1,0 +1,17 @@
+1. /
+	* 최상위 디렉토리(= Windows 내 컴퓨터)
+2. /root
+	* 시스템 관리자(root)의 홈 디렉토리
+		- '.bash_profile', '.bashrc'
+3. /bin, /sbin
+	* /bin : 사용자 명령어 디렉토리(ex_ls, cp, mv 등)
+	* /sbin : 관리자 명령어 디렉토리(ex_fsck, fdisk 등)
+4. /etc
+	* 시스템 전반에 걸친 환경설정 관련 디렉토리
+5. /boot
+	* 리눅스 커널이 저장된 디렉토리(ex_GRUB, vmlinuz 등)
+6. /mnt, /run/media, /dev
+	* /mnt : 외부 H/W(ex_CDROM, SAMBA 등)를 마운트하기 위해 임시로 사용되는 디렉토리
+		- /etc/fstab 파일을 수정하여 부팅 시 자동인식할 수 있도록 지정
+	* /run/media : 외부 H/W 를 마운트하기 위해 사용되는 디렉토리로 장비를 자동인식하여 해당 디렉토리에 위치함
+	* /dev : 내장 H/W 를 자동인식하여 해당 디렉토리에 위치함

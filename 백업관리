@@ -39,4 +39,12 @@
 			\ rsync -a --delete -e ssh /backup/ main:/test/ : /backup/* 을 /test/* 에 동기화시킴
 			\ rsync -a --delete -e ssh /backup main:/test : /backup/* 을 /test/backup/* 에 동기화시킴
 				~ 동기화할 디렉토리가 없을 경우 생성하여 진행
-
+		- Rsync 서버 구축
+			\ Server : 
+				~ yum install rsync-daemon rsync
+				~ vi /etc/rsyncd.conf
+				~ systemctl enable --now rsyncd.socket
+			\ Client : 
+				~ rsync -avz --delete -e ssh server2:/backup1/ /backup1
+				~ rsync -avz --delete -e ssh server2::Backup /backup1
+					> /etc/rsyncd.conf 에서 명시된 서비스 명으로 명시할때는 콜론(:) 2개 사용

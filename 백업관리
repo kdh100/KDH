@@ -29,14 +29,14 @@
 		- cd /test1 \ tar czf - . | (cd /test2 ; tar xzf -)
 			\ test1 의 내용을 .gz 형태로 아카이빙 할때 파일명을 넣지않고 -(Stdout) 기호를 넣어 파이프로 Stdin 형태로 넘김
 			\ test2 로 이동하여 앞에서 Stdout 결과값에 대해 - 기호로 Stdin 으로 받을 위치를 지정하고 아카이빙 해제
-			\ 마이그레이션을 진행하여 test1 과 test2 의 모든 세부적인 내용이 동일해짐
+				~ test1 내용으로 test2 를 덮어써서 동일해짐
 	* 원격 백업		# rsync CMD
 		- -a : 아카이브 형태로 싱크 진행
 		- -z : 파일 전송 시 압축하여 진행
-			\ 파일의 크기가 100MB 이상일 때 사용하는게 효율적
-		- -e : SSH 등의 원격 접속 툴로 진행
+			\ 파일의 크기가 100MB 이상일 때 사용하는게 효율적임
+		- -e : SSH 로 진행
 		- --delete : 원본 파일이 삭제되었다면 동일하게 삭제시키며 동기화시킴
-			\ rsync -a --delete -e ssh /backup/ /test/ : /backup/* 을 /test/* 에 동기화시킴
-			\ rsync -a --delete -e ssh /backup /test : /backup/* 을 /test/backup/* 에 동기화시킴
-			\ 동기화할 디렉토리가 없을 경우 생성하여 진행
+			\ rsync -a --delete -e ssh /backup/ main:/test/ : /backup/* 을 /test/* 에 동기화시킴
+			\ rsync -a --delete -e ssh /backup main:/test : /backup/* 을 /test/backup/* 에 동기화시킴
+				~ 동기화할 디렉토리가 없을 경우 생성하여 진행
 

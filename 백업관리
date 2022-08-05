@@ -6,34 +6,37 @@
 	* 차등 백업(Differential Backup)
 		- 완전 백업 이후의 모든 데이터를 백업하는 방법	
 	* 로컬 백업
-		- Full : (백업) cd /home ; tar -g /backup/backup.list -czf /backup/full-backup.tar.gz .
-		         (복구) cd /home ; tar -g /backup/backup.list -xzf /backup/full-backup.tar.gz
-				 (백업) tar -g /backup/backup.list -czf /backup/full-backup.tar.gz /home
-				 (복구) cd / ; tar -g /backup/backup.list -xzf /backup/full-backup.tar.gz
-				 	\\ 상대경로는 백업한 디렉토리에서 복구
-				 	\\ 절대경로는 최상위 디렉토리(/)에서 복구
-					\\ -g : 아카이빙 기록을 스냅샷 처리
-		- Incremental : (백업) tar -g /backup/backup.list -czf /backup/full-backup.tar.gz /home
-						(추가) tar -g /backup/backup.list -czf /backup/incr-backup.tar.gz /home
-						(복구) cd / ; tar -g /backup/backup.list -xzf /backup/inc-backup.tar.gz
-							\\ 최초 기록의 시간과 증분 백업을 진행할 시간을 비교하여 증분된 데이터만 백업이 진행
-		- Differential : (백업) tar -g /backup/backup.list -czf /backup/full-backup.tar.gz /home
-						 (추가) cd /backup ; cp backup.list backup-1.list
-						 (추가) tar -g /backup/backup.list -czf /backup/diff-backup.tar.gz /home
-						 (복구) cd / ; tar -g /backup/backup-1.list -xzf /backup/diff-backup.tar.gz
-				 			\\ 초기 스냅샷을 복사하여 복사한 스냅샷을 타겟으로 
+		- Full : 
+			\ cd /home ; tar -g /backup/backup.list -czf /backup/full-backup.tar.gz .
+			\ cd /home ; tar -g /backup/backup.list -xzf /backup/full-backup.tar.gz
+			\ tar -g /backup/backup.list -czf /backup/full-backup.tar.gz /home
+			\ cd / ; tar -g /backup/backup.list -xzf /backup/full-backup.tar.gz
+			 	~ 상대경로는 백업한 디렉토리에서 복구
+				~ 절대경로는 최상위 디렉토리(/)에서 복구
+				~ -g : 아카이빙 기록을 스냅샷 처리
+		- Incremental : 
+			\ tar -g /backup/backup.list -czf /backup/full-backup.tar.gz /home
+			\ tar -g /backup/backup.list -czf /backup/incr-backup.tar.gz /home
+			\ cd / ; tar -g /backup/backup.list -xzf /backup/inc-backup.tar.gz
+				~ 최초 기록의 시간과 증분 백업을 진행할 시간을 비교하여 증분된 데이터만 백업이 진행
+		- Differential : 
+			\ tar -g /backup/backup.list -czf /backup/full-backup.tar.gz /home
+			\ cd /backup ; cp backup.list backup-1.list
+			\ tar -g /backup/backup.list -czf /backup/diff-backup.tar.gz /home
+			\ cd / ; tar -g /backup/backup-1.list -xzf /backup/diff-backup.tar.gz
+				~ 초기 스냅샷을 복사하여 복사한 스냅샷을 타겟으로 
 	* 데이터 이관작업(Migration)
 		- cd /test1 \ tar czf - . | (cd /test2 ; tar xzf -)
-			\\ test1 의 내용을 .gz 형태로 아카이빙 할때 파일명을 넣지않고 -(Stdout) 기호를 넣어 파이프로 Stdin 형태로 넘김
-			\\ test2 로 이동하여 앞에서 Stdout 결과값에 대해 - 기호로 Stdin 으로 받을 위치를 지정하고 아카이빙 해제
-			\\ 마이그레이션을 진행하여 test1 과 test2 의 모든 세부적인 내용이 동일해짐
+			\ test1 의 내용을 .gz 형태로 아카이빙 할때 파일명을 넣지않고 -(Stdout) 기호를 넣어 파이프로 Stdin 형태로 넘김
+			\ test2 로 이동하여 앞에서 Stdout 결과값에 대해 - 기호로 Stdin 으로 받을 위치를 지정하고 아카이빙 해제
+			\ 마이그레이션을 진행하여 test1 과 test2 의 모든 세부적인 내용이 동일해짐
 	* 원격 백업		# rsync CMD
 		- -a : 아카이브 형태로 싱크 진행
 		- -z : 파일 전송 시 압축하여 진행
-			\\ 파일의 크기가 100MB 이상일 때 사용하는게 효율적
+			\ 파일의 크기가 100MB 이상일 때 사용하는게 효율적
 		- -e : SSH 등의 원격 접속 툴로 진행
 		- --delete : 원본 파일이 삭제되었다면 동일하게 삭제시키며 동기화시킴
-			\\ rsync -a --delete -e ssh /backup/ /test/ : /backup/* 을 /test/* 에 동기화시킴
-			\\ rsync -a --delete -e ssh /backup /test : /backup/* 을 /test/backup/* 에 동기화시킴
-			\\ 동기화할 디렉토리가 없을 경우 생성하여 진행
+			\ rsync -a --delete -e ssh /backup/ /test/ : /backup/* 을 /test/* 에 동기화시킴
+			\ rsync -a --delete -e ssh /backup /test : /backup/* 을 /test/backup/* 에 동기화시킴
+			\ 동기화할 디렉토리가 없을 경우 생성하여 진행
 

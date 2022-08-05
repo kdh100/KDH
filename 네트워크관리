@@ -8,10 +8,35 @@
 		- SK : (A) 210.180.98.85 (B) 221.139.108.194
 		- Google : (A) 8.8.8.8 (B) 8.8.4.4
 		- 보라넷 : (A) 164.124.101.31 (B) 203.248.240.31
-	* /etc/sysconfig/network-scripts/ifcfg-eth0 : 네트워크 인터페이스에 대한 프로필
-		- 
-2. 네트워크 관련 명령어
-	* ethtool
-	* ifconfig
-	* netstat
+	* /etc/sysconfig/network-scripts/ifcfg-$DIVICE : 네트워크 인터페이스에 대한 프로필 파일
+		- TYPE : 장치 연결 종류
+		- BOOTPROTO :
+			\ none|static : 정적 IP
+			\ dhcp : 동적 IP
+		- NAME : 프로필 이름
+		- DEVICE : 장치 이름
+		- ONBOOT : 부팅시 활성화 유무
+		- HWADDR : MAC 주소
+		- IPADDR : IP 주소
+		- PREFIX : Netmask(CIDR)
+		- GATEWAY : 게이트웨이 주소
+		- DNS1 : DNS 주소
+		- DOMAIN : 도메인 이름
+2. 네트워크 정보 확인 명령어
+	* ethtool : NIC(네트워크 인터페이스) 확인
+	* ifconfig : 인터페이스와 IP 상태 확인
+	* ip route : 라우팅 테이블 확인
+	* tracepath(= traceroute) : 라우팅 경로 추적
+	* netstat -altupn : 서비스 상태 확인
+		- a,l : Listening 상태를 포함한 모든 서비스
+		- t,u : TCP,UDP
+		- p : 서비스에 해당되는 프로그램
+		- n : 포트를 이름으로 표시하지않고 번호로 표시(ex_:dns <> :53)
+3. 네트워크 설정 명령어
+	* (TUI) nmtui
+	* (GUI) nm-connection-editor
+	* (CLI) nmcli device|connection show|modify $DEVICE|$CONNECTION
+		- modify 후 cli 형태로 세부내용 수정
+		- connection.autoconnect 가 yes 인지 확인
+		- ipv4.method - auto > manual 로 수정 후 하부 ipv4 내용 수정 
 	

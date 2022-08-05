@@ -36,3 +36,4 @@
 			\\ rsync -a --delete -e ssh /backup/ /test/ : /backup/* 을 /test/* 에 동기화시킴
 			\\ rsync -a --delete -e ssh /backup /test : /backup/* 을 /test/backup/* 에 동기화시킴
 			\\ 동기화할 디렉토리가 없을 경우 생성하여 진행
+

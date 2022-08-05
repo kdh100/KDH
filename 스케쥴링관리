@@ -10,9 +10,19 @@
 			\ /var/spool/cron/$USER 에 저장
 		- -l : 작업(파일) 확인
 		- -r : 작업(파일) 삭제
-	* 파일 형식 : 'A B C D E CMD'(ex_0 3 * * * /root/bin/backup.sh)
+	* 파일 형식 : 'A B C D E $USER CMD'(ex_0 3 * * * $USER /root/bin/backup.sh)
 		- A : mm(0-59)
 		- B : hh(0-23)
 		- C : DD(1-31)
 		- D : MM(1-12)
 		- E : 요일(0-7; 0,7:일, 1:월, 2:화, 3:수, 4:목, 5:금, 6:토)
+	* 명령어 사용자 제한
+		- /etc/cron.deny : 파일에 명시된 사용자만 제한하고 모두 허용
+		- /etc/cron.allow : 파일에 명시된 사용자만 허용하고 모두 제한
+		- deny, allow 모두 있을 경우 allow 만 활성화
+			\ /var/spool/cron 에 등록된 사용자에 대해 allow 파일에 반드시 등록해야함
+		- deny, allow 모두 없을 경우 root 사용자만 허용
+	* 관리자의 JOB 스케쥴링 선택지
+		- crontab -e		# 가장 일반적인 사용법
+		- vi /etc/crontab
+		- /etc/cron.{hourly, daily, weekly, monthly}		# 소프트웨어에서 사용하는 스케쥴링으로 되도록 사용 지양

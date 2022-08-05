@@ -1,0 +1,16 @@
+1. 백업 종류		# tar CMD
+	* 완전 백업(Full Backup)
+		- 모든 데이터를 백업하는 방법		
+	* 증분 백업(Incremental Backup)
+		- 완전 백업 이후에 변경된 데이터만 백업하는 방법		
+	* 차등 백업(Differential Backup)
+		- 완전 백업 이후의 모든 데이터를 백업하는 방법	
+	* 로컬 백업
+		- Full : (백업) cd /home ; tar cvzf /backup/home-backup.tar.gz .
+				 (복구) cd /home ; tar xvzf /backup/home-backup.tar.gz
+					\ 상대경로는 백업 디렉토리에서 복구
+				 (백업) tar cvzf /backup/home-backup.tar.gz /home
+				 (복구) cd / ; tar xvzf /backup/home-backup.tar.gz
+				 	\ 절대경로는 최상위 디렉토리(/)에서 복구
+	
+	

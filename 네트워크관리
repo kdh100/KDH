@@ -1,0 +1,17 @@
+1. 네트워크 관련 파일
+	* /etc/hosts : IP 와 hostname 혹은 domainname 을 맵핑
+	* /etc/host.conf : 도메인 요청(Request)시 검색 순서 지정
+		- multi on/off : 기본값은 on, /etc/hosts 에서 도메인 우선 검색 후 /etc/resolv.conf 의 DNS 서버에 요청 전송
+	* /etc/reslov.conf : DNS 서버 지정
+		- KT : (A) 168.126.63.1 (B) 168.126.63.2
+		- LG : (A) 164.124.101.2 (B) 203.248.252.2
+		- SK : (A) 210.180.98.85 (B) 221.139.108.194
+		- Google : (A) 8.8.8.8 (B) 8.8.4.4
+		- 보라넷 : (A) 164.124.101.31 (B) 203.248.240.31
+	* /etc/sysconfig/network-scripts/ifcfg-eth0 : 네트워크 인터페이스에 대한 프로필
+		- 
+2. 네트워크 관련 명령어
+	* ethtool
+	* ifconfig
+	* netstat
+	

@@ -23,7 +23,8 @@
 		- DNS1 : DNS 주소
 		- DOMAIN : 도메인 이름
 2. 네트워크 정보 확인 명령어
-	* ethtool : NIC(네트워크 인터페이스) 확인
+	* ethtool $DEVICE : NIC(네트워크 인터페이스) 확인
+	* ip link(= nmcli device) : 모든 NIC 상태 확인
 	* ifconfig : 인터페이스와 IP 상태 확인
 	* ip route : 라우팅 테이블 확인
 	* tracepath(= traceroute) : 라우팅 경로 추적
@@ -37,6 +38,40 @@
 	* (GUI) nm-connection-editor
 	* (CLI) nmcli device|connection show|modify $DEVICE|$CONNECTION
 		- modify 후 cli 형태로 세부내용 수정
-		- connection.autoconnect 가 yes 인지 확인
+		- connection.autoconnect 값이 yes 인지 확인
 		- ipv4.method - auto > manual 로 수정 후 하부 ipv4 내용 수정 
+		- 수정 후 nmcli connection up $PROFILE 적용
+			\ /etc/sysconfig/network-scripts/ 내 ifcfg-$DEVICE 파일 편집으로 동일 수정 가능
+				~ nmcli connection reload : ifcfg 파일을 네트워크 매니저가 다시 읽어들임
+				~ nmcli connection up $PROFILE : 네트워크 매니저가 읽어들였던 내용으로 인터페이스에 재설정
+4. 티밍(Teaming) & 본딩(Bonding)		# Link Aggregation
+	* 두 개의 NIC 인터페이스를 가상의 하나의 인터페이스로 묶어서 사용하게하는 기술
+		- 전제조건으로 두 개의 인터페이스는 disconnect 상태여야 함
+		- 두 개의 멤버 인터페이스와 한 개의 LAG(메인) 인터페이스
+		- LAG 인터페이스에 IP 설정값으로 멤버 인터페이스가 구동방식에 맞추어 작동
+	* LAG 생성
+		- LAG 인터페이스 생성/설정 > 멤버 인터페이스 생성/추가 > LAG 인터페이스 & 멤버 인터페이스 활성화
+		- nmcli connection add help
+		- nmcli connection add con-name $PROFILE ifname $DEVICE type team team.runner activebackup
+			\ con-name : Connnection 이름 설정
+			\ ifname : 장치 이름 설정
+			\ type : LAG 타입 설정(team or bond)
+			\ team.runner : LAG 구동방식 설정(active-backup, loadbalance, roundrobin, LACP 등)
+		- nmcli connection add con-name $RPOFILE ifname $DEVICE type team-slave mater team0
+			\ team-salve : team 인터페이스의 멤버 인터페이스로 선언
+			\ master : team 인터페이스의 메인 DEVICE 선언
+		- nmcli connection modify $PROFILE(team profile) ipv4.method manual ipv4.addresses $ADDR ...
+		- nmcli connection up $PROFILE(team-slave profile)
+		- nmcli connection up $PROFILE(team profile)
+		- teamdctl $PROFILE state
+			\ LAG 인터페이스 상태 확인(멤버 상태, runner(구동방식) 상태 등)
+		- teamnl $PROFILE ports
+			\ LAG 인터페이스의 포트 상태 확인
+	* LAG 삭제
+		- LAG 인터페이스 상태 확인 > 멤버 인터페이스 비활성화(remove) > LAG/멤버 인터페이스 삭제(delete)
+		- teamdctl $PROFILE state
+		- teamdctl $PROFILE port remove $DEVICE
+		- nmcli connection
+		- nmcli connection delete $PROFILE(team-slave profile)
+		- nmcli connection delete $PROFILE(team profile)
 	

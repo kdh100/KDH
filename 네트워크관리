@@ -74,4 +74,3 @@
 		- nmcli connection
 		- nmcli connection delete $PROFILE(team-slave profile)
 		- nmcli connection delete $PROFILE(team profile)
-	

@@ -13,7 +13,30 @@
 			\ Enforcing(= 1)
 			\ Permissive(= 0)
 	* Context(= 라벨)
-		- _u : user
-		- _r : role
-		- _t : tyle
-		- :s? : security level
+		- /etc/selinux/targeted 내 파일들이 context 기본값을 규정하고 있음
+		- 기본적으로 상위 디렉토리의 context 를 넘겨받음
+		- system_u:object_r:httpd_sys_content_t:s0 /var/www/html : 
+			\ _u : user
+			\ _r : role
+			\ _t : type
+				~ /etc/selinux/config 파일 내 SELINUXTYPE 항목
+				~ targeted(default) : 
+				~ minimum : 
+				~ mls : 
+			~ :s0 : security level
+	* Context 설정변경
+		- semanage fcontext -l : context 확인
+		- semanage fcontext -a -t httpd_sys_content_t '/custom(/.*)?' : 
+			\ -a : context 추가
+				~ -d : context 삭제
+			\ -t : context 지정
+				~ 기존 context 외 추가하는 context 에 대한 내용은 /etc/selinux/targeted/file_context.local 에 저장
+			\ httpd_sys_content_t : 추가하려는 context 지정값
+			\ '/custom(/.*)?' : context 지정값을 적용받을 상황 구성
+				~ '루트 디렉토리 하단과 그 하단에 내용이 존재할 경우 그 하단 내용까지 동일하게'
+		- restorecon -R /custom : 
+			\ context 복원
+			\ -R(recursive) : 하단 내용까지 모두 동일하게 복원
+	
+	
+		

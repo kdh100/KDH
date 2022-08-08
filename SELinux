@@ -1,0 +1,19 @@
+1. SELinux 란?		# Target Policy
+	* 파일, 디렉토리, 포트에 보안 라벨을 붙여 프로세스의 엑세스 결정 규칙의 집합
+	* 기존 Ownership(r,w,x) 보다 우선시되어 적용
+	* /etc/selinux/config
+		- Enforcing(default) : 엑세스 제어 적용 + 규칙 위반 로깅
+		- Permissive : 엑세스 제어 미적용 + 규칙 위반 로깅
+		- Disabled : 비활성화
+	* Mode
+		- disabled <> enforcing|permissive 변경 시 reboot 진행
+		- enforcing <> permissive 변경 시 config 파일 수정 + setenforce 설정변경 진행
+		- getenforce(= sestatus) : 모드 확인
+		- setenforce : 모드 변경
+			\ Enforcing(= 1)
+			\ Permissive(= 0)
+	* Context(= 라벨)
+		- _u : user
+		- _r : role
+		- _t : tyle
+		- :s? : security level

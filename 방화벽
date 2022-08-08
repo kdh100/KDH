@@ -1,0 +1,32 @@
+1. firewalld
+	* nftables 라는 방화벽 프레임워크를 동적으로 관리해주는 프론트앤드
+	* Source IP 확인 > Interface 확인 > Default Zone(public) 적용
+		- firewalld 는 Default Zone 으로 Public Zone 지정
+		- Loopback0 Interface 는 Trunsted Zone 에 속해있음
+2. Zone(Predefined)
+	* trusted : 모든 트래픽 허용(ex_lo0)
+	* public(default) : ssh, dhcpv6-client 등의 사전 서비스와 불일치 혹은 out 트래픽과 무관 시 in 트래픽 거부
+	* external : ssh 등의 사전 서비스와 불일치 혹은 out 트래픽과 무관 시 in 트래픽 거부 + egress NAT(Masquerade)
+	* block : out 트래픽과 무관 시 in/out 트래픽 거부
+	* drop : out 트래픽과 무관 시(ICMP error include) in 트래픽 drop
+	* dmz : 서비스 통신을 목적으로 하는 지역
+3. Service(Predefined)
+	* ipp-client : 641/UDP, 로컬 인쇄 서비스
+	* samba-client : 137/UDP, 138/UDP, 139/UDP, 445/UDP, 로컬 Windows 파일/인쇄 공유 클라이언트
+	* dhcpv6-client : 546/UDP, 로컬 DHCPv6 클라이언트
+		- fe80::/64
+	* mdns : 5353/UDP, mDNS(Multi-cast DNS) 로컬 링크 이름 확인
+		- 224.0.0.251(v4) or ff02::fb(v6) 멀티캐스트 주소 사용
+4. Configuration
+	* firewall-config CMD(GUI Tool; yum install firewall-config)
+	* firewall-cmd
+		- firewall-cmd --get-default : default zone 확인
+		- firewall-cmd --set-default : default zone 설정
+		- firewall-cmd --permanent --zone=public --add-source=192.168.10.0/24
+			\ --permanent : /etc/firwalld 내 구성 파일을 수정하는 것
+				~ --reload : 구성 파일을 Runtime 에 로드
+				~ Runtime 에서 설정할 경우 --runtime-to-permanent 으로 permanent 설정 로드 필요
+			\ --zone=$ZONE : zone 에 설정
+			\ --add-source=$ADDR : Source IP 를 추가
+				~ --add-service=$SERVICE : Service 를 추가
+		- firewall-cmd --permanent --remove~ : 설정 삭제

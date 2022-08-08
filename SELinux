@@ -10,8 +10,8 @@
 		- enforcing <> permissive 변경 시 config 파일 수정 + setenforce 설정변경 진행
 		- getenforce(= sestatus) : 모드 확인
 		- setenforce : 모드 변경
-			\ Enforcing(= 1)
 			\ Permissive(= 0)
+			\ Enforcing(= 1)
 	* Context(= 라벨)
 		- /etc/selinux/targeted 내 파일들이 context 기본값을 규정하고 있음
 		- 기본적으로 상위 디렉토리의 context 를 넘겨받음
@@ -20,11 +20,11 @@
 			\ _r : role
 			\ _t : type
 				~ /etc/selinux/config 파일 내 SELINUXTYPE 항목
-				~ targeted(default) : 
-				~ minimum : 
-				~ mls : 
+				~ targeted(default) : 명시된 context 에 따라 프로세스 엑세스 제한
+				~ minimum : 지정한 프로세스만 엑세스 제한
+				~ mls : Multi Level Security; 다중 보안 레벨 정책에 따라 프로세스 엑세스 제한
 			~ :s0 : security level
-	* Context 설정변경
+	* semanage fcontext
 		- semanage fcontext -l : context 확인
 		- semanage fcontext -a -t httpd_sys_content_t '/custom(/.*)?' : 
 			\ -a : context 추가
@@ -37,6 +37,13 @@
 		- restorecon -R /custom : 
 			\ context 복원
 			\ -R(recursive) : 하단 내용까지 모두 동일하게 복원
-	
-	
-		
+	* semanage boolean		# SELinux 정책 On|Off 스위치
+		- semanage boolean -l : boolean 전체 상태 확인
+		- getsebool -a : boolean 상태 확인
+		- setsebool httpd_enable_homedirs on|off : boolean 스위치 On|Off(현재 상태)
+		- setsebool -P httpd_enable_homedirs on|off : boolean 스위치 On|Off(현재 상태 + 기본 상태)
+	* Troubleshooting
+		- tail /var/log/messages 로그 내용 중 'SELinux is preventing ~: sealert $SERIAL' 확인
+			\ tail /var/log/messages | grep -i 'SELinux is preventing'
+		- sealert $SERIAL CMD 확인 시 문제 해결에 대한 제안(suggests) 세부내용 확인하여 문제 해결 시도
+		- 조치 후 미해결 시 다시 로그 분석 후 sealert 의 다른 제안 시도

@@ -1,12 +1,59 @@
-1. DNS Server
-	* Domain 이름과 IP 주소를 매핑시켜 요청(Request)에 대한 응답(Reply)으로 정보를 제공하는 서버
+1. DNS
+	* Domain 이름과 IP 주소를 매핑시켜 질의(Query)에 대한 응답(Reply)으로 정보를 제공하는 서버
+	* /etc/host.conf(multi on) > 1st. /etc/hosts > 2nd. /etc/resolv.conf
 	* www.soldesk.co.kr
 		- www : Hostname
 		- soldesk.co.kr : Domainname
+			\ 루트 도메인 : .
 			\ 1차 도메인 : kr
 			\ 2차 도메인 : co
 			\ 3차 도메인 : soldesk
 			\ www.soldesk.com : FQDN(Full Qualified Domain Name)
-	* 
-
+	* DNS 형태
+		- Master(Primary) : 도메인 데이터 저장 및 질의에 대한 응답 진행
+		- Slave(Secondary) : 도메인 데이터 저장 및 질의에 대한 응답 진행 + 도메인 데이터를 Master 로 부터 전달받음
+		- Caching-only : 도메인 Cache 데이터만으로 질의에 대한 응답 진행
+		- Forwarding : 도메인 데이터에 대한 질의만 진행
+	* BIND DNS Tool
+		- Package : bind, bind-utils
+		- Daemon : named(53, TCP(M-S Sync)/UDP)
+		- Conf.File : /etc/named.conf, /etc/named.rfc1912.zones
+		- DB(Sub File) : /var/named/*
+2. DNS 구축
+	* TCP/UDP:53 서비스를 이용하므로 SELinux, Firewalld 의 영향을 받음
+	* SELinux > Permissive
+	* Firewalld > firewall-cmd --add-service=dns && firewall-cmd --reload
+	* 서비스 설정 파일 구성
+		- /etc/named.conf : named 설정 파일
+			\ Listening Port + allow-query + DNSSec 사용유무 확인
+			\ hint 파일 확인(type hint;)
+				~ /var/named/named.ca
+			\ 어떤 설정파일을 참고할 지 확인(lnclude $FILE)
+		- /etc/named.rfc1912.zones : 존 지정 파일
+			\ Forwarding Zone + ARPA(Reversed) Zone
+				~ DNS, mail, ssh 는 등록하고 일반적으로 등록하진않음
+			\ 지정된 존 설정값에서 존파일 경로 확인
+		- named-checkconf /etc/named.conf|rfc1912.zones : 파일 이상유무 체크
+	* 도메인 질의 힌트 파일 구성
+		- /var/named/named.ca : 도메인 질의에 대한 정보 파일
+			\ DB 내 매핑되는 도메인 데이터가 없을 경우 상위(교육 내에서는 루트 도메인으로 정함) 도메인에 쿼리 전송
+			\ 상위 도메인에 대한 매핑 정보가 hint 파일에 저장되어있음
+	* 존파일 구성
+		- /var/named/named.localhost : Forward 존파일
+			\ $TTL 4 : 모든 매핑되는 정보는 4초 후 삭제됨
+				~ 각 라인에서 개별적으로 적용하는게 최우선, 없을 경우 $TTL, 이마저도 없으면 기본 값(minimum: 3H)
+		- /var/named/named.loopback : ARPA(Reversed) 존파일
+		- named-checkzone $@(Origin Domain) /var/named/named.localhost|loopback : 존파일 이상유무 체크
+		- systemctl disable --now named ; systemctl enable --now named (or systemctl restart named) : 서비스 재시작
+3. 도메인 등록
+	* RR(Resource Record; Record Type) 종류
+		- NS(Name Server) : 도메인 이름
+		- A(Address) : IP 주소
+		- MX(Mail Exchage) : 메일
+			\ test.com.			IN	MX	10	mail.test.com.
+			\ mail.test.com.	IN	A		192.168.10.10
+				~ test.com 은 10 우선순위로 mail.test.com 을 MX 타입으로 매핑
+				~ mail.test.com 은 192.168.10.10 을 A 타입으로 매핑
+		- CNAME(Canonical Name) : alias 처럼 도메인을 문자열로 매핑
+		- PTR(Pointer Address) : Host IP(/32)에 대하여 FQDN 을 PTR 타입으로 매핑
 

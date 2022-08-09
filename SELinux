@@ -25,23 +25,28 @@
 				~ mls : Multi Level Security; 다중 보안 레벨 정책에 따라 프로세스 엑세스 제한
 			~ :s0 : security level
 	* semanage fcontext
-		- semanage fcontext -l : context 확인
 		- semanage fcontext -a -t httpd_sys_content_t '/custom(/.*)?' : 
+			\ -l : context 확인
 			\ -a : context 추가
-				~ -d : context 삭제
+			\ -d : context 삭제
 			\ -t : context 지정
 				~ 기존 context 외 추가하는 context 에 대한 내용은 /etc/selinux/targeted/file_context.local 에 저장
 			\ httpd_sys_content_t : 추가하려는 context 지정값
 			\ '/custom(/.*)?' : context 지정값을 적용받을 상황 구성
-				~ '루트 디렉토리 하단과 그 하단에 내용이 존재할 경우 그 하단 내용까지 동일하게'
+				~ '루트 디렉토리 하단에 'custom' 디렉토리와 그 하단에 내용이 존재할 경우 그 내용까지 동일하게'
 		- restorecon -R /custom : 
-			\ context 복원
-			\ -R(recursive) : 하단 내용까지 모두 동일하게 복원
+			\ -R(recursive) : 하단 내용까지 모두 동일하게 context 복원
 	* semanage boolean		# SELinux 정책 On|Off 스위치
 		- semanage boolean -l : boolean 전체 상태 확인
 		- getsebool -a : boolean 상태 확인
 		- setsebool httpd_enable_homedirs on|off : boolean 스위치 On|Off(현재 상태)
 		- setsebool -P httpd_enable_homedirs on|off : boolean 스위치 On|Off(현재 상태 + 기본 상태)
+	* semanage port		# 서비스 포트 라벨
+		- firewalld 와 중복하여 서비스 포트 관리 가능
+		- semanage port -a -t http_port_t -p tcp 82 : 
+			\ -l : 포트 확인
+			\ -p : 포트 지정
+			\ -m(modify) : 기존값 변경
 	* Troubleshooting
 		- tail /var/log/messages 로그 내용 중 'SELinux is preventing ~: sealert $SERIAL' 확인
 			\ tail /var/log/messages | grep -i 'SELinux is preventing'

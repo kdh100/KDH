@@ -1,0 +1,12 @@
+1. DNS Server
+	* Domain 이름과 IP 주소를 매핑시켜 요청(Query)에 대한 응답(Reply)으로 정보를 제공하는 서버
+	* www.soldesk.co.kr
+		- www : Hostname
+		- soldesk.co.kr : Domainname
+			\ 1차 도메인 : kr
+			\ 2차 도메인 : co
+			\ 3차 도메인 : soldesk
+		- www.soldesk.com : FQDN(Full Qualified Domain Name)
+	* 
+
+

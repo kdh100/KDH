@@ -21,12 +21,32 @@
 	* firewall-config CMD(GUI Tool; yum install firewall-config)
 	* firewall-cmd
 		- firewall-cmd --get-default : default zone 확인
-		- firewall-cmd --set-default : default zone 설정
-		- firewall-cmd --permanent --zone=public --add-source=192.168.10.0/24
+			\ --get-service : 서비스 확인
+		- firewall-cmd --set-default : default zone 변경
+		- firewall-cmd --permanent --zone=$ZONE --add-source=$ADDR
 			\ --permanent : /etc/firwalld 내 구성 파일을 수정하는 것
-				~ --reload : 구성 파일을 Runtime 에 로드
-				~ Runtime 에서 설정할 경우 --runtime-to-permanent 으로 permanent 설정 로드 필요
 			\ --zone=$ZONE : zone 에 설정
 			\ --add-source=$ADDR : Source IP 를 추가
 				~ --add-service=$SERVICE : Service 를 추가
-		- firewall-cmd --permanent --remove~ : 설정 삭제
+		- firewall-cmd --reload : 구성 파일 값을 Runtime 에 동일하게 로드
+		- firewall-cmd --runtime-to-permanent : Runtime 값을 구성 파일에 동일하게 로드
+		- firewall-cmd --permanent --remove-service=$? : 설정 삭제
+5. Rich Rule
+	* Src IP, Dst IP, Port 등의 규칙들을 복합적으로 사용한 룰셋
+	* firewall-cmd --add-rich-rule='rule family=ipv4 source address=192.168.10.0/24 port port=80 protocol=tcp reject'
+		- --add-rich-rule='$' : 룰 추가
+		- --remove-rich-rule='$' : 룰 삭제
+		- --query-rich-rule='$' : 룰 존재할 경우 0, 없을 경우 1 출력
+		- --list-rich-rules : 모든 룰 확인
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 1. firewalld
+	* 서비스 < Ownership < SELinux < Firewalld
 	* nftables 라는 방화벽 프레임워크를 동적으로 관리해주는 프론트앤드
 	* Source IP 확인 > Interface 확인 > Default Zone(public) 적용
 		- firewalld 는 Default Zone 으로 Public Zone 지정
@@ -38,15 +39,3 @@
 		- --remove-rich-rule='$' : 룰 삭제
 		- --query-rich-rule='$' : 룰 존재할 경우 0, 없을 경우 1 출력
 		- --list-rich-rules : 모든 룰 확인
-
-
-
-
-
-
-
-
-
-
-
-

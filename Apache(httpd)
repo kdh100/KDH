@@ -36,18 +36,42 @@
 		- vi /etc/httpd/conf.d/vhost.conf : httpd 환경파일 디렉토리에 가상 호스트 설정파일 생성
 			\ /etc/httpd/conf/httpd.conf 파일에는 httpd 환경파일(/etc/httpd/conf.d/*.conf) 을 include 시켜 읽어들임
 			\ <VirtualHost *:80> 은 항상 80/TCP 의 http 트래픽에서 일치하는 가상 호스트를 찾으므로 기존 서버 구성이 비활성화
+			\ DocumentRoot "/www1" : httpd 기본 디렉토리를 /www1 로 설정
 			\ Require all granted : 접근하기위한 모든 권한 설정
-	* CGI(Common Gateway Interface) : 웹서버와 클라이언트간의 정보 교환 웹인터페이스		# 보안 취약
+	* CGI(Common Gateway Interface) : 웹서버와 클라이언트간의 정보 교환 정의		# 보안 취약
 		- WAS 와 비슷하나 WAS 는 자기 자신이 프로그램을 실행시키지만 CGI 는 서버 자체에서 프로그램을 실행
 		- mkdir /www1/cgi-bin ; vi /www1/cgi-bin/test.cgi : CGI 디렉토리 생성 및 CGI 테스트 파일 생성
 		- /etc/httpd/conf.d/vhost.conf 파일에 ScriptAlias 설정
 			\ ScriptAlias /cgi-bin/ /www1/cgi-bin/
+		- chmod 555 /www1/cgi-bin/test.cgi
 		- httpd -t
 		- systemctl restart httpd
-	* Perl 스크립트 : Apache 서버에서 사용하는 Perl 언어 해석기
+	* CGI 방식_Perl 스크립트 : Perl 언어 스크립트
 		- yum install epel-release mod_perl
 			\ 패키지 설치 후 /etc/httpd/conf.d/perl.conf 파일 생성여부 확인
 		- vi /etc/httpd/conf.d/perl.conf : perl 설정
 			\ Alias 설정 및 디렉토리 설정 주석(#) 제거하여 활성화
 		- systemctl restart httpd
-	* PHP 스크립트 : 
+	* CGI 방식_PHP 스크립트 : PHP 언어 스크립트		# php 를 이용한 웹쉘 생성 가능, 보안상 금지
+		- yum install php
+			\ 패키지 설치 후 /etc/httpd/conf.d/php.conf 파일 생성여부 확인
+		- cat /etc/httpd/conf.d/php.conf | grep DirectoryIndex
+			\ 디렉토리 내 파일을 읽어들이는 우선순위 확인(가장 왼쪽이 최우선, 읽어들이면 뒤의 확장자는 무시함)
+		- systemctl restart httpd
+	* .htaccess
+		- 사용자가 웹서버 디렉토리 혹은 파일에 접근할 때 ID/PW 로 인증한 뒤 접근 가능하게 만드는 보안 설정
+		- vi /etc/httpd/conf.d/vhost.conf 내 디렉토리 설정값 하부에 AllowOverride AuthConfig 추가
+		- vi /www1/.htaccess : htaccess 파일 생성하여 AuthConfig 의 내용 설명
+		- htpasswd -c /etc/httpd/conf/mypasswd $USER : 인증에 필요한 ID/PW 생성 + 계정정보 저장할 디렉토리 생성
+			\ 사용자가 보안상 웹디렉토리에 접근하여 ID/PW 정보를 확인할 수 있으므로 Permission 은 400 apache apache 권장
+		- httpd -t
+		- systemctl restart httpd
+3. 가상 호스팅(Virtual Hosting)
+	* 
+
+
+
+
+
+
+

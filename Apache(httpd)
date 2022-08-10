@@ -2,4 +2,8 @@
 	* 클라이언트에게 저장된 정적 하이퍼텍스트를 제공(ex_Apache, IIS, Nginx 등)
 		- WAS(Web Application Server) : Web Server 기능 + 동적 하이퍼텍스트 제공(ex_Tomcat, JBOSS 등)
 2. Web Server 구축
-	* 
+	* Package : httpd, mod_ssl(https)
+	* Daemon : httpd(80/TCP, 443/TCP)
+	* Conf.File : /etc/httpd/conf/httpd.conf
+	* Sub.File : /etc/httpd/conf.d/*.conf
+

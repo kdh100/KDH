@@ -52,7 +52,7 @@
 		- vi /etc/httpd/conf.d/perl.conf : perl 설정
 			\ Alias 설정 및 디렉토리 설정 주석(#) 제거하여 활성화
 		- systemctl restart httpd
-	* CGI 방식_PHP 스크립트 : PHP 언어 스크립트		# php 를 이용한 웹쉘 생성 가능, 보안상 금지
+	* CGI 방식_PHP 스크립트 : PHP 언어 스크립트		# php 를 이용한 웹쉘 생성 가능(보안상 매우 위험)
 		- yum install php
 			\ 패키지 설치 후 /etc/httpd/conf.d/php.conf 파일 생성여부 확인
 		- cat /etc/httpd/conf.d/php.conf | grep DirectoryIndex

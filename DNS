@@ -10,10 +10,10 @@
 			\ 3차 도메인 : soldesk
 			\ www.soldesk.com : FQDN(Full Qualified Domain Name)
 	* DNS 형태
-		- Master(Primary) : 도메인 데이터 저장 및 질의에 대한 응답 진행
-		- Slave(Secondary) : 도메인 데이터 저장 및 질의에 대한 응답 진행 + 도메인 데이터를 Master 로 부터 전달받음
-		- Caching-only : 도메인 Cache 데이터만으로 질의에 대한 응답 진행
-		- Forwarding : 도메인 데이터에 대한 질의만 진행
+		- Master(Primary) : DNS 데이터 저장 및 질의에 대한 응답 진행
+		- Slave(Secondary) : DNS 데이터 저장 및 질의에 대한 응답 진행 + 도메인 데이터를 Master 로 부터 전달받음
+		- Caching-only : DNS Cache 데이터만으로 질의에 대한 응답 진행
+		- Forwarding : DNS 데이터에 대한 질의만 진행
 	* BIND DNS Tool
 		- Package : bind, bind-utils
 		- Daemon : named(53, TCP(M-S Sync)/UDP)
@@ -35,17 +35,24 @@
 			\ 지정된 존 설정값에서 존파일 경로 확인
 		- named-checkconf /etc/named.conf|rfc1912.zones : 파일 이상유무 체크
 	* 도메인 질의 힌트 파일 구성
-		- /var/named/named.ca : 도메인 질의에 대한 정보 파일
+		- /var/named/named.ca : DNS 질의를 위한 상위 도메인 정보 파일
 			\ DB 내 매핑되는 도메인 데이터가 없을 경우 상위(교육 내에서는 루트 도메인으로 정함) 도메인에 쿼리 전송
 			\ 상위 도메인에 대한 매핑 정보가 hint 파일에 저장되어있음
 	* 존파일 구성
-		- /var/named/named.localhost : Forward 존파일
-			\ $TTL 4 : 모든 매핑되는 정보는 4초 후 삭제됨
-				~ 각 라인에서 개별적으로 적용하는게 최우선, 없을 경우 $TTL, 이마저도 없으면 기본 값(minimum: 3H)
-		- /var/named/named.loopback : ARPA(Reversed) 존파일
+		- /var/named/named.localhost : 존파일(Forward)
+		- SOA 필드 : 존파일에 대한 정의(DNS Server, E-mail 기제)
+			\ $TTL 4 : Caching Time
+				~ 1순위로 각 도메인 라인의 TTL, 2순위 존파일 최상단의 $TTL, 3순위 SOA 필드의 TTL
+			\ ( 2022081011 1D 1H 1W 3H )
+				~ 2022081011 : Update Serial(YYYYMMDD+$$)
+				~ 1D : Update Refresh
+				~ 1H : Update Retry
+				~ 1W : Expire
+				~ 3H : TTL
+		- /var/named/named.loopback : 리버스 존파일(ARPA)
 		- named-checkzone $@(Origin Domain) /var/named/named.localhost|loopback : 존파일 이상유무 체크
 		- systemctl disable --now named ; systemctl enable --now named (or systemctl restart named) : 서비스 재시작
-3. 도메인 등록
+3. DNS 도메인 등록
 	* RR(Resource Record; Record Type) 종류
 		- NS(Name Server) : 도메인 이름
 		- A(Address) : IP 주소
@@ -56,4 +63,32 @@
 				~ mail.test.com 은 192.168.10.10 을 A 타입으로 매핑
 		- CNAME(Canonical Name) : alias 처럼 도메인을 문자열로 매핑
 		- PTR(Pointer Address) : Host IP(/32)에 대하여 FQDN 을 PTR 타입으로 매핑
-
+	* 부하분산(Load Balance)
+		- 단일 도메인에 다중 DNS 서버 IP 를 설정하여 DNS 질의를 설정한 서버들에서 동일하게 응답할 수 있도록 설정
+	* 위임(Delegation)
+		- 클라이언트로부터 받은 DNS 질의을 해당 질의에 해당하는 도메인을 담당하는 DNS 서버에게 전달하기 위한 설정
+		- Master : /etc/named.rfc1912.zones 존 정보 수정하여 Slave 정보 설정 후 업데이트(systemctl restart named)
+		- Slave : /etc/named.rfc1912.zones 존 정보 수정하여 Master 정보 설정 후 업데이트(systemctl restart named)
+			\ Master 로부터 전달받은 존파일에 대해 SOA 필드의 Serial 값이 Origin Serial 보다 크면 업데이트
+	* RNDC(Remote Name Daemon Control)
+		- 원격 클라이언트가 DNS 서버의 named 서비스를 관리하기 위한 명령어
+		- 별도의 보안키를 사용해 해당 명령어의 접근이 가능
+		- rndc-confgen : 보안키 생성
+			\ -a : 보안키 파일 생성
+			\ /etc/rndc.key : 보안키 파일 수정 필요(rndc-confgen 의 key 값을 편집)
+		- /etc/rndc.conf : RNDC 서비스를 위한 설정 파일
+			\ key 값과 옵션 값을 설정(default-server;원격 서버, default-port;RNDC 서비스포트)
+		- /etc/named.conf : RNDC 서비스를 추가
+			\ include "/etc/rndc.key";
+			\ control 내용의 allow(원격 서버), key 값 설정
+	* nsupdate : CLI 방식으로 존파일 수정 및 업데이트 진행하는 명령어
+4. DNS 보안
+	* /etc/named.rfc1912.zones 파일을 이용한 보안 설정
+		- allow-query : 지정한 IP 대역만 질의 허용
+		- allow-update : 지정한 IP 대역만 존파일 변경 허용
+		- allow-transfer : 지정한 IP 대역만 Slave 서버로 지정
+	* chroot 구성(yum install bind-chroot) : /var/named 하단에 chroot/ 디렉토리를 추가 생성하여 루트 디렉토리 지정
+	* DNSSec : DNS 질의-응답 과정에서 특별한 전자서명을 사용하여 데이터 위/변조를 방지하는 기술
+	* dnsgraph : DNS 통계를 그래프 형식으로 표기
+	* DNS 패키지 업데이트(yum update bind bind-utils)
+	* 최근 보안 취약점 정보를 주기적으로 확인 요망

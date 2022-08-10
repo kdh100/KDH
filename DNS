@@ -14,12 +14,12 @@
 		- Slave(Secondary) : DNS 데이터 저장 및 질의에 대한 응답 진행 + 도메인 데이터를 Master 로 부터 전달받음
 		- Caching-only : DNS Cache 데이터만으로 질의에 대한 응답 진행
 		- Forwarding : DNS 데이터에 대한 질의만 진행
-	* BIND DNS Tool
+2. DNS 구축
+	* Bind(DNS Tool)
 		- Package : bind, bind-utils
 		- Daemon : named(53, TCP(M-S Sync)/UDP)
 		- Conf.File : /etc/named.conf, /etc/named.rfc1912.zones
 		- DB(Sub File) : /var/named/*
-2. DNS 구축
 	* TCP/UDP:53 서비스를 이용하므로 SELinux, Firewalld 의 영향을 받음
 	* SELinux > Permissive
 	* Firewalld > firewall-cmd --add-service=dns && firewall-cmd --reload

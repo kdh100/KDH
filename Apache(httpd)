@@ -1,9 +1,31 @@
 1. Web Server
 	* 클라이언트에게 저장된 정적 하이퍼텍스트를 제공(ex_Apache, IIS, Nginx 등)
 		- WAS(Web Application Server) : Web Server 기능 + 동적 하이퍼텍스트 제공(ex_Tomcat, JBOSS 등)
-2. Web Server 구축
-	* Package : httpd, mod_ssl(https)
-	* Daemon : httpd(80/TCP, 443/TCP)
-	* Conf.File : /etc/httpd/conf/httpd.conf
-	* Sub.File : /etc/httpd/conf.d/*.conf
-
+	* httpd
+		- Package : httpd, mod_ssl(https)
+		- Daemon : httpd(80/TCP, 443/TCP)
+		- Conf.File : /etc/httpd/conf/httpd.conf
+		- Sub.File : /etc/httpd/conf.d/*.conf
+	* 서비스 기동
+		- systemctl enable --now httpd
+	* Firewall 서비스 추가
+		- firewall-cmd --permanent --add-service=http --add-service=https
+		- firewall-cmd --reload
+	* 클라이언트 프로그램
+		- GUI : firefox
+		- TUI : curl
+			\ -k : https(SSL) 오류 메시지 무시
+			\ -I : httpd 헤더 정보 확인(= telnet $ADDR 80 ; GET / HTTP/1.0<ENT><ENT>)			
+	* 사용자 웹페이지 기본 설정		# 관리자 웹페이지는 서비스 기동하면서 자동 생성됨
+		- su - $USER && mkdir public_html && chmod 711 /home/$USER/public_html ; cd /home/$USER/public_html
+			\ 사용자 홈디렉토리의 public_html 디렉토리를 사용자 웹페이지로 사용
+			\ 클라이언트가 해당 디렉토리에 접근할 수 있는 권한을 주기 위해 711(최소) 설정
+		- /etc/httpd/conf.d/userdir.conf
+			\ UserDir public_html 을 사용하겠다 설정하고 UserDir disabled 설정은 주석(#) 처리
+		- systemctl restart httpd
+		- firefox http://www.example.com/~$USER
+			\ 클라이언트 별 사용자 웹페이지 주소체계 호환을 위해 /etc/httpd/conf/httpd.conf 에 Alias 설정 필요
+				~ Alias /$USER /home/$USER/public_html
+2. Apache Web Server
+	* httpd -t : Apache 설정 파일 무결성 체크
+	* 

@@ -16,7 +16,12 @@
 		- TUI : curl
 			\ -k : https(SSL) 오류 메시지 무시
 			\ -I : httpd 헤더 정보 확인(= telnet $ADDR 80 ; GET / HTTP/1.0<ENT><ENT>)			
-	* 사용자 웹페이지 기본 설정		# 관리자 웹페이지는 서비스 기동하면서 자동 생성됨
+	* 관리자 웹페이지 기본 설정
+		- vi /etc/httpd/conf/httpd.conf
+			\ ServerAdmin $EMAIL : 서버관리자 이메일 설정
+			\ ServerName $FQDN:80 : 서버관리자 도메인:포트 설정
+		- systemctl restart httpd
+	* 사용자 웹페이지 기본 설정
 		- su - $USER && mkdir public_html && chmod 711 /home/$USER/public_html ; cd /home/$USER/public_html
 			\ 사용자 홈디렉토리의 public_html 디렉토리를 사용자 웹페이지로 사용
 			\ 클라이언트가 해당 디렉토리에 접근할 수 있는 권한을 주기 위해 711(최소) 설정
@@ -28,7 +33,10 @@
 				~ Alias /$USER /home/$USER/public_html
 		- httpd -t : 설정 파일 무결성 체크
 2. Apache Web Server
-	* 가상 호스트 설정		# /usr/share/doc/httpd/httpd-vhosts.conf 참고
+	* 가상 호스트	
+		- 클라이언트의 작업 요청이 적을 경우 하나의 장치에 다중 호스트를 생성해서 관리
+		- 이름(Name-Based), IP(IP-Based), 포트(Port-Based) 기반 가상 호스팅 생성/관리 혹은 혼합하여 사용 가능
+		- /usr/share/doc/httpd/httpd-vhosts.conf 파일을 참고하여 가상 호스트 설정 가능
 		- 가상 호스트를 설정하면 기존 설정파일(/etc/httpd/conf/httpd.conf)을 Overwrite 하여 최우선시 됨
 			\ 기존 설정파일의 Global Config 와 Main Config 중 Main 에 해당되는 부분이 Overwrite
 			\ 가상 호스트 설정파일에서 명시되지 않은 부분은 기존 설정파일에서 읽어들여 적용시킴
@@ -38,7 +46,8 @@
 			\ <VirtualHost *:80> 은 항상 80/TCP 의 http 트래픽에서 일치하는 가상 호스트를 찾으므로 기존 서버 구성이 비활성화
 			\ DocumentRoot "/www1" : httpd 기본 디렉토리를 /www1 로 설정
 			\ Require all granted : 접근하기위한 모든 권한 설정
-	* CGI(Common Gateway Interface) : 웹서버와 클라이언트간의 정보 교환 정의		# 보안 취약
+	* CGI(Common Gateway Interface)		# 보안 매우 취약
+		- 서버와 클라이언트 간 정보 교환 인터페이스 정의
 		- WAS 와 비슷하나 WAS 는 자기 자신이 프로그램을 실행시키지만 CGI 는 서버 자체에서 프로그램을 실행
 		- mkdir /www1/cgi-bin ; vi /www1/cgi-bin/test.cgi : CGI 디렉토리 생성 및 CGI 테스트 파일 생성
 		- /etc/httpd/conf.d/vhost.conf 파일에 ScriptAlias 설정
@@ -51,8 +60,10 @@
 			\ 패키지 설치 후 /etc/httpd/conf.d/perl.conf 파일 생성여부 확인
 		- vi /etc/httpd/conf.d/perl.conf : perl 설정
 			\ Alias 설정 및 디렉토리 설정 주석(#) 제거하여 활성화
+		- mkdir -p /var/www/perl ; vi /var/www/perl/index.pl : perl 디렉토리 생성 후 index 파일 생성
+		- chmod 755 /var/www/perl/index.pl
 		- systemctl restart httpd
-	* CGI 방식_PHP 스크립트 : PHP 언어 스크립트		# php 를 이용한 웹쉘 생성 가능(보안상 매우 위험)
+	* CGI 방식_PHP 스크립트 : PHP 언어 스크립트
 		- yum install php
 			\ 패키지 설치 후 /etc/httpd/conf.d/php.conf 파일 생성여부 확인
 		- cat /etc/httpd/conf.d/php.conf | grep DirectoryIndex
@@ -66,9 +77,42 @@
 			\ 사용자가 보안상 웹디렉토리에 접근하여 ID/PW 정보를 확인할 수 있으므로 Permission 은 400 apache apache 권장
 		- httpd -t
 		- systemctl restart httpd
-3. 가상 호스팅(Virtual Hosting)
-	* 
-
+3. Server Statistic
+	* 서버 통계 웹페이지 구성
+		- cp /usr/share/doc/httpd/httpd-info.conf /etc/httpd/conf.d/info.conf
+		- vi /etc/httpd/conf.d/info.conf
+			\ /server-status|info > Require IP 에 로컬 IP 추가
+		- systemctl restart httpd
+		- http://www.exmaple.com/server-info|status
+	* 서버 통계 패키지
+		- yum install webalizer
+		- vi /etc/webalizer.conf
+			\ HostName 의 주석(#) 제거, 로컬 도메인으로 수정
+		- vi /etc/sysconfig/webalizer : 스케쥴링(crontab) 설정
+			\ WEBALIZER_CRON=yes 의 주석(#) 제거
+		- webalizer CMD
+			\ 실행 후 /var/www/usage 디렉토리에 통계 파일 생성 확인
+		- systemctl restart httpd
+		- http://localhost/usage
+4. 보안
+	* 웹페이지 헤더에 포함된 서버 버전, OS 정보 숨기기
+		- cp /usr/share/doc/httpd/httpd-default.conf /etc/httpd/conf.d/default.conf
+		- vi /etc/httpd/conf.d/default.conf
+			\ ServerTokens Full > Prod 수정 필요
+		- systemctl restart httpd
+	* WAF(Web Application Firewall)
+		- 물리적 구성방식에 따라 네트워크 혹은 호스트 방식
+		- 논리적 구성방식에 따라 프록시 혹은 필터링 방식
+	* 웹 취약점 진단
+		- KISA(https://www.krcert.or.kr/webprotect/webVulnerability.do) : 무료
+	* 웹 방화벽(Modsecurity)
+		- yum install mod_security mod_security_crs
+		- /etc/httpd/conf.d/mod_security.conf : 설정 파일
+			\ SecRuleEngine On|Off : 웹방화벽 On|Off
+		- systemctl restart httpd
+5. Apache(Web) + Tomcat(Application) + MariaDB(DB) 연동
+	* ...
+	
 
 
 

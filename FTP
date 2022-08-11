@@ -1,0 +1,106 @@
+1. vsFTP(Very Secure FTP)
+	* 안정적이고 빠르며 보안 강화된 FTP 로 다양한 오픈소스 OS 에서 기본으로 채택하는 FTP 서버 툴
+		- Package : vsftpd, ftp
+		- Daemon : vsftpd(21/TCP, 20/TCP, 1024~/TCP)
+		- Conf.File : /etc/vsftpd/vsftpd.conf
+		- Sub.File : /etc/vsftpd/{user_list, ftpusers}
+		- systemctl enable --now vsftpd
+		- firewall-cmd --permanent --add-service=ftp && firewall --reload
+	* /etc/vsftpd/{user_list, ftpusers} 파일에 등록된 사용자는 ftp 로그인 불가
+		- 둘 중 하나라도 등록되어있으면 로그인 불가
+			\ 일반사용자는 등록이 안되어있어 로그인 가능
+			\ 루트사용자는 등록이 되어있어 로그인 불가
+				~ 설정파일을 수정하면 가능하지만 보안상 수정 지양
+	* FTP 클라이언트
+		- GUI 방식의 FTP(ex_ Filezilla 등)
+		- yum install filezilla
+	* FTP CMD
+		- TUI 방식의 FTP
+		- ID/PW 인증
+		- cd/lcd : 업로드/다운로드 포인터 맞추기
+		- bin, hash, prompt : 편리한 기능 설정
+		- get/put, mget/mput : 업로드/다운로드
+		- ls/dir, bye : 확인, 종료
+	* 외부(Windows) > Firewall(WAF, DNS 등) > 내부(Linux) FTP
+		- Port Forwarding : NAT(masquerade) 의 반대 방향으로 접근에 대한 설정 필요
+2. 기본 설정
+	* Session Timeout 설정
+		- vi /etc/vsftpd/vsftpd.conf
+		- idle_session_timeout, data_connection_timeout 을 9000 초로 변경
+		- systemctl restart vsftpd
+	* 배너 설정		# 배너가 최우선
+		- vi /etc/vsftpd/vsftpd.conf
+		- banner_file=/etc/vsftpd/banner.txt
+		- systemctl restart vsftpd
+	* 인사 설정
+		- vi /etc/vsftpd/vsftpd.conf
+		- ftpd_banner=$TEXT
+		- systemctl restart vsftpd
+	* 홈디렉토리 제한(chroot) 설정
+		- 사용자의 홈디렉토리를 /(root) 디렉토리로 제한하여 다른 디렉토리로 이동할 수 없게 제한하는 기능
+		- vi /etc/vsftpd/vsftpd.conf
+		- chroot_local_user=YES : 사용자 홈디렉토리 제한 ON
+		- allow_writeable_chroot=YES : 사용자가 제한된 디렉토리 내에서 쓰기 ON
+		- chroot_list_enable=YES : chroot 제한에 해당되지 않는 사용자를 리스트로 관리 ON
+		- chroot_list_file=$FILE : 리스트 파일 지정
+		- systemctl restart vsftpd
+	* 익명(Anonymous) 사용자 설정
+		- /var/ftp 를 홈디렉토리로 가지고 다운로드만 가능
+			\ ftp 접속 시 ls, dir, pwd 확인 시 최상위 디렉토리가 / 로 표기되지만 실제로는 /var/ftp
+			\ 각 디렉토리의 권한 중 Others 의 read 권한이 없지만 exec 권한이 있다면 디렉토리에 접근 가능(정확한 이름 필요)
+			\ 미확인 디렉토리의 파일 다운로드 시 get 만 가능
+		- vi /etc/vsftpd/vsftpd.conf
+		- anonymous_enable=YES : 익명 사용자 기능 ON
+		- anon_upload_enable=YES : 업로드 가능 ON
+			\ chown_uploads=YES : 
+			\ chown_username=$USER : 
+		- anon_mkdir_wire_enable=YES : 업로드 시 디렉토리 생성 가능 ON
+		- systemctl restart vsftpd
+	* 서비스 포트 설정
+		- 서버는 /etc/vsftpd/vsfptd.conf, 클라이언트는 /etc/services 파일에서 정의한 포트를 사용
+		- vi /etc/vsftpd/vsftpd.conf
+		- listen_port=$PORT : 포트 지정
+		- systemctl restart vsftpd
+3. 보안 설정
+	* 호스트 제한
+		- firewall-cmd 
+	* 사용자 세션 제한
+		- vi /etc/vsftpd/vsftpd.conf
+		- max_clients=$NUMBER : 최대접속자 수
+		- max_per_ip=$NUMBER : IP 당 최대접속자 수
+		- systemctl restart vsftpd
+	* 사용자 접근 제어(ACL)
+		- vi /etc/vsftpd/vsftpd.conf
+		- userlist_enable=YES : /etc/vsftpd/{user_list, ftpusers} 에 명시된 사용자들의 접근을 제한
+		- userlist_deny=NO : /etc/vsftpd/user_list 에 등록된 사용자들은 허용
+			\ YES 일 경우 user_list, ftpusers 두 개의 파일 중 하나라도 사용자가 포함되어 있다면 제한
+		- systemctl restart vsftpd
+	* 포트 설정
+		- 서버는 /etc/vsftpd/vsfptd.conf, 클라이언트는 /etc/services 파일에서 정의한 포트를 사용
+			\ vi /etc/vsftpd/vsftpd.conf
+			\ listen_port=$PORT : 포트 지정
+			\ systemctl restart vsftpd
+		- 클라이언트가 데이터 전송에 대한 FTP 포트 모드를 선택 가능
+			\ Active(default) : 20/TCP well-known 포트로 데이터 수신
+			\ Passive : 서버로부터 데이터 전송 요청할때마다 dynamic 포트(1024 이상)를 수신받아 데이터 수신
+				~ ftp 서버에서 passive CMD
+4. 로그 분석
+	* 파일 업로드/다운로드 로그
+		- tail -f /var/log/xferlog
+			\ b(binary) : 전송 종류
+				~ a : ASCII
+			\ _(null) : 액션 플래그
+				~ C : 압축O 파일
+				~ U : 압축X 파일
+				~ T : tar 파일
+			\ o(outgoing) : 전송 방향
+				~ i : incoming
+				~ d : delete
+			\ r(real) : 사용자 방식
+				~ a : anonymous
+			\ 0(인증X) : 사용자 인증 방법
+			\ *(null) : 사용자 인증 방법에 따라 되돌려지는 사용자 ID
+			\ c(complete) : 전송 상태
+				~ i : incomplete
+	* FTP 인증 실패 로그
+		- tail -f /var/log/secure

@@ -1,0 +1,69 @@
+1. 용어
+	* MTA : 메일 전송 에이전트(ex_ sendmail, dovecot, postfix 등)
+	* MUA : 메일 유저 에이전트(ex_ outlook 등)
+	* SMTP/ESMTP : 메일 송신 프로토콜
+		- sendmail : 25/TCP(smtp), 465/TCP(smtps)
+	* POP3/IMAP4 : 메일 수신 프로토콜
+		- dovecot : 110/TCP(pop3), 995/TCP(pop3s), 143/TCP(imap), 993/TCP(imaps)
+2. 송신 메일 서버
+	* 구성
+		- Package : sendmail(서버), mailx(클라이언트)
+		- Daemon : sendmail
+		- Conf.File : /ect/mail/sendmail.cf
+		- Sub.File : /etc/mail/*, /etc/aliases
+		- systemctl enable --now sendmail
+		- firewall-cmd --permanent --add-service={smtp,smtps} && firewall-cmd --reload
+	* /etc/mail/sendmail.cf
+		- Dj : 
+		- EightBitMode=pass8 : 
+		- DaemonPortOptions=Port=smtp,Addr=127.0.0.1, Name=MTA : 
+	* /etc/mail/local-host-names
+		- 
+	* /etc/mail/access
+		-   
+		- makemap hash /etc/mail/access < /etc/mail/access
+3. 수신 메일 서버
+	* 구성
+		- Package : dovecot
+		- Daemon : dovecot
+		- Conf.File : /ect/dovecot/dovecot.conf
+		- Sub.File : /etc/dovecot/conf.d/*.conf
+		- systemctl enable --now dovecot
+		- firewall-cmd --permanent --add-service={pop3,pop3s,imap,imaps} && firewall-cmd --reload
+	* /etc/dovecot/dovecot.conf
+		- 
+	* /etc/dovecot/conf.d/10-mail.conf
+		- 
+	* /etc/dovecot/conf.d/10-ssl.conf
+		- 
+	* /etc/dovecot/conf.d/10-auth.conf
+		- 
+4. 메일 포워딩
+	* /etc/aliases 파일 수정하여 어떤 사용자에게 보낼 메일을 다른 사용자에게 포워딩 설정할 수 있음
+		- vi /etc/aliases : 마지막 라인에 추가 '$USER1:	$USER2'
+			\ $USER2 의 정보는 반드시 존재해야함
+		- newaliases
+		- praliases | grep $USER
+	* /etc/aliases 파일 수정하여 단체 메일 혹은 리스트로 관리되는 대상들에게 단체 메일 발송 가능
+		- vi /etc/aliases : 마지막 라인에 추가 
+			\ 'team:$USER1,$USER2,$USER3,...'
+			\ 'everyone::include:/etc/mail/list/$NAME.list'
+				~ mkdir /etc/mail/list 필요
+		- newaliases
+		- praliases | grep 'team|$NAME'
+4. Troubleshooting
+	* return 메일 확인(= 힌트 정보)
+	* DNS 서버 정보 확인
+		- nslookup -q=MX $DOMAIN
+	* 로그 확인
+		- /var/log/maillog
+	* 방화벽 확인
+		- firewall-cmd --list-all
+	* 서비스 확인
+		- journalctl -f -u sendmail|dovecot
+		- systemctl status sendmail|dovecot
+	* 서버 전반적인 설정 점검
+
+
+
+

@@ -1,2 +1,97 @@
 1. 리눅스 로그
-	* 
+	* 사용자/서버 활동, 시스템 공격 및 서버 장애 기록, 성능 카운트
+	* OS 기본 로그 파일
+		- /var/log/messages : 시스템 전반적인 로그
+		- /var/log/secure : 개인 인증 로그(ex_ su, telnet, ssh)
+		- /var/log/boot.log : 부팅 로그(= dmesg CMD)
+		- /var/log/lastlog : 마지막 로그인 기록 데이터(= lastlog)
+		- /var/log/btmp : 마지막 로그인 실패 데이터(= lastb)
+		- /var/log/wtmp : 사용자 로그인/아웃 기록 데이터(= last)
+		- /var/log/utmp : 현재 사용자 데이터(= who)
+		- /var/log/cron : 스케쥴링 로그(ex_ at, crontab)
+	* 서비스 기본 로그 파일
+		- DNS : /var/log/messages
+		- HTTP : /var/log/httpd/*
+		- FTP : /var/log/secure, /var/log/xferlog
+		- MAIL : /var/log/maillog
+		- NFS : /var/log/messages
+		- CIFS(SMB) : /var/log/samba/*
+2. rsyslog
+	* rsyslogd : 시스템 메시지의 모든 로그 파일 생성/관리
+	* 구성
+		- Package : rsyslog
+		- Daemon : rsyslogd(514/TCP,UDP)
+		- Conf.File : /etc/rsyslog.conf
+		- Sub.File : /etc/rsyslog.d/*.conf
+		- systemctl enable --now rsyslog
+		- firewall-cmd --permanent --add-port=514/tcp --add-port=514/udp ; firewall-cmd --reload
+	* /etc/rsyslog.conf : 설정 파일
+		- 필드 구분 : selector{facility.level} + action
+		- facility : 메시지 종류
+			\ daemon : 데몬에 의한 메시지
+			\ kern : 커널에 의한 메시지
+			\ lpr : 프린트 프로그램에 의한 메시지
+			\ authpriv : 개인 인증 프로그램에 의한 메시지(ex_ su, telnet, ssh)
+			\ security : 인증 프로그램에 의한 메시지(ex_ login)
+			\ syslog : syslog 에 의한 메시지
+			\ user : 사용자 프로그램에 의한 메시지
+			\ mark : 이미 생성된 메시지를 반복 생성
+			\ * : 모든 메시지(mark 제외)
+			\ local0-7 : 예약된 부팅 메시지
+		- level(priority) : 위험 수위, 지정된 레벨 이상의 모든 레벨을 기록
+			\ 0(emerg) :  패닉 상태
+			\ 1(alert) : 즉각적인 조치가 필요한 상황
+			\ 2(crit) : 시스템 문제 상황
+			\ 3(err) : 에러 발생 상황
+			\ 4(warn) : 주의 상황
+			\ 5(notice) : 상황 안내
+			\ 6(info) : 기본 정보
+			\ 7(debug) : 디버깅
+			\ none : 해당 facility 제외
+			\ * : 모든 레벨
+		- action : 로그 기록 위치
+			\ /var/log/messages : 파일 위치에 로그
+			\ /dev/console : 콘솔 위치에 로그
+			\ $USER, root, * : 특정 사용자 혹은 모든 사용자(*)
+			\ @ADDR, @@ADDR : @ 은 UDP, @@ 은 TCP
+	* logger CMD
+		- rsyslog 설정파일이 정상동작 하는지 확인하기 위한 테스트 로그 발생시키는 명령어
+		- logger -p authpriv.=warn "Warning Message Test Log"
+		- -p : 지정하고자 하는 로그 내용
+			\ =warn : 해당 레벨 메시지만 로그 기록
+	* tail -f /var/log/*
+	* /var/log/*.log 형식으로 새로운 로그 파일 생성
+		- /etc/rsyslog.conf 파일에서 로그 기록 경로 설정 필요
+	* Shell Script 에 의해 새로운 로그 파일 생성
+		- 스크립트 내 /var/log/*.log 형식으로 파일 생성 구문 작성
+	* rsyslogd -N $NUM : rsyslog 설정 파일 문법 점검
+		- -N $NUM : 문법 점검 레벨(높을수록 자세히 표시)
+3. 로그 서버 구축
+	* 모든 prio level 로그를 다 기록하기보단 warn level 로그만 기록하는게 관리 상 효율적
+	* /etc/rsyslog.conf 내 imtcp, imudp 구문 주석 제거 해야 514/TCP,UDP 포트로 전달받을 수 있음
+	* /etc/rsyslog.d/*.conf 파일로 원격 로그 서버 설정
+		- facility.level 지정 및 로컬 디렉토리 혹은 원격 호스트 설정(@ or @@; UDP or TCP)
+	* rsyslogd -N 1
+	* systemctl restart rsyslog
+	* logger CMD Test
+		- -n : 원격 서버 IP
+		- -p : 로깅 대상(facility.priority)
+		- -P : 포트 지정
+		- -T : TCP
+		- -d : UDP
+	* Visual Syslog Server : 리눅스 > 윈도우 로그 수신 프로그램
+	* eventlog-to-syslog : 리눅스 < 윈도우 로그 송신 프로그램
+	* Graylog Server : rsyslog 체계의 로그 분석 프로그램
+		- Graylog : 
+		- MongoDB : 
+		- Elasticsearch : 
+		
+
+
+
+
+
+
+
+
+

@@ -6,16 +6,16 @@
 		- 서버는 메시지를 수신하고 DHCP Acknowledge 메시지 전송(사용 허가)
 	* 구성(Server)
 		- Package : dhcp-server
-		- Daemon : 67/UDP(dhcpd)
+		- Daemon : 67/UDP(dhcpd_ipv4), 547(dhcpd_ipv6)
 		- Conf.File : /etc/dhcp/dhcpd.conf
 		- 
 	* 구성(Client)
 		- Package : dhcp-client
-		- Daemon : 68/UDP(dhclient)
+		- Daemon : 68/UDP(dhclient_ipv4), 546(dhclient_ipv6)
 		- Conf.File : /etc/dhcp/dhclient.conf
 		- Sub.File : /etc/dhcp/dhclient.d/*
-		- Script : /etc/NetworkManager/dispatcher.d/11-dhclient
-
-
+		- Script : /etc/NetworkManager/d ispatcher.d/11-dhclient
+		- 
+2. 설정
 
 

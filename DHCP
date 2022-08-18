@@ -1,0 +1,21 @@
+1. DHCP(Dynamic Host Configuration Protocol)
+	* 동일 네트워크 대역의 서버가 클라이언트에게 요청받을 때 유동적으로 IP Pool 에서 확인된 가용 IP 제공
+		- 클라이언트는 DHCP Discover 메시지 브로드캐스트 전송
+		- 메시지를 수신받은 서버는 클라이언트에게 DHCP Offer 메시지에 IP 주소 + 서비스 정보를 전송
+		- 클라이언트는 수신받은 메시지로 네트워크 설정 후 서버에게 DHCP Request 메시지 전송(사용 허가 요청)
+		- 서버는 메시지를 수신하고 DHCP Acknowledge 메시지 전송(사용 허가)
+	* 구성(Server)
+		- Package : dhcp-server
+		- Daemon : 67/UDP(dhcpd)
+		- Conf.File : /etc/dhcp/dhcpd.conf
+		- 
+	* 구성(Client)
+		- Package : dhcp-client
+		- Daemon : 68/UDP(dhclient)
+		- Conf.File : /etc/dhcp/dhclient.conf
+		- Sub.File : /etc/dhcp/dhclient.d/*
+		- Script : /etc/NetworkManager/dispatcher.d/11-dhclient
+
+
+
+

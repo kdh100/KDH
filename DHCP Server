@@ -8,14 +8,26 @@
 		- Package : dhcp-server
 		- Daemon : 67/UDP(dhcpd_ipv4), 547(dhcpd_ipv6)
 		- Conf.File : /etc/dhcp/dhcpd.conf
-		- 
+			\ 기본 설정 아무것도 없음
+			\ mv /etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.OLD
+			\ cp /var/share/doc/dhcp-server/dhcpd.conf.example /etc/dhcp/dhcpd.conf
+		- systemctl enable --now dhcpd
+		- firewall-cmd --permanent --add-service={dhcp,dhcpv6}
 	* 구성(Client)
 		- Package : dhcp-client
 		- Daemon : 68/UDP(dhclient_ipv4), 546(dhclient_ipv6)
 		- Conf.File : /etc/dhcp/dhclient.conf
 		- Sub.File : /etc/dhcp/dhclient.d/*
-		- Script : /etc/NetworkManager/d ispatcher.d/11-dhclient
-		- 
+		- /etc/sysconfig/network-scripts/ifcfg-eth# : 설정변경 필수
 2. 설정
-
-
+	* /etc/dhcp/dhcpd.conf
+		- option domain-name, domain-name-server : DNS 정보
+		- default-lease-time, max-lease-time : 임대 시간
+		- authoritative : 정상적인 DHCP 서버임을 클라이언트에게 안내
+		- No service will b given... : 서비스 안하는 서브넷 선언 주석(#) 처리
+		- basic subnet declaration : 서브넷 선원 주석(#) 처리
+		- BOOTP clients to get dynamic addresses... : BOOTP 클라이언트를 위한 서브넷 선언 주석(#) 처리
+		- internal subnet : 내부(LAN) 서브넷 선언
+		- Hosts which require special configuration... : 부팅 이미지 할당받을 클라이언트 선언 주석(#) 처리
+		- Fixed IP addresses... : 고정 IP 를 할당받을 클라이언트 선언
+		- declare a class of clients... : 주석(#) 처리

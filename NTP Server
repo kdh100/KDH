@@ -1,0 +1,21 @@
+1. NTP(Network Time Protocol)
+	* 네트워크 상 시간을 동기화하는 프로토콜
+	* 용어 : 
+		- UTC(Universal Time Coordinated) : 세계 협정 시간, 모든 시간의 기준 시간
+			\ 한국은 UTC + 9 시간
+		- Stratum : NTP 서버 계층 레벨
+		- Resolution : H/W 단 시간 최소 단위
+		- Precision : S/W 단 시간 최소 단위
+		- Jitter : 오차 중 작은 값
+		- Wander : 오차 중 큰 값
+	* 구성
+		- Package : chrony
+		- Daemon : 123/UDP(chronyd)
+		- Conf.File : /etc/chrony.conf
+		- systemctl enable --now chronyd
+
+
+
+
+
+

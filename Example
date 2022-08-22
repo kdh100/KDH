@@ -1,3 +1,5 @@
+pylint
+
 # 커피 자판기
 
 coffee = 5

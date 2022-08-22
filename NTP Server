@@ -13,9 +13,5 @@
 		- Daemon : 123/UDP(chronyd)
 		- Conf.File : /etc/chrony.conf
 		- systemctl enable --now chronyd
-
-
-
-
-
-
+		- server time.bora.net iburst
+			\ iburst : 동기화를 즉시 시작

@@ -68,7 +68,12 @@
 		- create user $USER@$HOST identified by $PASS;
 	* 사용자 삭제
 		- drop user $USER@$HOST;
-
-
-
-
+6. 백업/복구
+	* Backup Target : /var/lib/mysql
+	* Backup Method
+		- Logical Backup
+			\ mysqldump -u'root' -p $DB > /backup/$DB.dump
+			\ mysqldump -u'root' -p --add-databases > /backup/FullDB.dump
+			\ mysqldump -u'root' -p $DB --add-drop-database --add-drop-table > /backup/$DB.dump
+		- Logical Restore
+			\ mysql -u'root' -p $DB < /backup/$DB.dump

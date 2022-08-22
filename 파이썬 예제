@@ -16,3 +16,4 @@ while True:
         print("돈을 다시 돌려주고 커피를 주지 않습니다.")
 
     print("남은 커피의 양은 %d개 입니다." % coffee)
+

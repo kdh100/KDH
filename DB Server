@@ -1,0 +1,74 @@
+1. MariaDB(= MySQL)
+	* 용어 개념
+		- DB Software 	== Excel
+		- DB 			== Excel File
+		- Table 		== Excel File_Sheet
+		- column,Row 	== Excel File_Sheet_열, 행
+	* MariaDB = MySQL
+	* 구성
+		- Package : mariadb, mariadb-server
+		- Daemon : 3306/TCP(mysqld)
+		- Conf.File : /etc/my.cnf
+		- Sub.File : /etc/my.cnf.d/*.cnf
+		- systemctl enable --now mariadb
+		- firewall-cmd --permanent --add-service=mysql
+		- mysql_secure_installation : 초기 설정
+			\ Enter current password for root (enter for none): <ENTER>
+			\ Set root password? [Y/n] Y
+			\ Remove anonymous users? [Y/n] Y
+			\ Disallow root login remotely? [Y/n] Y
+			\ Remove test database and access to it? [Y/n] Y
+			\ Reload privilege tables now? [Y/n] Y
+	* 접속
+		- Local : mysql -u'$USER' -p'$PASS'
+		- Remote : mysql -h $ADDR -p $PORT -u'$USER' -p'$PASS'
+2. DB 관리
+	* DB 선택
+		- use $DB;
+	* DB 생성
+		- create database $DB;
+	* DB 삭제
+		- drop database $DB;
+3. Table 관리
+	* Table 확인
+		- show tables : 테이블 리스트 확인
+		- desc $TABLE : 테이블 양식(form) 확인
+	* Table 생성
+		- create table $TABLE (name char(20), passwd char(30), ...);
+			\ name char(20), : 열에 들어갈 항목들 지정
+	* Table 이름변경
+		- rename table $TABLE to $TABLE;
+	* Table 삭제
+		- drop table $TABLE;
+4. Table Contents 관리
+	* Contents 확인
+		- select * from $TABLE;
+		- select $OBJECT from $TABLE;
+		- select * from $TABLE where $OBJECT=$VALUE;
+			\ = : 같음
+			\ <> : 같지않음
+			\ BETWEEN : 포함 범위 사이
+			\ LIKE : 패턴 검색
+			\ MAIN : 한 열에 대해 가능한 값을 여러개 지정
+	* Contents 입력
+		- insert into $TABLE ($OBJECT, ...) values ($VALUE, ...);
+	* Contents 수정
+		- update $TABLE set $OBJECT=$VALUE, ... where $OBJECT=$VALUE;
+5. 사용자 및 엑세스 관리
+	* 권한 확인
+		- show grants;
+		- show grants for $USER@$HOST;
+	* 권한 부여
+		- grant $PRIV, ... on $DB.$TABLE to $USER@$HOST;
+	* 권한 박탈
+		- revoke $PRIV, ... on $DB.$TABLE from $USER@$HOST;
+	* 권한 새로고침
+		- flush privileges;
+	* 사용자 추가
+		- create user $USER@$HOST identified by $PASS;
+	* 사용자 삭제
+		- drop user $USER@$HOST;
+
+
+
+

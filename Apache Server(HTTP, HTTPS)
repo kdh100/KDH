@@ -110,9 +110,22 @@
 		- /etc/httpd/conf.d/mod_security.conf : 설정 파일
 			\ SecRuleEngine On|Off : 웹방화벽 On|Off
 		- systemctl restart httpd
-5. Apache(Web) + Tomcat(Application) + MariaDB(DB) 연동
-	* ...
-	
+5. HTTPS 
+	* 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

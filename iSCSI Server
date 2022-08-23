@@ -1,0 +1,53 @@
+1. iSCSI
+	* 인터넷 상의 디스크를 제공하는 프로토콜
+	* 용어
+		- initiator : iSCSI 클라이언트
+		- target : 공유 대상 디스크(리소스)
+		- IQN : initiator, target 을 식별하는 이름체계
+		- LUN(Logical Unit Number) : target 에 부여하는 장치 번호
+		- node : IQN 으로 식별되는 initiator, target
+		- portal : initiator, target 의 IP 와 포트
+		- TPG(Target Portal Group) : portal 리스트
+2. iSCSI target
+	* 구성
+		- Package : targetcli
+		- Daemon : 3260/TCP(target)
+		- Conf.File : /etc/target/saveconfig.json
+		- systemctl enable --now target
+		- firewall-cmd --permanent --add-service=iscsi-target
+	* 리소스 작업
+		- fdisk 파티션 작업
+	* 타켓 작업
+		- targetcli
+		- block|fileio/ create disk : 디스크 생성
+		- iscsi/ create iqn.2022-08.com.example:server1 : IQN 설정
+		- luns/ create /backstores/block|fileio/disk : 디스크에 LUN 지정(= 비로소 사용 가능)
+		- acls/ create iqn.2022-08.com.example:server2 : ACL 설정
+			\ server2 의 IQN 을 지정하여 해당 서버만 접근할 수 있게 설정
+	* exit : 종료 시 설정 자동저장
+	* cat /etc/target/saveconfig.json : 설정 확인
+3. iSCSI initiator
+	* 구성
+		- Package : iscsi-initiator-utils
+		- Daemon : 860/TCP(iscsid)
+		- Conf.File : /etc/iscsi/iscsid.conf
+		- Sub.File : /etc/iscsi/initiatorname.iscsi
+			\ 해당 서버에서 사용할 initiator 의 IQN 을 지정, 수정 작업 필수
+		- systemctl enable --now iscsi
+		- firewall-cmd --permanent --add-service=iscsi-target
+	* 요청 작업
+		- iscsiadm -m discovery -t sendtarget -p 192.168.10.20:3260 -l
+			\ -m : 모드 선택
+				~ discovery : 검색
+				~ node : 노드 지정
+				~ session : 연결노드 확인
+			\ -t : 타겟 타입
+				~ sendtarget : 직접 target 에게 요청
+				~ isns : ISNS 에게 대리 target 요청
+			\ -T : 타겟 IQN
+			\ -p : portal
+			\ -l : 로그인
+				~ /etc/iscsi/iscsid.conf 에서 CHAP 방식의 로그인 인증방식을 설정할 수 있음
+			\ -u : 로그아웃
+				~ 로그인 시 노드 정보를 /var/lib/iscsi/nodes 에 저장시켜 세션 종료(로그아웃) 후 재로그인 시 세션 자동 로그인
+				~ 이를 방지하기 위해선 -o(option) delete 로 노드 정보를 삭제시켜야 함

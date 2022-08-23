@@ -110,8 +110,10 @@
 		- /etc/httpd/conf.d/mod_security.conf : 설정 파일
 			\ SecRuleEngine On|Off : 웹방화벽 On|Off
 		- systemctl restart httpd
-5. HTTPS 
-	* 
+5. HTTPS
+	* 인증서 방식
+		- 공개키 암호(ex_ rsa) 방식 : pub key 암호화 > pri key 복호화
+		- 공개키 서명(ex_ rsa, dsa) 방식 : pri key 암호화 > pub key(상위 인증기관의 pub key 로 서명) 복호화
 
 
 

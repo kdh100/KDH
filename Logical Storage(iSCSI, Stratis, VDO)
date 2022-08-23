@@ -54,3 +54,54 @@
 			\ -u : 로그아웃
 				~ 로그인 시 노드 정보를 /var/lib/iscsi/nodes 에 저장시켜 세션 종료(로그아웃) 후 재로그인 시 세션 자동 로그인
 				~ 이를 방지하기 위해선 -o(option) delete 로 노드 정보를 삭제시켜야 함
+4. Stratis
+	* LVM 과 비슷한(더 좋아질 가능성이 높은) 가상 디스크/파일시스템 관리 프로그램
+	* LVM 은 Thick 볼륨, Stratis 는 Thin 볼륨
+	* 구성
+		- Package : stratis-cli, stratisd
+		- Conf.File : /etc/fstab
+			\ 파일시스템 마운트 정보를 기록해 부팅 시 로드하도록 설정 필요
+		- systemctl enable --now stratisd
+	* 풀(pool) 생성
+		- stratis pool create $POOLNAME /dev/$DEVICE
+		- stratis pool destory $POOLNAME
+	* 풀 리스트
+		- stratis pool list
+	* 풀 장치 추가
+		- stratis pool add-data $POOLNAME /dev/$DEVICE
+	* 풀 장치 확인
+		- stratis blockdev list
+	* 파일시스템 생성
+		- stratis filesystem create $POOLNAME $FSNAME
+			\ 오직 xfs 파일시스템으로 자동 생성됨
+	* 파일시스템 리스트
+		- stratis filesystem list
+	* 스냅샷 생성
+		- stratis filesystem snapshot $POOLNAME $FSNAME $SNAPNAME
+	* /etc/fstab 항목 추가
+		- /dev/stratis/$POOLNAME/$FSNAME /$MOUNTPOINT xfs defaults,x-systemd.requires=stratisd.service 0 0
+			\ 부팅 시 stratis 서비스가 가동되어야만 마운트할 수 있기 때문에 반드시 설정해야함
+		- mount -a
+5. VDO
+	* 가상 데이터 최적화 프로그램
+	* Compression(데이터 압축, kvdo), Deduplication(중복 제거, uds), Thin Volume
+	* 구성
+		- Package : vdo, kmod-kvdo
+		- systemctl status vdo
+		- Conf.File : /etc/fstab
+			\ 파일시스템 마운트 정보를 기록해 부팅 시 로드하도록 설정 필요
+		- lsmod | grep kvdo ; modprobe kvdo
+			\ 커널 모듈이 올라오지 않으면 정상적으로 볼륨 생성이 불가능
+	* 볼륨 생성
+		- vdo create --name=$VDONAME --device=$DEVICE --vdoLogicalSize=10G
+			\ 디바이스의 최소 용량은 5G 이상이어야 볼륨 생성이 가능
+	* 볼륨 리스트
+		- vdo list
+	* 볼륨 상태
+		- vdo stats --human-readable
+	* 파일시스템 생성
+		- mkfs.xfs /dev/mapper/$VDONAME
+	* /etc/fstab 항목 추가
+		- /dev/mapper/$VDONAME /$MOUNTPOINT xfs defaults,x-systemd.requires=vdo.service 0 0
+			\ 부팅 시 stratis 서비스가 가동되어야만 마운트할 수 있기 때문에 반드시 설정해야함
+		- mount -a

@@ -48,6 +48,9 @@
 			\ -p : portal
 			\ -l : 로그인
 				~ /etc/iscsi/iscsid.conf 에서 CHAP 방식의 로그인 인증방식을 설정할 수 있음
+		- iscsiadm -m session -T iqn.... -P 0|1|2|3
+			\ -P : 정보 확인 레벨
+		- iscsiadm -m node -T iqn.... -p 192.168.10.20:3260 -u -o delete
 			\ -u : 로그아웃
 				~ 로그인 시 노드 정보를 /var/lib/iscsi/nodes 에 저장시켜 세션 종료(로그아웃) 후 재로그인 시 세션 자동 로그인
 				~ 이를 방지하기 위해선 -o(option) delete 로 노드 정보를 삭제시켜야 함

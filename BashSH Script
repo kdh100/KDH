@@ -114,12 +114,22 @@
 		- /etc/profile
 		- ~/.bash_profile
 		- ~/.bashrc
-	* Here Documentation
-		- 
+	* Here Documentation """ cat CMD + << """
+		- 내용이 많은 text 형태의 파일 생성 시
+		- 선택 메뉴 형식의 내용을 출력해야 할 때
+			# cat << EOF > test.c
+			  main() { printf("Hello world\n" }
+			  EOF
 	* 그룹화(Grouping)
-		- 
+		- CMD 의 내용들을 하나로 묶어 하나의 입력값으로 출력
+			# cd ~ ; tar cvf - . | (cd /backup ; tar xvf -)
+			# yum update -y || exit 1
 	* 조건부실행(Condition Execution)
-		- 
+		- &&(AND) : 앞의 결과값이 참이면 실행
+			# cd /test && rm -rf *
+		- ||(OR) : 앞의 결과값이 참이면 종료, 참이 아니라면 실행
+			# [ -f /etc/passwd ] && echo "OK" || echo "FAIL"
+				~ 조건문은 '[,]' 으로 묶어서 선언
 	* 경로(File/Directory Path)
 		- 
 

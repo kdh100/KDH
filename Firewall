@@ -22,12 +22,12 @@
 	* firewall-config CMD(GUI Tool; yum install firewall-config)
 	* firewall-cmd
 		- firewall-cmd --get-default : default zone 확인
-			\ --get-service : 서비스 확인
+			# --get-service : 서비스 확인
 		- firewall-cmd --set-default : default zone 변경
 		- firewall-cmd --permanent --zone=$ZONE --add-source=$ADDR
-			\ --permanent : /etc/firwalld 내 구성 파일을 수정하는 것
-			\ --zone=$ZONE : zone 에 설정
-			\ --add-source=$ADDR : Source IP 를 추가
+			# --permanent : /etc/firwalld 내 구성 파일을 수정하는 것
+			# --zone=$ZONE : zone 에 설정
+			# --add-source=$ADDR : Source IP 를 추가
 				~ --add-service=$SERVICE : Service 를 추가
 		- firewall-cmd --reload : 구성 파일 값을 Runtime 에 동일하게 로드
 		- firewall-cmd --runtime-to-permanent : Runtime 값을 구성 파일에 동일하게 로드

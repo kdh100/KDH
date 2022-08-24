@@ -35,13 +35,13 @@
 4. 메일 포워딩
 	* /etc/aliases 파일 수정하여 어떤 사용자에게 보낼 메일을 다른 사용자에게 포워딩 설정할 수 있음
 		- vi /etc/aliases : 마지막 라인에 추가 '$USER1:	$USER2'
-			\ $USER2 의 정보는 반드시 존재해야함
+			# $USER2 의 정보는 반드시 존재해야함
 		- newaliases
 		- praliases | grep $USER
 	* /etc/aliases 파일 수정하여 단체 메일 혹은 리스트로 관리되는 대상들에게 단체 메일 발송 가능
 		- vi /etc/aliases : 마지막 라인에 추가 
-			\ 'team:$USER1,$USER2,$USER3,...'
-			\ 'everyone::include:/etc/mail/list/$NAME.list'
+			# 'team:$USER1,$USER2,$USER3,...'
+			# 'everyone::include:/etc/mail/list/$NAME.list'
 				~ mkdir /etc/mail/list 필요
 		- newaliases
 		- praliases | grep 'team|$NAME'

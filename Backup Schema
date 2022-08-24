@@ -1,4 +1,4 @@
-1. 백업 종류		# tar CMD
+1. 백업 종류 """ tar CMD """
 	* 완전 백업(Full Backup)
 		- 모든 데이터를 백업하는 방법		
 	* 증분 백업(Incremental Backup)

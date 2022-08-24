@@ -2,25 +2,25 @@
 	* 서버는 share
 		- /etc/exports : share Conf.File
 		- exportfs CMD : 공유 자원 확인
-			\ -ar : 모든 설정내역을 다시 읽어들임(= systemctl restart nfs-server)
-			\ -v : 옵션 확인
+			# -ar : 모든 설정내역을 다시 읽어들임(= systemctl restart nfs-server)
+			# -v : 옵션 확인
 	* 클라이언트는 mount
 		- /etc/fstab : mount Conf.File
 		- showmount CMD : 공유 자원 확인
-			\ -e : 로컬 서버 공유 자원 확인
+			# -e : 로컬 서버 공유 자원 확인
 		- mount $ADDR:$DIR $LOCALDIR : NFS 서버가 공유하는 모든 자원에 대하여 로컬 디렉토리에 마운트
-			\ -o nfsvers=3 : NFSv3 으로 마운트하겠다는 옵션
+			# -o nfsvers=3 : NFSv3 으로 마운트하겠다는 옵션
 	* NFSv4 표준, NFSv3 도 같이 사용될 수 있음
 	* 구성
 		- Package : nfs-utils
 		- Daemon : 2049/TCP(nfsd)
 		- Conf.File : /etc/exports
 		- Sub.File : /etc/exports.d/*.exports
-			\ 파일 이름은 관리자 입맛대로 만들고 확장자 확인필
+			# 파일 이름은 관리자 입맛대로 만들고 확장자 확인필
 		- systemctl enable --now nfs-server
 		- firewall-cmd --permanent --add-service={nfs,mountd,rpc-bind}
-			\ mountd : nfs 의존 서비스, 20048/TCP|UDP
-			\ rpc-bind : nfs 의존 서비스
+			# mountd : nfs 의존 서비스, 20048/TCP|UDP
+			# rpc-bind : nfs 의존 서비스
 	* 공유 권한
 		- 권한 적용 순서 : 1) firewall 2) SELinux 3) 공유옵션(ro|rw) 4) 마운트옵션(ro|rw) 5) Ownership(rwx)
 		- 사용자 ID(UID, GID) 가 매칭되야 자유롭게 공유 자원 사용 가능

@@ -8,9 +8,9 @@
 		- Package : dhcp-server
 		- Daemon : 67/UDP(dhcpd_ipv4), 547(dhcpd_ipv6)
 		- Conf.File : /etc/dhcp/dhcpd.conf
-			\ 기본 설정 아무것도 없음
-			\ mv /etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.OLD
-			\ cp /var/share/doc/dhcp-server/dhcpd.conf.example /etc/dhcp/dhcpd.conf
+			# 기본 설정 아무것도 없음
+			# mv /etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.OLD
+			# cp /var/share/doc/dhcp-server/dhcpd.conf.example /etc/dhcp/dhcpd.conf
 		- systemctl enable --now dhcpd
 		- firewall-cmd --permanent --add-service={dhcp,dhcpv6}
 	* 구성(Client)

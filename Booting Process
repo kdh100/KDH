@@ -1,4 +1,4 @@
-1. Firmware 단계 - BIOS(Basic Input/Output System)
+1. Firmware 단계 """ BIOS(Basic Input/Output System) """
 	* 자체진단기능(POST(Power On Self Test))
 		- 각종 H/W(CPU, Mem, 키보드, 마우스 등)의 이상 유무 검사 및 초기화 진행
 		- 부팅 매체(HDD, CD, 플로피디스크 등) 검색 후 해당 매체의 부팅파티션 0번 섹터(MBR)에 있는 부트로더를 메모리에 올림
@@ -8,7 +8,7 @@
 	* Troubleshooting
 		- H/W 문제 발생 시 POST 단계에서 비프음 발생
 		- H/W 교체 진행
-2. 부트로더 단계 - GRUB(Grand Unified Bootloader)
+2. 부트로더 단계 """ GRUB(Grand Unified Bootloader) """
 	* /boot/grub2/grub.cfg 파일을 읽어 어떤 부팅메뉴(커널, kernel)로 부팅할 지 결정 후 메모리에 올림
 		- 자동결정 혹은 사용자선택으로 결정 후 제어권을 넘김
 		- Edit(e) 모드를 들어가서 root 권한을 가져올 수 있기 때문에 보안상 ID/PW 설정을 권장

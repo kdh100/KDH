@@ -4,9 +4,9 @@
 	* 구성
 		- Package : samba, samba-client, cifs-utils
 		- Daemon : 139,445/TCP(smbd), 137,138/UDP(nmbd)
-			\ smbd : 인증(Authentication), 인가(Authorization), 파일/프린트 공유(Sharing)
-			\ nmbd : 자원 검색(Browsing), Windows 서버 관리
-			\ 서버는 모든 포트 사용, 클라이언트는 137,138/UDP 사용
+			# smbd : 인증(Authentication), 인가(Authorization), 파일/프린트 공유(Sharing)
+			# nmbd : 자원 검색(Browsing), Windows 서버 관리
+			# 서버는 모든 포트 사용, 클라이언트는 137,138/UDP 사용
 		- Conf.File : /etc/samba/smb.conf
 		- Sub.File : /etc/samba/*
 		 - systemctl enable --now smb nmb
@@ -22,8 +22,8 @@
 2. Linux 공유 설정
 	* 서버 설정
 		- vi /etc/samba/smb.conf
-			\ security = user
-			\ [public]
+			# security = user
+			# [public]
 				~ path = /samba
 				~ writable = yes (=read_only = no)
 				~ valid users = smbuser1, smbuser2
@@ -35,11 +35,11 @@
 	* 클라이언트 설정
 		- (임시) mount.cifs //192.168.10.202/share $DIR -o user=$WINUSER
 		- (영구) vi /etc/fstab ; //192.168.10.202/share /mnt/share cifs credential=/root/cred 0 0
-			\ vi /root/cred ; username=$WINUSER ; password=$WINPASSWD
+			# vi /root/cred ; username=$WINUSER ; password=$WINPASSWD
 3. Windows 공유 설정
 	* 서버 설정
 		- 공유 서비스 기동
-			\ 네트워크 및 공유센터 > 고급공유 > 프로필(개인,공용,게스트)
+			# 네트워크 및 공유센터 > 고급공유 > 프로필(개인,공용,게스트)
 		- 네트워크 검색 체크
 		- 파일 및 프린터 공유 체크
 		- 공유 디렉토리 생성

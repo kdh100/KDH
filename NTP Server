@@ -2,7 +2,7 @@
 	* 네트워크 상 시간을 동기화하는 프로토콜
 	* 용어 : 
 		- UTC(Universal Time Coordinated) : 세계 협정 시간, 모든 시간의 기준 시간
-			\ 한국은 UTC + 9 시간
+			# 한국은 UTC + 9 시간
 		- Stratum : NTP 서버 계층 레벨
 		- Resolution : H/W 단 시간 최소 단위
 		- Precision : S/W 단 시간 최소 단위
@@ -14,4 +14,4 @@
 		- Conf.File : /etc/chrony.conf
 		- systemctl enable --now chronyd
 		- server time.bora.net iburst
-			\ iburst : 동기화를 즉시 시작
+			# iburst : 동기화를 즉시 시작

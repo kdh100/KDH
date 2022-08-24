@@ -1,4 +1,4 @@
-1. SELinux 란?		# Target Policy
+1. SELinux """ Target Policy """
 	* 파일, 디렉토리, 포트에 보안 라벨을 붙여 프로세스의 엑세스 결정 규칙의 집합
 	* 기존 Ownership(r,w,x) 보다 우선시되어 적용
 	* /etc/selinux/config
@@ -10,15 +10,15 @@
 		- enforcing <> permissive 변경 시 config 파일 수정 + setenforce 설정변경 진행
 		- getenforce(= sestatus) : 모드 확인
 		- setenforce : 모드 변경
-			\ Permissive(= 0)
-			\ Enforcing(= 1)
+			# Permissive(= 0)
+			# Enforcing(= 1)
 	* Context(= 라벨)
 		- /etc/selinux/targeted 내 파일들이 context 기본값을 규정하고 있음
 		- 기본적으로 상위 디렉토리의 context 를 넘겨받음
 		- system_u:object_r:httpd_sys_content_t:s0 /var/www/html : 
-			\ _u : user
-			\ _r : role
-			\ _t : type
+			# _u : user
+			# _r : role
+			# _t : type
 				~ /etc/selinux/config 파일 내 SELINUXTYPE 항목
 				~ targeted(default) : 명시된 context 에 따라 프로세스 엑세스 제한
 				~ minimum : 지정한 프로세스만 엑세스 제한
@@ -26,29 +26,29 @@
 			~ :s0 : security level
 	* semanage fcontext
 		- semanage fcontext -a -t httpd_sys_content_t '/custom(/.*)?' : 
-			\ -l : context 확인
-			\ -a : context 추가
-			\ -d : context 삭제
-			\ -t : context 지정
+			# -l : context 확인
+			# -a : context 추가
+			# -d : context 삭제
+			# -t : context 지정
 				~ 기존 context 외 추가하는 context 에 대한 내용은 /etc/selinux/targeted/file_context.local 에 저장
-			\ httpd_sys_content_t : 추가하려는 context 지정값
-			\ '/custom(/.*)?' : context 지정값을 적용받을 상황 구성
+			# httpd_sys_content_t : 추가하려는 context 지정값
+			# '/custom(/.*)?' : context 지정값을 적용받을 상황 구성
 				~ '루트 디렉토리 하단에 'custom' 디렉토리와 그 하단에 내용이 존재할 경우 그 내용까지 동일하게'
 		- restorecon -R /custom : 
-			\ -R(recursive) : 하단 내용까지 모두 동일하게 context 복원
-	* semanage boolean		# SELinux 정책 On|Off 스위치
+			# -R(recursive) : 하단 내용까지 모두 동일하게 context 복원
+	* semanage boolean """ SELinux 정책 On|Off 스위치 """
 		- semanage boolean -l : boolean 전체 상태 확인
 		- getsebool -a : boolean 상태 확인
 		- setsebool httpd_enable_homedirs on|off : boolean 스위치 On|Off(현재 상태)
 		- setsebool -P httpd_enable_homedirs on|off : boolean 스위치 On|Off(현재 상태 + 기본 상태)
-	* semanage port		# 서비스 포트 라벨
+	* semanage port """ 서비스 포트 라벨 """
 		- firewalld 와 중복하여 서비스 포트 관리 가능
 		- semanage port -a -t http_port_t -p tcp 82 : 
-			\ -l : 포트 확인
-			\ -p : 포트 지정
-			\ -m(modify) : 기존값 변경
+			# -l : 포트 확인
+			# -p : 포트 지정
+			# -m(modify) : 기존값 변경
 	* Troubleshooting
 		- tail /var/log/messages 로그 내용 중 'SELinux is preventing ~: sealert $SERIAL' 확인
-			\ tail /var/log/messages | grep -i 'SELinux is preventing'
+			# tail /var/log/messages | grep -i 'SELinux is preventing'
 		- sealert $SERIAL CMD 확인 시 문제 해결에 대한 제안(suggests) 세부내용 확인하여 문제 해결 시도
 		- 조치 후 미해결 시 다시 로그 분석 후 sealert 의 다른 제안 시도

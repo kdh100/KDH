@@ -3,7 +3,7 @@
 	* 구성
 		- Package : openssh, openssh-clients, openssh-askpass, openssh-server
 		- Daemon : 22/TCP(sshd)
-			\ ssh, scp, sftp 처럼 secure CMD 는 모두 22 포트 사용
+			# ssh, scp, sftp 처럼 secure CMD 는 모두 22 포트 사용
 		- Conf.File : /etc/ssh/sshd_config(sshd), /etc/ssh/ssh_config(ssh CMD)
 		- systemctl enable --now sshd
 		- firewall-cmd --permanent --add-service=sshd && firewall-cmd --reload
@@ -14,7 +14,7 @@
 		- ssh-keygen -t rsa|dsa|ecdsa|ed25519 : 인증키 생성
 		- ssh-copy-id -i ~/.ssh/id_rsa.pub $USER@SERVER : 인증키 전달
 		- 임시 인증 : ssh-agent bash ; ssh-add
-			\ Shell 을 열어놓은 해당 세션에서만 임시로 인증 추가
+			# Shell 을 열어놓은 해당 세션에서만 임시로 인증 추가
 3. 접근 제어
 	* /etc/ssh/sshd_config
 	* PermitRootLogin : 루트사용자 접근제어
@@ -30,15 +30,15 @@
 5. 원격서버 GUI 툴 실행
 	* /etc/ssh/sshd_config
 		- X11Forwarding : 원격 서버에서 GUI 방식의 툴 실행 시 클라이언트 환경에서 직접 제어할 수 있는 설정
-			\ 양단 X11 사용가능 + GUI 환경의 터미널 사용 하는 경우만 정상 작동
+			# 양단 X11 사용가능 + GUI 환경의 터미널 사용 하는 경우만 정상 작동
 6. 포트 포워딩(=Tunneling)
 	* IP/포트를 우회하면서 암호화 방식의 통신 가능
 	* Local Port Forwarding
 		- ssh -L 1234:localhost:25 -N $USER@$SERVER
-			\ 로컬(Client) 에서 원격(Server) 으로 ssh 연결(tunnel), 로컬에서 입구 포트로 통신 시 원격 출구 포트로 통신
+			# 로컬(Client) 에서 원격(Server) 으로 ssh 연결(tunnel), 로컬에서 입구 포트로 통신 시 원격 출구 포트로 통신
 	* Remote Port Forwarding
 		- ssh -R 2345:localhost:80 -N $USER@$SERVER
-			\ 로컬(Server) 에서 원격(Client) 으로 ssh 연결(tunnel), 원격에서 입구 포트로 통신 시 로컬 출구 포트로 통신
+			# 로컬(Server) 에서 원격(Client) 으로 ssh 연결(tunnel), 원격에서 입구 포트로 통신 시 로컬 출구 포트로 통신
 7. Windows 원격 데스크톱 연결
 	* Windwos(Remote) -> xrdp -> Linux(Client)(tigervnc)
 	* yum install epel-release

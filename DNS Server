@@ -4,11 +4,11 @@
 	* www.soldesk.co.kr
 		- www : Hostname
 		- soldesk.co.kr : Domainname
-			\ 루트 도메인 : .
-			\ 1차 도메인 : kr
-			\ 2차 도메인 : co
-			\ 3차 도메인 : soldesk
-			\ www.soldesk.com : FQDN(Full Qualified Domain Name)
+			# 루트 도메인 : .
+			# 1차 도메인 : kr
+			# 2차 도메인 : co
+			# 3차 도메인 : soldesk
+			# www.soldesk.com : FQDN(Full Qualified Domain Name)
 	* DNS 형태
 		- Master(Primary) : DNS 데이터 저장 및 질의에 대한 응답 진행
 		- Slave(Secondary) : DNS 데이터 저장 및 질의에 대한 응답 진행 + 도메인 데이터를 Master 로 부터 전달받음
@@ -25,25 +25,25 @@
 	* Firewalld > firewall-cmd --add-service=dns && firewall-cmd --reload
 	* 서비스 설정 파일 구성
 		- /etc/named.conf : named 설정 파일
-			\ Listening Port + allow-query + DNSSec 사용유무 확인
-			\ hint 파일 확인(type hint;)
+			# Listening Port + allow-query + DNSSec 사용유무 확인
+			# hint 파일 확인(type hint;)
 				~ /var/named/named.ca
-			\ 어떤 설정파일을 참고할 지 확인(lnclude $FILE)
+			# 어떤 설정파일을 참고할 지 확인(lnclude $FILE)
 		- /etc/named.rfc1912.zones : 존 지정 파일
-			\ Forwarding Zone + ARPA(Reversed) Zone
+			# Forwarding Zone + ARPA(Reversed) Zone
 				~ DNS, mail, ssh 는 등록하고 일반적으로 등록하진않음
-			\ 지정된 존 설정값에서 존파일 경로 확인
+			# 지정된 존 설정값에서 존파일 경로 확인
 		- named-checkconf /etc/named.conf|rfc1912.zones : 파일 무결성 체크
 	* 도메인 질의 힌트 파일 구성
 		- /var/named/named.ca : DNS 질의를 위한 상위 도메인 정보 파일
-			\ DB 내 매핑되는 도메인 데이터가 없을 경우 상위(교육 내에서는 루트 도메인으로 정함) 도메인에 쿼리 전송
-			\ 상위 도메인에 대한 매핑 정보가 hint 파일에 저장되어있음
+			# DB 내 매핑되는 도메인 데이터가 없을 경우 상위(교육 내에서는 루트 도메인으로 정함) 도메인에 쿼리 전송
+			# 상위 도메인에 대한 매핑 정보가 hint 파일에 저장되어있음
 	* 존파일 구성
 		- /var/named/named.localhost : 존파일(Forward)
 		- SOA 필드 : 존파일에 대한 정의(DNS Server, E-mail 기제)
-			\ $TTL 4 : Caching Time
+			# $TTL 4 : Caching Time
 				~ 1순위로 각 도메인 라인의 TTL, 2순위 존파일 최상단의 $TTL, 3순위 SOA 필드의 TTL
-			\ ( 2022081011 1D 1H 1W 3H )
+			# ( 2022081011 1D 1H 1W 3H )
 				~ 2022081011 : Update Serial(YYYYMMDD+$$)
 				~ 1D : Update Refresh
 				~ 1H : Update Retry
@@ -57,8 +57,8 @@
 		- NS(Name Server) : 도메인 이름
 		- A(Address) : IP 주소
 		- MX(Mail Exchage) : 메일
-			\ test.com.			IN	MX	10	mail.test.com.
-			\ mail.test.com.	IN	A		192.168.10.10
+			# test.com.			IN	MX	10	mail.test.com.
+			# mail.test.com.	IN	A		192.168.10.10
 				~ test.com 은 10 우선순위로 mail.test.com 을 MX 타입으로 매핑
 				~ mail.test.com 은 192.168.10.10 을 A 타입으로 매핑
 		- CNAME(Canonical Name) : alias 처럼 도메인을 문자열로 매핑
@@ -69,18 +69,18 @@
 		- 클라이언트로부터 받은 DNS 질의을 해당 질의에 해당하는 도메인을 담당하는 DNS 서버에게 전달하기 위한 설정
 		- Master : /etc/named.rfc1912.zones 존 정보 수정하여 Slave 정보 설정 후 업데이트(systemctl restart named)
 		- Slave : /etc/named.rfc1912.zones 존 정보 수정하여 Master 정보 설정 후 업데이트(systemctl restart named)
-			\ Master 로부터 전달받은 존파일에 대해 SOA 필드의 Serial 값이 Origin Serial 보다 크면 업데이트
+			# Master 로부터 전달받은 존파일에 대해 SOA 필드의 Serial 값이 Origin Serial 보다 크면 업데이트
 	* RNDC(Remote Name Daemon Control)
 		- 원격 클라이언트가 DNS 서버의 named 서비스를 관리하기 위한 명령어
 		- 별도의 보안키를 사용해 해당 명령어의 접근이 가능
 		- rndc-confgen : 보안키 생성
-			\ -a : 보안키 파일 생성
-			\ /etc/rndc.key : 보안키 파일 수정 필요(rndc-confgen 의 key 값을 편집)
+			# -a : 보안키 파일 생성
+			# /etc/rndc.key : 보안키 파일 수정 필요(rndc-confgen 의 key 값을 편집)
 		- /etc/rndc.conf : RNDC 서비스를 위한 설정 파일
-			\ key 값과 옵션 값을 설정(default-server;원격 서버, default-port;RNDC 서비스포트)
+			# key 값과 옵션 값을 설정(default-server;원격 서버, default-port;RNDC 서비스포트)
 		- /etc/named.conf : RNDC 서비스를 추가
-			\ include "/etc/rndc.key";
-			\ control 내용의 allow(원격 서버), key 값 설정
+			# include "/etc/rndc.key";
+			# control 내용의 allow(원격 서버), key 값 설정
 	* nsupdate : CLI 방식으로 존파일 수정 및 업데이트 진행하는 명령어
 4. DNS 보안
 	* /etc/named.rfc1912.zones 파일을 이용한 보안 설정

@@ -28,7 +28,7 @@
 		- vi /etc/vsftpd/vsftpd.conf
 		- idle_session_timeout, data_connection_timeout 을 9000 초로 변경
 		- systemctl restart vsftpd
-	* 배너 설정(배너가 최우선순위)
+	* 배너 설정 """ 배너가 최우선순위 """
 		- vi /etc/vsftpd/vsftpd.conf
 		- banner_file=/etc/vsftpd/banner.txt
 		- systemctl restart vsftpd

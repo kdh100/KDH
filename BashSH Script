@@ -82,7 +82,57 @@
 				~ tee : 출력값을 파일로 생성
 				~ -a : 내용 추가
 3. Variable(변수)
-	* 
+	* 변수 종류
+		- 지역변수 : VAR=5
+		- 환경변수 : export VAR=5
+		- 특수변수 : $, ?, !, *, #, @, ...
+	* 변수 선언
+		- 선언 : VAR=5 ; export VAR
+			# 현재 쉘 뿐만 아니라 다른 쉘에서도 해당 변수가 적용됨
+		- 확인 : echo $VAR
+			# 선언된 변수는 사용 시 반드시 변수 앞에 '$' 추가
+		- 해제 : unset VAR
+	* 특수변수
+		- $$ : 현재 PID 번호(ex_ 임시파일 생성 시 사용)
+		- $! : 바로 이전에 수행된 백그라운드 프로세스 PID 번호
+		- $? : 바로 이전에 수행된 명령어의 return 값(0 ~ 255; 0 은 정상종료)
+		- $*, $@ : 모든 인자
+		- $# : 인자 개수
+		- $0 : 프로그램 이름
+		- $'N' : 'N'째 인자
+	* 메타캐릭터(Metacharacter)
+		- '' : 쉘이 해석할 수 없도록 차단
+		- "" : 쉘이 해석할 수 없도록 차단(except $, ``, \)
+		- `` : CMD
+		- \ : escape character
+		- ; : 한 라인에 여러개의 CMD 수행
+	* 별칭(Alias)
+		- alias $NAME='CMD'
+		- alias $NAME
+		- unalias $NAME
+	* 대표적인 환경파일
+		- /etc/profile
+		- ~/.bash_profile
+		- ~/.bashrc
+	* Here Documentation
+		- 
+	* 그룹화(Grouping)
+		- 
+	* 조건부실행(Condition Execution)
+		- 
+	* 경로(File/Directory Path)
+		- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 

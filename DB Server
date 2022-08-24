@@ -13,12 +13,12 @@
 		- systemctl enable --now mariadb
 		- firewall-cmd --permanent --add-service=mysql
 		- mysql_secure_installation : 초기 설정
-			\ Enter current password for root (enter for none): <ENTER>
-			\ Set root password? [Y/n] Y
-			\ Remove anonymous users? [Y/n] Y
-			\ Disallow root login remotely? [Y/n] Y
-			\ Remove test database and access to it? [Y/n] Y
-			\ Reload privilege tables now? [Y/n] Y
+			# Enter current password for root (enter for none): <ENTER>
+			# Set root password? [Y/n] Y
+			# Remove anonymous users? [Y/n] Y
+			# Disallow root login remotely? [Y/n] Y
+			# Remove test database and access to it? [Y/n] Y
+			# Reload privilege tables now? [Y/n] Y
 	* 접속
 		- Local : mysql -u'$USER' -p'$PASS'
 		- Remote : mysql -h $ADDR -p $PORT -u'$USER' -p'$PASS'
@@ -35,7 +35,7 @@
 		- desc $TABLE : 테이블 양식(form) 확인
 	* Table 생성
 		- create table $TABLE (name char(20), passwd char(30), ...);
-			\ name char(20), : 열에 들어갈 항목들 지정
+			# name char(20), : 열에 들어갈 항목들 지정
 	* Table 이름변경
 		- rename table $TABLE to $TABLE;
 	* Table 삭제
@@ -45,11 +45,11 @@
 		- select * from $TABLE;
 		- select $OBJECT from $TABLE;
 		- select * from $TABLE where $OBJECT=$VALUE;
-			\ = : 같음
-			\ <> : 같지않음
-			\ BETWEEN : 포함 범위 사이
-			\ LIKE : 패턴 검색
-			\ MAIN : 한 열에 대해 가능한 값을 여러개 지정
+			# = : 같음
+			# <> : 같지않음
+			# BETWEEN : 포함 범위 사이
+			# LIKE : 패턴 검색
+			# MAIN : 한 열에 대해 가능한 값을 여러개 지정
 	* Contents 입력
 		- insert into $TABLE ($OBJECT, ...) values ($VALUE, ...);
 	* Contents 수정
@@ -72,8 +72,8 @@
 	* Backup Target : /var/lib/mysql
 	* Backup Method
 		- Logical Backup
-			\ mysqldump -u'root' -p $DB > /backup/$DB.dump
-			\ mysqldump -u'root' -p --add-databases > /backup/FullDB.dump
-			\ mysqldump -u'root' -p $DB --add-drop-database --add-drop-table > /backup/$DB.dump
+			# mysqldump -u'root' -p $DB > /backup/$DB.dump
+			# mysqldump -u'root' -p --add-databases > /backup/FullDB.dump
+			# mysqldump -u'root' -p $DB --add-drop-database --add-drop-table > /backup/$DB.dump
 		- Logical Restore
-			\ mysql -u'root' -p $DB < /backup/$DB.dump
+			# mysql -u'root' -p $DB < /backup/$DB.dump

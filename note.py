@@ -903,7 +903,12 @@ print(decbook)
     - (객체).write(파일내용) : 새로운 파일에 들어갈 파일 내용 추가
     - (객체).close() : 새로운 파일 쓰기 종료
     - (객체) = open("파일이름", "r") : 파일 읽기
-    - print((객체).read()) : 열린 파일의 읽어들인 내용을 프린트로 출력
+    - (객체).read() : 파일의 모든 문자열을 읽어 객체에 저장
+    - (객체).readline() : 파일의 첫번째 줄을 읽어 객체에 저장
+        # read, readline 의 괄호 안에 숫자 입력시 해당 문자열까지만 읽음
+    - (객체).readlines() : 파일의 모든 줄을 읽어 각각의 줄을 요소로 객체에 저장 
+        # readlines 의 결과는 리스트 형식의 데이터로 인덱스를 이용해 문자열 추출 가능(ex_ [0][0:5])
+    - os.remove(filename) : 위에서 생성한 파일을 삭제할 때 사용 
   # 모드 생략시 기본값으로 읽기전용,텍스트 모드로 파일 생성 후 리턴
   # 모드 종류 :
     -b : binary
@@ -914,7 +919,7 @@ print(decbook)
     -x : empty(null)
 """
 """
-다양한 외장 함수
+다양한 기본 외장 함수
 - sys.
 - pickle.
 - os.
@@ -945,6 +950,7 @@ print(decbook)
 """
 
 # 'mymodule.py' 라는 신규 파일에 아래 내용이 있다고 가정
+"""
 # Object Declaration
 person = {"name": "John", "age": "28", "Contry": "Korean"}
 # Variable Declaration
@@ -952,6 +958,7 @@ man = True
 # Function Declaration
 def myfun(a, b):
     return a + b
+"""
 
 # 위에서 만들어진 파일을 작업하고 있는 현재 파일(환경)에 import 시켜 불러와서 쓸 수 있음
 import mymodule
@@ -962,3 +969,89 @@ marry = mymodule.myfun(28, 32)
 from mymodule import person, man
 people = person["age"]  # 내 전역 변수 혹은 함수처럼 직접 끌어다 쓸 수 있다
 gender = man
+
+!# sys module
+
+"""
+파이썬 해석기가 제공하는 변수, 함수를 제어할 수 있는 방법을 제공한다.
+- sys.ps1 : 대화형 프롬프트
+- sys.argv : 프로그램 인자
+- sys.exit : 프로그램 종료
+- sys.path : 모듈 경로
+- sys.platform : 파이썬 플랫폼
+- sys.version : 파이썬 버전
+"""
+
+import sys
+sys.path.append("/root/mymod")  # 모듈 경로 추가
+
+!# os module
+
+"""
+OS 를 제어할 수 있는 방법을 제공한다.
+- os.environ : 시스템 환경변수 확인
+- os.chdir() : 디렉토리 위치 변경
+- os.getcwd() : 현재 작업 디렉토리 확인
+- os.listdir() : 디렉토리 위치 리스트
+- os.system() : 시스템 명령어 호출
+"""
+
+!# glob module
+
+"""
+- glob.glob($DIR/$FILE) : 디렉토리 내 모든 파일들을 읽어서 리턴한다. 
+"""
+
+!# tempfile module
+
+"""
+- tempfile.mktemp() : 중복되지 않는 임시 파일의 이름을 무작위로 만들어서 리턴한다.
+"""
+
+!# time module
+
+"""
+시간과 관련된 모듈이다.
+- time.time() : 1970.01.01 00:00:00 기준, 지난 시간을 초 단위로 리턴한다.(= UNIX TIME)
+- time.strftime() : 시간 출력 형식을 지정한다.
+ # %c : 날짜, 시간 출력
+ # %x : 설정된 로케일 기반 날짜 출력
+ # %X : 설정된 로케일 기반 시간 출력
+ # %Z : 시간대 출력
+- time.sleep() : 일정한 시간동안 대기한다.
+"""
+
+!# re module
+
+"""
+정규표현식을 사용하기 위한 모듈이다.
+- 이스케이프 기호
+ # \\ : 역슬래시
+ # \d : 숫자
+ # \D : 문자
+ # \s : 공백
+ # \S : 데이터
+ # \w : 숫자 또는 문자
+ # \W : 숫자 또는 문자가 아닌 것
+ # \A : 문자열 처음
+ # \Z : 문자열 마지막
+- 플래그
+ # I : 대소문자 구별하지 않는다.
+ # M : ^ 가 문자열 맨 처음, 라인의 맨 처음에 매치된다.
+ # X : 공백은 무시한다.
+- re.complie(pattern[, 플래그]) : 패턴을 컴파일하여 정규식 객체 리턴
+- re.match(pattern, string[, 플래그]) : 문자열의 처음부터 정규식과 매치되는지 확인
+- re.search(pattern, string[, 플래그]) : 문자열 전체 검색하여 정규식과 매치되는지 확인
+- re.split(pattern, string[, maxsplit=0]) : 패턴을 구분자로 문자열 분리하여 리스트로 리턴
+- re.findall(pattern, string[, 플래그]) : 정규식과 매치되는 모든 문자열 리스트로 리턴
+"""
+
+!# random module
+
+"""
+무작위 값을 출력해준다.
+- random.random() : 랜덤값 출력한다.
+- random.randrange() : 지정된 범위에서 랜덤값 출력한다.
+- random.shuffle() : 순서형 자료를 랜덤으로 섞어준다. 
+- random.choice() : 아무 원소나 하나 뽑아준다.
+"""

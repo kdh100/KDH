@@ -206,11 +206,11 @@
 		- 식을 평가 후 논리값 반환, 종료 상태가 0 이면 TRUE, 0 이 아니면 FALSE
 			# [ -f /etc/passwd ]
 			# test -f /etc/passwd
-				~ -e : 대상 존재 여부
 				~ -f : 파일
 				~ -d : 디렉토리
+				~ -s : not null
 				~ -r|w|x : 읽기/쓰기/실행 권한
-				~ -s : 내용 존재
+
 
 
 

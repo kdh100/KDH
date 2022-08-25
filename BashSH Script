@@ -67,7 +67,6 @@
 		- -l : 파일의 총 행(line) 개수
 		- -w : 파일의 총 단어(word) 개수
 		- -c : 파일의 총 문자(character) 개수
-2. Shell 특성
 	* Redirection
 		- stdin(keyboard input) : 0
 			# mailx -s "[ OK ] server1" admin@example.com < report.txt
@@ -81,7 +80,7 @@
 			# fsck -y /dev/sdb1 2>&1 | tee -a fsck.log
 				~ tee : 출력값을 파일로 생성
 				~ -a : 내용 추가
-3. Variable(변수)
+2. Variable(변수)
 	* 변수 종류
 		- 지역변수 : VAR=5
 		- 환경변수 : export VAR=5
@@ -131,18 +130,87 @@
 			# [ -f /etc/passwd ] && echo "OK" || echo "FAIL"
 				~ 조건문은 '[,]' 으로 묶어서 선언
 	* 경로(File/Directory Path)
-		- 
-
-
-
-
-
-
-
-
-
-
-
+		- 등록된 변수의 경로와 파일 이름을 분리하여 출력
+		- dirname $DIR : 등록된 변수의 경로 출력
+		- basename $DIR : 등록된 변수의 파일 출력
+			# DIR1=/etc/passwd
+			# echo $(dirname $DIR1)/$(basename $DIR1) = /etc/passwd
+	* 재평가(Evaluation)
+		- 해석이 안되는 구문을 원래의 CMD 가 정상 해석 할 수 있게 한 번 재해석하여 결과를 원래 CMD 에 올려줌
+		- eval CMD + other CMD
+			# A=B ; B=C
+			# echo $A ; echo $B
+			# echo $$A = (expect) $(B) -> C | (output) 'present shell PID' + A
+			# eval echo \$$A
+				~ eval interpreted -> echo \$(B)
+				~ bash interpreted -> echo $B = C
+3. vscode
+	* Installation
+		- Microsoft GPG key import
+			# rpm --import https://packages.microsoft.com/keys/microsoft.asc
+		- repolist create
+			# vi /etc/yum.repos.d/vscode.repo
+			  [code]
+			  name=Visual Studio Code
+			  baseurl=https://packages.microsoft.com/yumrepos/vscode
+			  enabled=1
+			  gpgcheck=1
+			  gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+		- package install
+			# yum install code -y
+		- vscode run
+			# cd ; mkdir -p vscode/shellproject
+			# code --no-sandbox --user-date-dir="/root/vscode"
+				~ vi ~/.bashrc
+				~ alias code='code --no-sandbox --user-date-dir="/root/vscode"'
+				~ . ~/.bashrc
+	* Setting
+		- 작업 공간 선택
+			# Open Folder > /root/vscode/shellproject
+		- 확장 프로그램 설치
+			# Shell Debug, Code Runner, Shellcheck, shellman
+			# Korean Language Pack for Visual Studio Code
+4. Shell Script
+	* 실행 방법
+		- bash -x test.sh
+			# 서브 shell 실행시켜 그 위에서 스크립트를 실행
+			# 읽기 권한만 있어도 실행 가능
+		- . test.sh(= source test.sh)
+			# 현재 shell 위에서 스크립트를 실행
+			# 읽기 권한만 있어도 실행 가능
+		- chmod 755 test.sh && . test.sh
+			# 권한 변경하여 사용
+			# 매직넘버가 포함된 스크립트 사용시 권한 변경 필수
+	* PATH 변수 설정
+		- vi ~/.bash_profile
+			# PATH=$PATH:/root/vscode/shellproject(:$LOCATE; 추가하고싶다면 콜론을 붙여 경로 추가 지정)
+			# export PATH
+	* 매직넘버(#!/bin/bash)
+		- 커널에게 실행 프로그램으로 인식시키는 구문, 항상 스크립트 첫 행에 있어야함
+	* 주석(comment)
+		- # : 한 줄 주석
+		- : << EOF ~ EOF : 여러 줄 주석
+	* echo CMD
+		- 내용 출력
+			# echo -n "current time : " ; date
+				~ -n : 개행문자 무시, 뒤의 date 는 아래 행에 출력되어야 하지만 echo 와 같은 행에서 출력됨
+	* read CMD
+		- 입력(input) 받아오기
+			# read $ : stdin 을 변수($) 에 저장
+			# read $ $ $ : stdin 의 단어들을 각 변수($) 에 순서대로 저장하고 나머지는 마지막 변수($) 에 저장
+	* expr CMD
+		- 정수 산술 연산
+			# expr $ +|-|\*|/ 2
+				~ 소수값은 버림
+	* test(= [ ]) CMD
+		- 식을 평가 후 논리값 반환, 종료 상태가 0 이면 TRUE, 0 이 아니면 FALSE
+			# [ -f /etc/passwd ]
+			# test -f /etc/passwd
+				~ -e : 대상 존재 여부
+				~ -f : 파일
+				~ -d : 디렉토리
+				~ -r|w|x : 읽기/쓰기/실행 권한
+				~ -s : 내용 존재
 
 
 

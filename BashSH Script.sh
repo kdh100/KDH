@@ -171,6 +171,7 @@
 			# Shell Debug, Code Runner, Shellcheck, shellman
 			# Korean Language Pack for Visual Studio Code
 4. Shell Script
+	* 스크립트는 반복 작업을 쉽고 편하게 하기 위해 프로그래밍된 파
 	* 실행 방법
 		- bash -x test.sh
 			# 서브 shell 실행시켜 그 위에서 스크립트를 실행
@@ -206,11 +207,46 @@
 		- 식을 평가 후 논리값 반환, 종료 상태가 0 이면 TRUE, 0 이 아니면 FALSE
 			# [ -f /etc/passwd ]
 			# test -f /etc/passwd
+			# 파일 연산자
 				~ -f : 파일
 				~ -d : 디렉토리
 				~ -s : not null
 				~ -r|w|x : r|w|x 권한
+			# 문자열 연산자
+				~ = : 같다
+				~ != : 같지 않다
+				~ -z : 길이가 0
+				~ -n : 길이가 1 이상 (= ! -z string)
+			# 산술 연산자 """ expr """
+				~ -eq : 같다
+				~ -ne : 같지 않다
+				~ -lt : 미만
+				~ -le : 이하
+				~ -gt : 초과
+				~ -ge : 이상
+				~ -a : AND
+				~ -o : OR
+			# 논리 부정 연산자(NOT)
+				~ ! -z string
+		- 연산자 우선순위는 " () > ! > -a > -o "
+	* if 조건문
+		- 예문
+		if condition1; then
+			statement
+		elif condition2; then
+			statement
+		else
+			:
+		fi
+	* case 조건문
+		- 
 
+			
+			
+			
+		
+			
+			
 
 
 

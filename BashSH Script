@@ -229,20 +229,58 @@
 			# 논리 부정 연산자(NOT)
 				~ ! -z string
 		- 연산자 우선순위는 " () > ! > -a > -o "
+5. 조건문(if, case)
 	* if 조건문
 		- 예문
-		if condition1; then
-			statement
-		elif condition2; then
-			statement
-		else
-			:
-		fi
+			if condition1; then
+				statement
+			elif condition2; then
+				statement
+			else
+				:
+			fi
 	* case 조건문
-		- 
-
-			
-			
+		- 예문
+			case $VAR in
+				1) context ;;
+				2) context 
+			   	   context ;;
+				3 | 3 | 3) context;;
+				*) context ;;
+					echo "asdfasdf"
+					exit 1 ;;
+			esac
+6. 반복문(for, while, untile)	
+	* for 반복문
+		- 범위가 정해져있을 때
+		- 예문
+			for $VAR in $VARLIST
+			do
+				context
+			done
+	* while 반복문
+		- 범위가 정해져있지 않을때
+		- 예문
+			while $CONDITION
+			do
+				context
+			done
+		- shift CMD 와 같이 사용
+			while [ $# -gt 0 ]
+			do
+				echo "$# : $*"
+				shift
+			done
+7. 루프 제어
+	* shift CMD
+		- 인자를 하나씩 줄여가는 명령어
+		- 기본값 1, 인자값에 따라 그만큼 왼쪽에서 오른쪽으로 줄여감
+	* break CMD
+		- 반복 구문에서 바로 done 으로 탈출하여 종료시키는 명령어
+	* continue CMD
+		- 조건에 부합하면 상위 조건으로 다시 돌려보내는 명령어
+			# continue 1 이면 현재조건(3) 바로 전의 조건(2), 2 이면 또 그 위의 조건(1)
+	
 			
 		
 			

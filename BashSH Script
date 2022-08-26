@@ -280,3 +280,29 @@
 	* continue CMD
 		- 조건에 부합하면 상위 조건으로 다시 돌려보내는 명령어
 			# continue 1 이면 현재조건(3) 바로 전의 조건(2), 2 이면 또 그 위의 조건(1)
+8. 함수(function)
+	* 선언
+		- fun() { CMD; CMD; }
+		- function fun { CMD; CMD; }
+	* 확인
+		- typeset -f
+	* 실행
+		- fun
+	* 해제
+		- unset -f fun
+9. 시그널 트랩(Signal Trapping)
+	* 시그널을 무시하거나, 특정 시그널에 맞춰 내가 원하는 동작을 하게끔 제어(Signal Control)
+	* 시그널 무시
+		- trap ' ' 2 9 15
+		- trap 'echo "<Ctrl + C> will not terminate."' 2
+
+
+
+
+
+
+
+
+
+
+

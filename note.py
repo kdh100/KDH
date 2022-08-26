@@ -849,7 +849,9 @@ def lotto_number(max_choice):
         print(k, end=" ")
 lotto_number(6)
 
-x = lambda a, b: a * b  # 람다 함수; 한줄 짜리 함수
+!# 람다 함수(한 줄 짜리 함수)
+
+x = lambda a, b: a * b
 print(x(2, 4))
 
 results = map(lambda x: (x * x), (0, 1, 2, 3))
@@ -950,7 +952,6 @@ print(decbook)
 """
 
 # 'mymodule.py' 라는 신규 파일에 아래 내용이 있다고 가정
-"""
 # Object Declaration
 person = {"name": "John", "age": "28", "Contry": "Korean"}
 # Variable Declaration
@@ -958,7 +959,6 @@ man = True
 # Function Declaration
 def myfun(a, b):
     return a + b
-"""
 
 # 위에서 만들어진 파일을 작업하고 있는 현재 파일(환경)에 import 시켜 불러와서 쓸 수 있음
 import mymodule
@@ -1055,3 +1055,71 @@ OS 를 제어할 수 있는 방법을 제공한다.
 - random.shuffle() : 순서형 자료를 랜덤으로 섞어준다. 
 - random.choice() : 아무 원소나 하나 뽑아준다.
 """
+
+!# Class(분류) & Instance(객체; Object)
+
+"""
+class 는 instance 들의 공통점에 대한 정의다.
+mothod 는 class 안에서 정의된 함수를 뜻한다.
+- class $NAME:
+- instance = class()
+- instance.method
+ # 클래스 안의 함수(메소드)는 self 가 항상 첫번째 패러미터
+   = 현재 class 의 instance 를 참고
+"""
+
+class Singer:
+    def sing(self)
+        return "Lalala"
+teaji=Singer()
+print(teaji.sing())
+ricky=Singer()
+print(ricky.sing())
+
+class MyClass:
+    x = 5
+print(MyClass)
+p1=MyClass()
+print(p1.x)  # class 안에서 정의된 변수도 메소드처럼 사용해서 불러옴
+
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def myfun(self):
+        print("hello, my name is " + self.name)
+        print("i'm %d years old." % self.age)
+
+p1=Person("John", 42)  # instance(p1) 안에 name, age 값을 입력
+p1.myfun()  # instance(p1) 안에 class(Person) 로부터 학습한 메소드(myfun) 를 사용
+p1.age = 29  # instance(p1) 안에 'self.age = age' 값을 변경
+del p1.age  # instance(p1) 안에 __init__ 로 정의된 메소드의 내부 인자값 중 age 를 삭제
+del p1  # instance 삭제
+
+class Sorceress:  # 직업 정의
+    str = 5
+    dex = 10
+    vit = 15
+    erg = 30
+    def attack(self):  # 공격 기술을 정의
+        return '=> iceorb'
+    def levelup(self):  # 레벨업 할 때 상승되는 스탯 증감폭 정의
+        self.str += 1
+        self.vit += 4
+
+!# Parent(부모) & Child(자식) Class
+
+class Myself:  # parent class 선언
+    def __init__(self, fname, lname):
+        self.firstname = fname
+        self.lastname = lname
+    def printname(self):
+        print(self.firstname, self.lastname)
+x = Myself("Dongha", "Kim")
+x.printname()
+
+class Clone(Myself):  # child class 선언; 나는 부모로부터 내용을 상속받아 이미 내용이 있다.
+    pass  # 상속받은 것 외에 추가적인 선언이 필요없다면 패스하겠다.
+
+x = Clone("Mayor", "John")
+x.printname()

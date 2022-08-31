@@ -538,31 +538,281 @@ do
     mv $D_WORK/$FILE $TRANS
 done
 =======================================================================
-17. 자동 마운트
+17. 자동 마운트(function)
+=======================================================================
+#!/bin/bash
 
+# Function Definitions
+Partition(){
+echo "====================="
+echo "Create disk partition"
+echo "====================="
+echo ; echo -n "Which disk you want to create partition? : "
+read DISK
+parted $DISK mklabel msdos
+echo "$DISK has labeled in msdos."
+sleep 1
+echo ; echo -n "How many you want to create partition? : "
+read P_NUMBER
+case $P_NUMBER in
+    1) parted $DISK mkpart primary 2048s 100% ;
+       echo "$(echo $DISK$P_NUMBER) Disk has created." ;;
+    2) parted $DISK mkpart primary 2048s 50% ;
+       parted $DISK mkpart primary 50% 100% ;
+       echo "$(echo $DISK$P_NUMBER) Disk has created." ;;
+    3) parted $DISK mkpart primary 2048s 33% ;
+       parted $DISK mkpart primary 33% 67% ;
+       parted $DISK mkpart primary 67% 100% ;
+       echo "$(echo $DISK$P_NUMBER) Disk has created." ;;
+    4) parted $DISK mkpart primary 2048s 25% ;
+       parted $DISK mkpart primary 25% 50% ;
+       parted $DISK mkpart primary 50% 75% ;
+       parted $DISK mkpart primary 75% 100% ;
+       echo "$(echo $DISK$P_NUMBER) Disk has created." ;;
+    *) echo "Wrong choice. Please retry." ;;
+esac
+echo
+Goback
+}
+Filesystem(){
+echo "========================"
+echo "Filesystem configuration"
+echo "========================"
+echo ; echo -n "Which disk you want to create filesystem? : "
+read P_DISK
+echo ; echo -n "Which filesystem?(ext4/xfs) : "
+read FILESYSTEM
+case $FILESYSTEM in
+    "ext4") mkfs.ext4 $P_DISK ;
+            echo "$P_DISK Disk has created filesystem in ext4." ;;
+    "xfs") mkfs.xfs $P_DISK ;
+           echo "$P_DISK Disk has created filesystem in xfs." ;;
+    *) echo "Wrong choice. Please retry." ;;
+esac
+echo
+Goback
+}
+Mountpoint(){
+echo "===================================="
+echo "Mount Point Create (/mnt/mount[0-9])"
+echo "===================================="
+echo ; echo -n "How many you want to creat mount point? : "
+read M_NUM
+for i in $(seq 1 $M_NUM)
+do
+[ -d /mnt/mount$i ] && echo "Directory already exists!" \
+                    || mkdir -p /mnt/mount$i
+done
+echo
+Goback
+}
+Mount(){
+echo "====================="
+echo "Mount & Configuration"
+echo "====================="
+echo ; echo -n "Which disk you want to mount? : "
+read M_DISK
+echo ; echo -n "Which point you want to mount? : "
+read M_POINT
+mount $M_DISK $M_POINT
+if [ $? -eq 0 ] ; then
+    echo "Mount filesystem done."
+else
+    echo "Mount filesystem failed."
+    exit 2
+fi
+FS=$(df -hT | grep /dev/sdc1 | awk '{print $2}')
+cat << EOF >> /etc/fstab
+# Configured by <mount.sh>_echo `date +%Y_%m_%d` `date +%T` `date +%Z`
+$M_DISK    $M_POINT    $FS    defaults    0 0
+:wq!
+EOF
+echo "Booting Mount Configuration done."
+echo
+Goback
+}
+Initialize(){
+echo "==================="
+echo "Disk Initialization"
+echo "==================="
+echo ; echo -n "Which base disk you want to initialize? : "
+read R_DISK
+dd if=/dev/zero of=$R_DISK bs=4096
+echo
+Goback
+}
+Menu(){
+cat << EOF
+========================
+    1) Verify
+    2) Partition
+    3) Filesystem
+    4) Mount
+    5) Initialize
+    6) Exit
+========================
+EOF
+}
+M_Menu(){
+cat << EOF
+================================
+    1) Mount Point Create
+    2) Mount & Configuration
+    3) Go Back..
+================================
+EOF
+}
+V_Menu(){
+cat << EOF
+====================================
+    1) Block deivces list
+    2) Filesystem disk usage
+    3) Booting Mount Environment
+    4) Go Back..
+====================================
+EOF
+}
+V_Menu_1(){
+echo "=================="
+echo "Block devices list"
+echo "=================="
+echo ; lsblk -fp
+echo
+Goback
+}
+V_Menu_2(){
+echo "====================="
+echo "Filesystem disk usage"
+echo "====================="
+echo ; df -hT
+echo
+Goback
+}
+V_Menu_3(){
+echo "========================="
+echo "Booting Mount Environment"
+echo "========================="
+echo ; cat /etc/fstab | grep '^/dev'
+echo
+Goback
+}
+Exit(){
+echo ; echo "Have a nice day :)" ; echo
+sleep 1.2
+exit 0
+}
+Goback(){
+echo -n "Press any keys to return previous menu..."
+read ANYKEY
+case $ANYKEY in
+    *) ;;
+esac
+}
+=======================================================================
+18. 자동 마운트(active)
+===========================================================================
+#!/bin/bash
+BASEDIR=/root/vscode/bin
+source $BASEDIR/fmount.sh
 
+while true
+do
+clear ; Menu
+echo ; echo -n "Enter your choice : "
+read M_CHOICE
+case $M_CHOICE in
+    1) while true
+       do
+       clear ; V_Menu
+       echo ; echo -n "What is you want to verify? : "
+       read V_CHOICE
+       case $V_CHOICE in
+           1) clear ; V_Menu_1 ;;
+           2) clear ; V_Menu_2 ;;
+           3) clear ; V_Menu_3 ;;
+           4) echo "Go to previous menu..." ; sleep 1 ; continue 2 ;;
+           *) echo ; echo "Wrong Choice. Please retry." ; sleep 1 ;;
+       esac
+       done ;;
+    2) clear ; Partition ;;
+    3) clear ; Filesystem ;;
+    4) while true
+       do
+       clear ; M_Menu
+       echo ; echo -n "What is you choose to mount? : "
+       read M_CHOICE
+       case $M_CHOICE in
+           1) clear ; Mountpoint ;;
+           2) clear ; Mount ;;
+           3) echo "Go to previous menu..." ; sleep 1 ; continue 2 ;;
+           *) echo ; echo "Wrong Choice. Please retry." ; sleep 1 ;;
+       esac
+       done ;;
+    5) clear ; Initialize ;;
+    6) Exit ;;
+    *) echo ; echo "Wrong choice. Please retry." ; sleep 1 ;;
+esac
+done
+===========================================================================
+19. 진행상황표시
+====================================
+#!/bin/bash
 
+for i in $(seq 1 10)
+do
+    PERCENT=$(expr $i \* 10)
+    echo -ne "$PERCENT%|"
 
+    for j in $(seq $i)
+    do
+        echo -ne "="
+    done
 
+    if [ $i -ne 10 ] ; then
+        echo -ne ">"
+    else
+        echo -ne "| complete\n"
+    fi
 
+    echo -ne "\r"
+    sleep 1
+done
+====================================
+20. 서버 정보 자동파악
+============================================================================
+#!/bin/bash
 
+export LANG=en_US.utf-8
 
+YOURNAME="My. KIM"
+OS=$(cat /etc/redhat-release)
+KERNEL=$(uname -sr)
+CPUNUM=$(lscpu | grep '^CPU(s):' | awk '{print $2}')
+CPUTYPE=$(echo $(lscpu | grep '^Model name:') | cut -d' ' -f 3-)
+MEM=$(free -h | grep '^Mem:' | awk '{print $2}')
+DISKNUM=$(lsblk -pS | awk '$3 == "disk" {print $3}' | wc -l)
+IP=$(ip addr show ens160 | grep 'inet ' | awk '{print $2}')
+GW=$(ip route | grep default | awk '{print $3}')
+DNS=$(cat /etc/resolv.conf | grep nameserver | head -1 | awk '{print $2}')
 
+cat << EOF
 
+Server Vul. Checker Version 1.0
 
+Date: $DATE
+NAME: $YOURNAME
 
+(1) Server Information
+============================================
+OS      : $OS
+Kernel  : $KERNEL
+CPU     : $CPUNUM ($CPUTYPE)
+MEM     : $MEM
+DISK    : $DISKNUM
+<Network>
+IP/NET  : $IP
+GW      : $GW
+DNS     : $DNS
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+EOF
+============================================================================

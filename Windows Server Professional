@@ -3,16 +3,41 @@
 	* [Ctrl] + E : 파일 탐색기
 	* [Ctrl] + R : 실행
 	* [Ctrl] + S : 검색
+	* [Ctrl] + [Shift] + [ESC] : 작업 관리자
 	* 
 2. 명령
+	* ServerManager : 서버 관리자
+	* gpedit.msc : 로컬 그룹 정책 편집기
+	* msconfig : 시스템 구성
+	* lusrmgr.msc : 로컬 사용자 및 그룹
 	* 
 3. 초기구성
 	* '서버관리자' 관리 > 속성 > 로그온 시 서버 관리자 자동 시작 안함
-	* VMware Tools 프로그램 설치	
 	* 네트워크 설정
-	* 
-
-
+	* 디스플레이 끄기 기능 중지
+	* 화면 해상도 확인
+	* IE 보안 강화 구성 사용 안함
+	* 암호 사용 기간 제한 없음
+	* Windows 업데이트 기능 확인하지 않음
+	* 바탕화면 배경 색상 변경
+	* VMware Tools 프로그램 설치(재부팅)
+	* 컴퓨터 이름 변경(재부팅)
+4. 실습
+	* administrator 계정 복구
+		- Windows CD 로 부팅
+		- 설치 초기 화면에서 컴퓨터 복구 선택
+		- 옵션 선택 화면에서 문제 해결 선택
+		- Command Prompt
+			# D:
+			# cd Windows\System32
+			# move Utilman.exe Utilman2.exe
+			# copy cmd.exe Utilman.exe
+		- OS 재부팅
+		- 로그인 창 화면에서 접근 > Command Prompt
+		- C:\Windows\System32> net user Administrator /active:yes
+		- C:\Windows\System32> net user Administrator *
+		- 새로운 암호 입력
+		- OS 재부팅
 
 
 

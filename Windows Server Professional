@@ -48,6 +48,8 @@
 		- -c : 코멘트
 	<tool>
 	* mstsc : 원격 데스크톱 연결
+	* mrt : 악성 소프트웨어 제거
+	* dfrgui : 디스크 조각모음
 	* mspaint : 그림판
 	* notepad : 메모장
 	* calc : 계산기
@@ -64,7 +66,6 @@
 	* fsmgmt.msc : 공유 폴더 관리
 	* eventnwr.msc : 이벤트 뷰어
 	* secpol.msc : 로컬 보안 정책
-	* dfrg.msc : 디스크 조각모음
 	* certmgr.msc : 인증서 관리
 	<control; 제어판>
 	* contrl : 제어판

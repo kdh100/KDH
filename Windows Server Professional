@@ -51,6 +51,7 @@
 	* mspaint : 그림판
 	* notepad : 메모장
 	* calc : 계산기
+	* taskmgr : 작업 관리자(= [Ctrl] + [Alt] + [Delete])
 	<.msc; 관리도구>
 	* servermanager : 서버 관리자
 	* msconfig : 시스템 구성
@@ -70,7 +71,6 @@
 	* ncpa.cpl : 네트워크 연결
 	* inetcpl.cpl : 인터넷 속성
 	* appwiz.cpl : 프로그램 및 기능
-	* 
 4. 실습
 	* administrator 계정 복구
 		- Windows CD 로 부팅

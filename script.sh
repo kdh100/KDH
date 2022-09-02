@@ -802,7 +802,7 @@ Server Vul. Checker Version 1.0
 Date: $DATE
 NAME: $YOURNAME
 
-(1) Server Information
+Server Information
 ============================================
 OS      : $OS
 Kernel  : $KERNEL
@@ -813,6 +813,6 @@ DISK    : $DISKNUM
 IP/NET  : $IP
 GW      : $GW
 DNS     : $DNS
-
+============================================
 EOF
 ============================================================================

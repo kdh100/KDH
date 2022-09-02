@@ -33,7 +33,8 @@
 	* [Ctrl] + R : 실행
 	* [Ctrl] + S : 검색
 	* [Ctrl] + [Shift] + [ESC] : 작업 관리자
-	* [ALT] + [F4] : 로그 아웃
+	* [Alt] + [F4] : 로그 아웃
+	* [Ctrl] + [Shift] + N : 폴더 생성
 	* 
 3. 명령
 	<shell>

@@ -68,7 +68,7 @@
 	* eventnwr.msc : 이벤트 뷰어
 	* secpol.msc : 로컬 보안 정책
 	* certmgr.msc : 인증서 관리
-	<control; 제어판>
+	<control>
 	* contrl : 제어판
 	* control userpasswords2 : 사용자 계정 접속 설정
 	* firewall.cpl : 방화벽
@@ -151,7 +151,7 @@
 			# 공유 내용 확인
 			# net use * /delete : 모든 공유 저장 내용 삭제
 		- 네트워크 드라이브 연결
-	[디스크 작업]
+	[디스크]
 	* 일반 디스크 작업
 		<Linux>						<Windows>
 		- 디스크 장착			 	 - 디스크 장착

@@ -8,13 +8,11 @@ v1.0
 	2) 상호작용 콘솔 제공
  - Pylance
 	1) 코드 정보 제공
- - Docker
-	1) 프로그램 생성/관리 간편
  - Code Runner
 	1) 쉽고 빠르게 코딩/디버깅 가능
 
 2. AI assistant
- - TabNine
+ - IntelliCode
 	1) 현재 작성중인 내용과 이전 커멘드 히스토리를 기반으로 코드 제안
 
 3. Lint/Format/Highlight
@@ -24,13 +22,7 @@ v1.0
 	1) 파이썬 자동 들여쓰기 기능
  - Indent rainbow
 	1) 들여쓰기 공간 색깔 표시
- - Bracket Pair Colorizer 2
-	1) 동일 브라켓에 대한 브라켓 색깔 표시
 
 4. Docstring
  - Auto Docstring
 	1) 도큐먼트 양식(""")을 자동으로 생성해줌
-
-5. Database
- - MySQL
-	1) MySQL 관리 툴

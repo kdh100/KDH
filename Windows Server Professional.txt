@@ -68,6 +68,7 @@
 	* eventnwr.msc : 이벤트 뷰어
 	* secpol.msc : 로컬 보안 정책
 	* certmgr.msc : 인증서 관리
+	* wbadmin.msc : 서버 백업 관리자
 	<control>
 	* contrl : 제어판
 	* control userpasswords2 : 사용자 계정 접속 설정
@@ -152,7 +153,7 @@
 			# net use * /delete : 모든 공유 저장 내용 삭제
 		- 네트워크 드라이브 연결
 	[디스크]
-	* 일반 디스크 작업
+	* OS 비교
 		<Linux>						<Windows>
 		- 디스크 장착			 	 - 디스크 장착
 		- Power ON                  - Power ON
@@ -175,9 +176,39 @@
 		<LVM>				<Storage>
 		- VG				- Pool
 		- LG				- Space
-	
-
-
+	* 디스크 작업
+		<역할 추가>
+		- Windows Server Essential Experience
+		<설정>
+		- 제어판 or 서버 관리자 설정
+		<RAID 구성>
+		- 실제 디스크 준비
+			# 스토리지 풀 생성
+			# 가상 디스크(단순, 미러, 패러티) 생성
+			# 볼륨(NTFS, ReFS => D:\) 추가
+	* 실제 디스크 추가
+		- 스토리지 풀에 실제 디스크 추가
+	* 가상 디스크 용량 늘리기
+		- 서버 관리자 에서 가상 디스크 확장
+		- 디스크 관리자 에서 볼륨 확장
+	[데이터 백업/복구]
+	* OS 백업
+		<백업 매체 준비>
+		- 백업 디스크 준비(백업전용(K:\))
+		<기능 추가>
+		- Windows Server Backup
+		<백업>
+		- wbadmin.msc
+		- 로컬 백업 > 한 번 백업
+		- 다른 옵션 > 사용자 지정 > 항목 추가 > 완전 복구 체크
+		- 로컬 드라이브(백업전용) 선택 > 백업
+		<복구>
+		- wbadmin.msc
+		- 로컬 백업 > 복구
+		- 이 서버 > 백업 날짜 선택 > 파일 및 폴더 > 복구할 디렉토리 선택
+		- 원래 위치 선택 > 복구
+	* 전체 백업 & 증분 백업
+		
 
 
 

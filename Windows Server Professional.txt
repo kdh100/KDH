@@ -58,6 +58,7 @@
 	<.msc; 관리도구>
 	* servermanager : 서버 관리자
 	* msconfig : 시스템 구성
+	* inetmgr : IIS 서비스 관리자
 	* gpedit.msc : 로컬 그룹 정책 편집기
 	* lusrmgr.msc : 로컬 사용자 및 그룹
 	* services.msc : 서비스
@@ -92,7 +93,7 @@
 		- C:\Windows\System32> net user Administrator *
 		- 새로운 암호 입력
 		- OS 재부팅
-	[서버 운영 필수 설정]
+5. 서버 운영 필수 설정
 	* 시작 프로그램 폴더
 		- 실행 > shell:startup
 		- 기존 폴더에서 끌어와서 바로가기 생성, 신규 파일 생성
@@ -152,7 +153,7 @@
 			# 공유 내용 확인
 			# net use * /delete : 모든 공유 저장 내용 삭제
 		- 네트워크 드라이브 연결
-	[디스크]
+6. 디스크
 	* OS 비교
 		<Linux>						<Windows>
 		- 디스크 장착			 	 - 디스크 장착
@@ -191,7 +192,7 @@
 	* 가상 디스크 용량 늘리기
 		- 서버 관리자 에서 가상 디스크 확장
 		- 디스크 관리자 에서 볼륨 확장
-	[데이터 백업/복구]
+7. 데이터 백업/복구
 	* OS 백업
 		<백업 매체 준비>
 		- 백업 디스크 준비(백업전용(K:\))
@@ -223,7 +224,7 @@
 		- 기존 OS 시스템이 백업된 저장 매체를 연결한 상태에서 OS 부팅 CD 로 부팅
 		- 시스템 설치 메뉴에서 복구 선택 > 복구 이미지 선택(아마 자동선택 될 것)
 		- 복구
-	[원격 접속 서버 구축]
+8. 원격 접속 서버 구축
 	* 원격 접속 종류
 		- TUI : telnet, ssh
 		- GUI : RDP(원격 데스크톱 접속), VNC, Teamviewer, Anydesk...
@@ -248,24 +249,61 @@
 		- services.msc > Bitvise SSH 서비스 확인
 		<방화벽 확인>
 		- firewall.cpl > 22/TCP 포트 인바운드 규칙 확인(없으면 새로 생성)
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	* VNC 서버/클라이언트
+		<터미널 설치>
+		- www.tightvnc.com > 최신 버전 다운로드
+			# 서버/클라이언트 패키지가 한 프로그램에 모두 포함되어 선택하여 설치 가능
+			# typical or custom(서버/클라이언트 선택)
+		<서비스 확인>
+		- services.msc > TightVNC 서비스 확인
+		<방화벽 확인>
+		- firewall.cpl > 앱/기능 허용 > TightVNC 허용 확인
+	* 원격 데스크톱(RDP)
+		- Microsoft 제공 원격 제어 도구
+9. Web 서버 & FTP 서버
+	* IIS(Internet Information Service) 서버 구축
+		<기능 추가>
+		- 서버 관리자 > 기능 추가
+		- 서버 역할 > Web Server(IIS) 체크 > 기능 추가
+		- 기능 > .NET Framework 3.5 Features 체크
+		- 역할 서비스 > Application Development 하단 CGI, FTP Server 체크
+		<서비스 확인>
+		- services.msc
+		- Microsoft FTP Service 확인
+		- World wide web Publishing Service 확인
+		<방화벽 확인>
+		- firewall.cpl > 앱/기능 허용
+		- FTP 서버 확인
+		- World wide web 서비스(HTTP) 확인
+	* IIS 설정
+		<FTP 사이트 생성>
+		- inetmgr > 사이트 선택 > FTP 사이트 생성
+		- 루트디렉토리: C:\inetput\ftproot
+		<기본 페이지 우선순위 설정>
+		- inetmgr > 기본 문서
+			# 맨 위쪽부터 내림차순 순위 별 페이지를 로드
+		<Web 실제 디렉토리 변경>
+		- inetmgr > 작업 메뉴의 고급 설정 > 실제 디렉토리~ 의 '...' 선택 > 디렉토리 변경
+		<디렉토리 검색 기능>
+		- 기본 문서(index.htm 등)가 없으면 디렉토리 내 정보들을 리스트로 보여지게 하는 기능
+		- inetmgr > 디렉토리 검색 > 작업 메뉴의 사용
+			# 보안 상 안좋음
+			# 구글 > site:co.kr index.of. <검색어>
+		<서브디렉토리 & 가상디렉토리>
+		- Web 서버 루트디렉토리 내 디렉토리를 만들고 사이트 요청 시 해당 디렉토리로 접속
+			# www.example.com/서브디렉토리
+		- Alias 설정으로 특정 디렉토리를 별칭으로 설정하여 사이트 요청 시 Alias 된 디렉토리로 접속
+			# www.example.com/가상디렉토리 => /가상디렉토리 = /실제디렉토리_1/실제디렉토리_2
+		<ICMP echo request 허용>
+		- Windows 서버는 ICMP echo 에 대한 인바운드가 기본적으로 막혀있음
+		- firewall.cpl > 인바운드 > 파일 및 프린트 공유(에코 요청 - ICMPv4) 허용
+		<익명 FTP 업로드 설정>
+		- inetmgr > FTP 사이트 선택 > FTP 권한 부여 규칙 > read, write 체크
+		- 루트디렉토리(C:\inetpub\ftproot) 선택 > 보안 > 그룹 추가
+		- IIS_IUSR|IUSR 추가 > 모든 권한 부여
+		- 서비스 재기동
+		<FTP 메시지>
+		- inetmgr > FTP 사이트 선택 > FTP 메시지
+		- '배너, 시작, 끝내기, 최대 연결 수' 메시지 작성
+10. DNS 서버
+	* 

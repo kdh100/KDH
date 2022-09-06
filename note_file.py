@@ -1123,3 +1123,51 @@ class Clone(Myself):  # child class 선언; 나는 부모로부터 내용을 상
 
 x = Clone("Mayor", "John")
 x.printname()
+
+!# Package(패키지)
+
+"""
+이 부분은 웹 도큐먼트 등을 통해 추가적으로 공부 필요
+"""
+
+!# Exception(예외처리)
+
+"""
+try : 실행 시
+except : 문제 발생 시
+else : 문제 없을 시
+finally : 무조건 실행
+
+1) try ~ except
+try:
+    구문1
+except:
+    구문2
+
+2) try ~ except(발생오류 포함)
+try:
+    구문1
+except 발생오류:
+    구문2
+
+3) try ~ except(발생오류 + 오류메시지 변수 포함)
+try:
+    구문1
+except 발생오류 as 오류메시지변수:
+    구문2
+
+4) try ~ except ~ else
+try:
+    구문1
+except 발생오류 as 오류메시지변수:
+    구문2
+else:
+    구문3
+"""
+
+text = '100%'
+try:
+    number = int(text)  # 문자열 처리된 인자를 정수로 받을 수 없다는 에러 발생
+except ValueError:  # 에러 발생시 아래 액션 처리
+    print("%s 는 숫자가 아닙니다." % text)
+

@@ -58,7 +58,8 @@
 	<.msc; 관리도구>
 	* servermanager : 서버 관리자
 	* msconfig : 시스템 구성
-	* inetmgr : IIS 서비스 관리자
+	* inetmgr : IIS 서비스 관리
+	* dnsmgmt.msc : DNS 서비스 관리
 	* gpedit.msc : 로컬 그룹 정책 편집기
 	* lusrmgr.msc : 로컬 사용자 및 그룹
 	* services.msc : 서비스
@@ -228,6 +229,9 @@
 	* 원격 접속 종류
 		- TUI : telnet, ssh
 		- GUI : RDP(원격 데스크톱 접속), VNC, Teamviewer, Anydesk...
+	* Windows 포트 및 프로세스 확인 명령어(cmd)
+		- cmd > netstat -ano | findstr :23
+		- cmd > tasklist | findstr $PID
 	* Telnet 서버/클라이언트
 		<기능 추가>
 		- appwiz.cpl > 기능 켜기/끄기 > 텔넷 서버, 텔넷 클라이언트 > 설치
@@ -266,7 +270,7 @@
 		- 서버 관리자 > 기능 추가
 		- 서버 역할 > Web Server(IIS) 체크 > 기능 추가
 		- 기능 > .NET Framework 3.5 Features 체크
-		- 역할 서비스 > Application Development 하단 CGI, FTP Server 체크
+		- 역할 서비스 > 응용 프로그램 개발에서 CGI, FTP Server 체크
 		<서비스 확인>
 		- services.msc
 		- Microsoft FTP Service 확인
@@ -306,4 +310,84 @@
 		- inetmgr > FTP 사이트 선택 > FTP 메시지
 		- '배너, 시작, 끝내기, 최대 연결 수' 메시지 작성
 10. DNS 서버
-	* 
+	* /etc/hosts 파일
+		- 경로 : C:\Windows\System32\drivers\etc\hosts
+		- 해당 파일에 등록된 DNS 정보가 있다면 DNS 쿼리보다 우선하여 확인
+	* DNS 서버 구축
+		<기능 추가>
+		- 서버 관리자 > 기능 추가 > 서버 역할에서 'DNS 서버' 체크
+		<서비스 확인>
+		- services.msc
+		- DNS Server/Client 서비스 확인
+		<방화벽 확인>
+		- firewall.cpl > 앱/기능 허용
+		- DNS 서비스 확인
+	* DNS 서버 구성
+		<사전 계획>
+		- FIRST : DNS Server
+			# 기능 추가
+			# 정방향 존파일 생성
+				~ dnsmgmt.msc > 정방향 조회 영역 선택 > 새 영역(brain.com) 생성
+				~ 존 파일 이름 생성(brain.com)
+				~ 도메인 추가(www|ftp.brain.com)
+		- SECOND : Web Server(IIS)
+			# 기능 추가, 서비스/방화벽 확인
+		- THIRD: FTP Server(Filezilla)
+			# 패키지 설치, 서비스/방화벽 확인
+			# firewall.cpl > 앱/기능 허용 > 프로그램으로 추가(filezilla-server|gui)
+		<라운드로빈(부하분산) 설정>
+		- 하나의 도메인에 여러개의 IP 를 설정해서 번갈아가며 응답하도록 설정
+11. Mail 서버
+	* DNS 서버 구축(종속성 처리)
+		<기능 추가>
+		- 서버 관리자 > 기능 추가 > DNS 서버
+			# .NET Framework 3.5 추가 필수
+		<DNS 설정>
+		- dnsmgmt.msc
+		- 존파일 생성 > daum.net, naver.com
+		- daum.net > 도메인 생성 > email
+		- naver.com > 도메인 생성 > email
+		- 각 존파일에 MX 레코드 생성 > 생성한 email 도메인 불러오기 > 확인
+		<방화벽 설정>
+		- firewall.cpl > 인바운드 규칙 > 새 규칙 생성
+		- SMTP: 25/TCP, POP3: 110/TCP
+	* Mail 서버 구축
+	[Server; daum.net_FIRST]
+			# DNS 에 종속적인 서비스이므로 사전에 DNS 서버 구성이 필요
+		<패키지 설치>
+		- hMailServer
+		- Automatically~ 체크 > Connect > 패스워드(soldesk1.) 입력
+		<도메인 등록>
+		- Add domain > daum.net > save
+		<계정 생성>
+		- daum.net 선택 > account > Add
+		- kim, soldesk1. 입력 > save
+		<설정>
+		- Advanced > Auto-ban > enable 체크해제
+	[Client; daum.net_FIRST]
+		<패키지 설치>
+		- Thunderbird
+		- 기본 메일 사용 > 계정 설정
+		- 김유신, kim@daum.net, soldesk1.
+		- 송신: POP3, email.daum.net, 110, 암호화 안함, 평문 패스워드
+		- 수신: SMTP, email.daum.net, 25, 암호화 안함, 평문 패스워드
+		- 아이디: 송신/발신서버: kim@daum.net
+	[Server; naver.com_SECOND]
+		<패키지 설치>
+		- hMailServer
+		- Automatically~ 체크 > Connect > 패스워드(soldesk1.) 입력
+		<도메인 등록>
+		- Add domain > naver.com > save
+		<계정 생성>
+		- daum.net 선택 > account > Add
+		- lee, soldesk1. 입력 > save
+		<설정>
+		- Advanced > Auto-ban > enable 체크해제
+	[Client; naver.com_THIRD]
+		<패키지 설치>
+		- Thunderbird
+		- 기본 메일 사용 > 계정 설정
+		- 이순신, lee@naver.com, soldesk1.
+		- 송신: POP3, email.naver.com, 110, 암호화 안함, 평문 패스워드
+		- 수신: SMTP, email.naver.com, 25, 암호화 안함, 평문 패스워드
+		- 아이디: 송신/발신서버: lee@naver.com

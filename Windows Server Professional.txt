@@ -433,4 +433,102 @@
 		- vagrant box 에 저장된 기본 OS 이미지 + VM 설정 템플릿 확인
 		- vagrant file 에서 설정된 VM 세부 설정 정의값에 따라 VM 생성
 13. Active Directory
-	* 
+	* 용어
+		- 도메인(Domain) : 물리적 범주
+		- 트리(Tree) : 부모-자식 도메인 계층 구조
+		- 포레스트(Forest) : 두 개 이상의 트리 구성
+			# 도메인 < 트리 <= 포레스트
+		- 사이트(Site) : 논리적 범주
+		- 트러스트(Trust) : 도메인 또는 포레스트 사이의 신뢰 관계
+		- 조직 구성 단위(OU; Organizational Unit) : 도메인 내 세부적인 그룹 단위
+		- 도메인 컨트롤러(DC; Domain Controller) : 로그인, 권한, 사용자 처리를 담당하는 서버
+			# 도메인 서비스에서 1대 이상의 DC 가 반드시 필수
+		- 읽기 전용 DC(RODC; Read-Only Domain Controller) : DC 의 부하분산 목적
+		- 글로벌 카탈로그(GC; Global Catalog) : DC 가 관리해야하는 정보들의 저장 공간
+	* AD 도메인 서비스 구축
+		<구성>
+		- 포레스트 : hanbit.com
+			# 단일 트리
+		- 부모도메인 : hanbit.com
+			# 서울본사(DC, GC)_FIRST -> 일본파견(RODC)_THIRD
+			# 도메인멤버_WinClient
+		- 자식도메인 : second.hanbit.com
+			# 부산지사(DC, GC)_SECOND
+		- 부모-자식 양방향 트러스트
+	[서울본사_FIRST]
+		<기능 추가>
+		- 서버 관리자 > 기능 추가 > Active Directory Domain Services 체크
+		- 서버 관리자 알림 > 이 서버를 도메인 컨트롤러로 승격 선택
+		- 새 포레스트 추가 체크 > hanbit.com
+		- DC 옵션 > DNS 서버 체크 > 암호(soldesk1.) 입력 > 다음... > 설치 > 리부팅
+		<로그인>
+		- 로그인 화면에서 Other User > administrator@hanbit.com 로그인
+			# 서울본사_FIRST 도메인 계정에 접속
+		<확인>
+		- 서버 관리자 > 도구 > AD 사용자 및 컴퓨터 선택
+		- hanbit.com > Computer 선택 > 도메인에 가입된 멤버(서버) 확인
+	[도메인멤버_WinClient]
+		<설정>
+		- ncpa.cpl > DNS 서버로 '서울본사_FIRST' IP 를 지정
+		- 시스템 > 설정 변경 > 변경 > 소속 그룹 '도메인' 선택
+		- hanbit.com 입력
+			# 서울본사_FIRST 의 도메인을 입력한 것
+		- administrator@hanbit.com, soldesk1. 입력
+			# 서울본사_FIRST 의 관리자 계정정보로 확인받는 것
+			# 확인 후 서울본사_FIRST 의 도메인멤버 가 되는 것
+		- 리부팅
+		<로그인>
+		- 로그인 화면해서 Other User > administrator@hanbit.com 로그인
+			# 서울본사_FIRST 도메인 계정에 접속
+		- 로그아웃 > Other User > WINCLIENT\WinAdmin 로그인
+			# Standalone(도메인에 귀속되지 않는 기본 시스템) 관리자 계정에 접속
+	[부산지사_SECOND]
+		<기능 추가>
+		- 서버 관리자 > 기능 추가 > Active Directory Domain Services 체크
+		- 서버 관리자 알림 > 이 서버를 도메인 컨트롤러로 승격 선택
+		- 기존 포레스트에 새 도메인을 추가 체크 > 도메인 유형에서 자식 도메인 확인
+		- 부모 도메인에 hanbit.com, 새 도메인에 second 입력 > 변경 선택
+		- administrator@hanbit.com, soldesk1. 입력 > 확인
+			# 부모 도메인의 DC 인 서울본사_FIRST 의 계정 정보로 자격 증명하는 것
+		- 도메인 컨트롤러 옵션 > DNS 서버 체크해제, GC 체크 > soldesk1. 입력 > 설치 > 리부팅
+		<로그인>
+		- 로그인 화면에서 Other User > administrator@second.hanbit.com 로그인
+			# 부산지사_SECOND 도메인 계정에 접속
+	[일본파견_THIRD]
+		<기능 추가>
+		- 서버 관리자 > 기능 추가 > Active Directory Domain Services 체크
+		- 서버 관리자 알림 > 이 서버를 도메인 컨트롤러로 승격 선택
+		- 기존 도메인에 도메인 컨트롤러 추가 > 도메인 이름 hanbit.com 입력 > 변경 선택
+		- administrator@hanbit.com, soldesk1. 입력 > 확인
+			# 도메인의 DC 인 서울본사_FIRST 의 계정 정보로 자격 증명하는 것
+		- 도메인 컨트롤러 옵션 > GC 체크해제, RODC 체크 > soldesk1. 입력 > 설치
+		- 자동 리부팅 > 로그인 화면에서 Other User > administrator@hanbit.com 로그인
+			# 서울본사_FIRST 관리자가 해당 일본파견_THIRD 의 도메인 관리자 계정으로 접속
+	* 사용자 관리
+		<OU 생성; 디렉토리 구조>
+		- 서버 관리자 > Active Directory 사용자 및 컴퓨터
+		- 도메인 선택 > 새로 만들기 > 조직 구성 단위 > 이름 작성 > 생성
+			# 삭제하지 않도록 컨테이너 보호 기능을 꺼야 해당 OU 삭제 가능
+			# 보기 > 고급 기능 체크
+		<사용자 추가>
+		- 서버 관리자 > Active Directory 사용자 및 컴퓨터
+		- 도메인 선택 > 새로 만들기 > 사용자 > 내용, 암호 작성 > 생성
+			# 생성한 OU(디렉토리) 에 이동시키려면 사용자 선택 > 이동
+			# 여러명의 사용자 추가 시 메인 도메인에 사용자 템플릿 생성하여 복사로 다중 생성할 것
+	* 그룹 관리 & 자원 공유
+		<그룹 종류>
+		- 글로벌 그룹 : 모든 도메인에 위치한 자원 접근 가능
+			# 그룹 구성원은 그룹을 생성한 도메인의 구성원만 포함 가능(자식도메인 포함 불가)
+		- 도메인 로컬 그룹 : 그룹이 속한 도메인의 자원만 접근 가능
+			# 다른 도메인의 구성원도 포함 가능
+		- 유니버설 그룹 : 모든 도메인에 모든 구성원이 모든 자원에 접근 가능
+		- AGDLP : 글로벌 + 도메인 로컬 혼합 구성
+		<그룹 생성>
+		- 서버 관리자 > Active Directory 사용자 및 컴퓨터
+		- 도메인 선택 > 새로 만들기 > 그룹 > 내용 작성 > 그룹 종류 선택 > 생성
+		<자원 공유>
+		- 공유할 폴더 선택 > 속성 > 공유 > 고급 공유 > 선택한 폴더 공유 체크
+		- 권한 > 기존 권한 삭제 후 추가 > 그룹이 생성된 도메인으로 위치 조정
+		- 해당 자원 공유에 대한 그룹 검색 > 이름 확인 > 적용/확인
+		- 클라이언트에서 공유된 자원의 경로로 네트워크 접근 확인
+		

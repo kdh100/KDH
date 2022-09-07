@@ -1,4 +1,56 @@
-1. 초기구성
+1. 단축키
+	* [WIN] + [Pause] : 시스템 정보
+	* [Ctrl] + E : 파일 탐색기
+	* [Ctrl] + R : 실행
+	* [Ctrl] + S : 검색
+	* [Ctrl] + [Shift] + [ESC] : 작업 관리자
+	* [Alt] + [F4] : 로그 아웃
+	* [Ctrl] + [Shift] + N : 폴더 생성
+2. 명령
+	* shell
+		- shell:startup : 시작프로그램 폴더
+		- shutdown $OPTION : 시스템 종료
+			# /f : 강제종료
+			# /s : 종료
+			# /r : 재시작
+			# /i : GUI 인터페이스 보여줌
+			# /t ss : 시간 설정(default: 30s)
+			# /a : 중지
+			# /c : 코멘트
+	* tool
+		- control : 제어판
+		- mstsc : 원격 데스크톱 연결
+		- mrt : 악성 소프트웨어 제거
+		- dfrgui : 디스크 조각모음
+		- mspaint : 그림판
+		- notepad : 메모장
+		- calc : 계산기
+		- taskmgr : 작업 관리자(= [Ctrl] + [Alt] + [Delete])
+	* .msc(관리도구)
+		- servermanager : 서버 관리자
+		- msconfig : 시스템 구성
+		- inetmgr : IIS 서비스 관리
+		- dnsmgmt.msc : DNS 서비스 관리
+		- gpedit.msc : 로컬 그룹 정책 편집기
+		- lusrmgr.msc : 로컬 사용자 및 그룹
+		- services.msc : 서비스
+		- devmgmt.msc : 장치 관리자
+		- compmgmt.msc : 컴퓨터 관리
+		- diskmgmt.msc : 디스크 관리
+		- fsmgmt.msc : 공유 폴더 관리
+		- eventnwr.msc : 이벤트 뷰어
+		- secpol.msc : 로컬 보안 정책
+		- certmgr.msc : 인증서 관리
+		- wbadmin.msc : 서버 백업 관리자
+		- dhcpmgmt.msc : DHCP 서버 관리자
+	* .cpl(제어판)
+		- control userpasswords2 : 사용자 계정 접속 설정
+		- firewall.cpl : 방화벽
+		- ncpa.cpl : 네트워크 연결
+		- inetcpl.cpl : 인터넷 속성
+		- appwiz.cpl : 프로그램 및 기능
+3. 초기 구성
+	<기본>
 	* '서버관리자' 관리 > 속성 > 로그온 시 서버 관리자 자동 시작 안함
 	* 네트워크 설정
 	* 디스플레이 끄기 기능 중지
@@ -27,58 +79,6 @@
 		- 개체 이름을 입력하십시오 칸에 'Administrators' 추가 후 이름 확인 선택 후 적용
 			# 관리자 그룹에 포함시켜 권한 부여
 		- 기존 Administrator 계정 사용안함 확인
-2. 단축키
-	* [WIN] + [Pause] : 시스템 정보
-	* [Ctrl] + E : 파일 탐색기
-	* [Ctrl] + R : 실행
-	* [Ctrl] + S : 검색
-	* [Ctrl] + [Shift] + [ESC] : 작업 관리자
-	* [Alt] + [F4] : 로그 아웃
-	* [Ctrl] + [Shift] + N : 폴더 생성
-	* 
-3. 명령
-	<shell>
-	* shell:startup : 시작프로그램 폴더
-	* shutdown $OPTION : 시스템 종료
-		- -f : 강제종료
-		- -s : 종료
-		- -r : 재시작
-		- -i : GUI 인터페이스 보여줌
-		- -t ss : 시간 설정(default: 30s)
-		- -a : 중지
-		- -c : 코멘트
-	<tool>
-	* mstsc : 원격 데스크톱 연결
-	* mrt : 악성 소프트웨어 제거
-	* dfrgui : 디스크 조각모음
-	* mspaint : 그림판
-	* notepad : 메모장
-	* calc : 계산기
-	* taskmgr : 작업 관리자(= [Ctrl] + [Alt] + [Delete])
-	<.msc; 관리도구>
-	* servermanager : 서버 관리자
-	* msconfig : 시스템 구성
-	* inetmgr : IIS 서비스 관리
-	* dnsmgmt.msc : DNS 서비스 관리
-	* gpedit.msc : 로컬 그룹 정책 편집기
-	* lusrmgr.msc : 로컬 사용자 및 그룹
-	* services.msc : 서비스
-	* devmgmt.msc : 장치 관리자
-	* compmgmt.msc : 컴퓨터 관리
-	* diskmgmt.msc : 디스크 관리
-	* fsmgmt.msc : 공유 폴더 관리
-	* eventnwr.msc : 이벤트 뷰어
-	* secpol.msc : 로컬 보안 정책
-	* certmgr.msc : 인증서 관리
-	* wbadmin.msc : 서버 백업 관리자
-	<control>
-	* contrl : 제어판
-	* control userpasswords2 : 사용자 계정 접속 설정
-	* firewall.cpl : 방화벽
-	* ncpa.cpl : 네트워크 연결
-	* inetcpl.cpl : 인터넷 속성
-	* appwiz.cpl : 프로그램 및 기능
-4. 실습
 	* administrator 계정 복구
 		- Windows CD 로 부팅
 		- 설치 초기 화면에서 컴퓨터 복구 선택
@@ -94,7 +94,7 @@
 		- C:\Windows\System32> net user Administrator *
 		- 새로운 암호 입력
 		- OS 재부팅
-5. 서버 운영 필수 설정
+4. 서버 운영 필수 설정
 	* 시작 프로그램 폴더
 		- 실행 > shell:startup
 		- 기존 폴더에서 끌어와서 바로가기 생성, 신규 파일 생성
@@ -154,7 +154,7 @@
 			# 공유 내용 확인
 			# net use * /delete : 모든 공유 저장 내용 삭제
 		- 네트워크 드라이브 연결
-6. 디스크
+5. 디스크
 	* OS 비교
 		<Linux>						<Windows>
 		- 디스크 장착			 	 - 디스크 장착
@@ -193,7 +193,7 @@
 	* 가상 디스크 용량 늘리기
 		- 서버 관리자 에서 가상 디스크 확장
 		- 디스크 관리자 에서 볼륨 확장
-7. 데이터 백업/복구
+6. 데이터 백업/복구
 	* OS 백업
 		<백업 매체 준비>
 		- 백업 디스크 준비(백업전용(K:\))
@@ -225,14 +225,14 @@
 		- 기존 OS 시스템이 백업된 저장 매체를 연결한 상태에서 OS 부팅 CD 로 부팅
 		- 시스템 설치 메뉴에서 복구 선택 > 복구 이미지 선택(아마 자동선택 될 것)
 		- 복구
-8. 원격 접속 서버 구축
+7. 원격 접속 서버
 	* 원격 접속 종류
 		- TUI : telnet, ssh
 		- GUI : RDP(원격 데스크톱 접속), VNC, Teamviewer, Anydesk...
 	* Windows 포트 및 프로세스 확인 명령어(cmd)
 		- cmd > netstat -ano | findstr :23
 		- cmd > tasklist | findstr $PID
-	* Telnet 서버/클라이언트
+	* Telnet 서버/클라이언트 구축
 		<기능 추가>
 		- appwiz.cpl > 기능 켜기/끄기 > 텔넷 서버, 텔넷 클라이언트 > 설치
 		<서비스 시작>
@@ -242,7 +242,7 @@
 		<텔넷 사용>
 		- telnet $IPADDR > ID/PW 입력
 			# 서버에 접속할 사용자가 텔넷 그룹에 속해있지 않으면 접속할 수 없음
-	* SSH 서버/클라이언트
+	* SSH 서버/클라이언트 구축
 		<터미널 설치>
 		- www.putty.org > bitvise SSH Server/Client 다운로드
 		- 'Personal edition' 선택 > 이름 입력
@@ -253,7 +253,7 @@
 		- services.msc > Bitvise SSH 서비스 확인
 		<방화벽 확인>
 		- firewall.cpl > 22/TCP 포트 인바운드 규칙 확인(없으면 새로 생성)
-	* VNC 서버/클라이언트
+	* VNC 서버/클라이언트 구축
 		<터미널 설치>
 		- www.tightvnc.com > 최신 버전 다운로드
 			# 서버/클라이언트 패키지가 한 프로그램에 모두 포함되어 선택하여 설치 가능
@@ -264,7 +264,7 @@
 		- firewall.cpl > 앱/기능 허용 > TightVNC 허용 확인
 	* 원격 데스크톱(RDP)
 		- Microsoft 제공 원격 제어 도구
-9. Web 서버 & FTP 서버
+8. Web 서버 & FTP 서버
 	* IIS(Internet Information Service) 서버 구축
 		<기능 추가>
 		- 서버 관리자 > 기능 추가
@@ -309,7 +309,7 @@
 		<FTP 메시지>
 		- inetmgr > FTP 사이트 선택 > FTP 메시지
 		- '배너, 시작, 끝내기, 최대 연결 수' 메시지 작성
-10. DNS 서버
+9. DNS 서버
 	* /etc/hosts 파일
 		- 경로 : C:\Windows\System32\drivers\etc\hosts
 		- 해당 파일에 등록된 DNS 정보가 있다면 DNS 쿼리보다 우선하여 확인
@@ -337,7 +337,7 @@
 			# firewall.cpl > 앱/기능 허용 > 프로그램으로 추가(filezilla-server|gui)
 		<라운드로빈(부하분산) 설정>
 		- 하나의 도메인에 여러개의 IP 를 설정해서 번갈아가며 응답하도록 설정
-11. Mail 서버
+10. Mail 서버
 	* DNS 서버 구축(종속성 처리)
 		<기능 추가>
 		- 서버 관리자 > 기능 추가 > DNS 서버
@@ -391,3 +391,46 @@
 		- 송신: POP3, email.naver.com, 110, 암호화 안함, 평문 패스워드
 		- 수신: SMTP, email.naver.com, 25, 암호화 안함, 평문 패스워드
 		- 아이디: 송신/발신서버: lee@naver.com
+11. DHCP 서버
+	* 고정 IP & 동적 IP
+		- 고정은 직접 설정한 IP, 동적은 DHCP 에 의해 유동적으로 변하는 IP
+			# DHCP 서버로 IP 를 사용받지 못할 경우 169.254.*.* 형식으로 IP 가 자동 할당됨
+			# 인터넷 연결 불가, 내부 통신은 가능
+	* DHCP 동작 방식(DORA)
+		- D(discover) : C, DHCP 서버를 검색하려고 브로드캐스트 전송
+		- O(offer) : S, 자신이 DHCP 서버라고 네트워크 정보와 IP 를 전송
+		- R(request) : C, 네트워크 정보와 IP 사용의 허가 요청 유니캐스트 전송
+		- A(ack) : S, C 의 허가 요청 승인과 네트워크 정보 임대(lease)
+	* DHCP 서버 구축
+		<기능 추가>
+		- 서버 관리자 > 기능 추가 > DHCP 서버 체크
+		<기본 설정>
+		- dhcpmgmt.msc
+		- IPv4 선택 > 새 범위
+		- IP Pool, Default Gateway 지정
+	* 임대 정보 확인
+		<서버>
+		- dhcpmgmt.msc
+		- IPv4 > 범위 > 주소 임대 > 새로고침 > 임대받은 클라이언트 정보 확인
+		<클라이언트>
+		- ncpa.cpl > DHCP 로 자동 IP 할당 체크
+		- cmd
+		- ipconfig /all
+		- ipconfig /release
+			# 임대받은 IP 정보 반납
+		- ipconfig /renew
+			# 신규 임대 요청
+12. Windows 배포 서버
+	* 네트워크를 통해 OS 설치 및 설정
+		- (MS) 무인 설치 서버
+		- (Redhat) Kickstart
+		- (Unix - Solaris) Jumpstart
+		- (Unix - ATX) NIM
+		...
+	* Vagrant
+		- 간편한 VM 생성/관리 서비스 프로그램
+			# 클라우드 환경에서 자주 사용됨
+		- vagrant box 에 저장된 기본 OS 이미지 + VM 설정 템플릿 확인
+		- vagrant file 에서 설정된 VM 세부 설정 정의값에 따라 VM 생성
+13. Active Directory
+	* 

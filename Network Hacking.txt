@@ -1,42 +1,132 @@
 1. 네트워크 모의해킹 구성 환경
-    * Firewall(Linux, CentOS8)
+    * Firewall(Linux, CentOS 8)
         - hostname : firewall.example.com
         - IP
             # eth0 : 192.168.10.100
             # GW : 192.168.10.2
             # DNS : 168.126.63.1
             # eth1 : 192.168.20.100
-    * Linux(Linux200)
+    * Linux200(Linux, CentOS 8)
         - hostname : linux200.example.com
         - IP
             # eth0 : 192.168.20.200
             # GW : 192.168.20.100
             # DNS : 168.126.63.1
-    * Windows 2012 R2
-        - hostname : win2012r2
+    * Win2012
+        - hostname : win2012
         - IP
             # eth0 : 192.168.20.201
             # GW : 192.168.20.100
             # DNS : 168.126.63.1
-    * Windows 8
+    * Win8
         - hostname : win8
         - IP
             # eth0 : 192.168.20.202
             # GW : 192.168.20.100
             # DNS : 168.126.63.1
 2. 환경 구축
-    * Firewall 설치
+    [Firewall]
+    * VM 설치
         <VM 생성>
         - CentOS 8 Stream, RAM 2G, HDD 40G
         <OS 설치>
         - 한국어, 자동 파티션
         - root : soldesk1.
         - fedora : fedora, 관리자 체크
-        <NAT 설정>
+        <네트워크 설정>
+        - connection : eth0
+        - IP : 192.168.10.100/24
+        - GW : 192.168.10.2/24
+        - DNS : 168.126.63.1
+        - domain search : example.com
+        - Hostname : firewall.example.com
+    * 추가 NIC(192.168.20.0/24) 설치
+        - connection : eth1
+        - IP : 192.168.20.100/24
+    * 가상 NIC 인터페이스(virbr0) 삭제
+        - systemctl disable --now libvirtd
+        - reboot
+    * TUI 환경 설정
+        - systemctl set-default multi-user.target
+        - systemctl isolate multi-user.target
+    * NAT 설정
+        <기본 설정>
         - sysctl -a | grep ip_forward
         - vi /etc/sysctl.d/01-ip_forward.conf
             # net.ipv4.ip_forward = 1
             # SNAT(source NAT = masquerade) 기능 ON
         - sysctl -p /etc/sysctl.d/01-ip_forward.conf
-            # 새로 생성한 설정 파일을 적용시킴
-        
+    * 방화벽 설정
+        - yum install -y firewalld firewall-config
+        - firewall-config &
+        - 퍼블릭 > 마스커레이드 체크 > 영구 적용
+    * SELinux 설정
+        - sestatus
+        - vi /etc/selinux/config
+            # SELINUX=disabled 수정
+            # 테스트 환경을 위해 SELinux 기능 OFF
+        - reboot
+    [Linux200]
+    * VM 설치
+        <VM 생성>
+        - CentOS 8 Stream, RAM 2G, HDD 40G
+        <OS 설치>
+        - 한국어, 자동 파티션
+        - root : soldesk1.
+        - fedora : fedora, 관리자 체크
+        <네트워크 설정>
+        - connection : eth0
+        - IP : 192.168.20.200/24
+        - GW : 192.168.20.100/24
+        - DNS : 168.126.63.1
+        - domain search : example.com
+        - Hostname : linux200.example.com
+    * 방화벽 설정
+        - systemctl status firewalld
+        - systemctl disable --now firewalld
+    * SELinux 설정
+        - sestatus
+        - vi /etc/selinux/config
+            # SELINUX=disabled 수정
+            # 테스트 환경을 위해 SELinux 기능 OFF
+        - reboot
+    * 가상 NIC 인터페이스(virbr0) 삭제
+        - systemctl disable --now libvirtd
+        - reboot
+    [Win2012]
+    * VM 설치
+        <VM 생성>
+        - Windows Server 2012 R2(DataCenter), RAM 2G, HDD 60G
+        <OS 설치>
+        - 한글, GUI 서버
+        - administrator : soldesk1.
+        <네트워크 설정>
+        - IP : 192.168.20.201/24
+        - GW : 192.168.20.100/24
+        - DNS : 168.126.63.1
+        <컴퓨터 이름 설정>
+        - 시스템 > 변경 > win2012 입력 > 리부팅
+        <VMware Tool 설치>
+        - VMware 에서 Player 선택 > VMware Tool 설치
+        - D:\ 선택 > 표준 > 리부팅 > 리부팅 후 다시 리부팅
+    * 방화벽 설정
+        - firewall.cpl > 설정 또는 해제 > 모든 옵션 해제 체크
+    [Win8]
+    * VM 설치
+        <VM 생성>
+        - Windows 8, RAM 2G, HDD 60G
+        <OS 설치>
+        - 한글
+        - 컴퓨터 이름 : win8
+        - 로컬 계정 생성 : soldesk, soldesk1.
+        <네트워크 설정>
+        - IP : 192.168.20.202/24
+        - GW : 192.168.20.100/24
+        - DNS : 168.126.63.1
+        <VMware Tool 설치>
+        - windows 필수 업데이트 필요
+            # KB2919442 설치 후 KB2919355 설치 > 리부팅
+        - VMware 에서 Player 선택 > VMware Tool 설치
+        - D:\ 선택 > 표준 > 리부팅 > 리부팅 후 다시 리부팅
+    * 방화벽 설정
+        - firewall.cpl > 설정 또는 해제 > 모든 옵션 해제 체크

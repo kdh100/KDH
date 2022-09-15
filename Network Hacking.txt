@@ -1,0 +1,42 @@
+1. 네트워크 모의해킹 구성 환경
+    * Firewall(Linux, CentOS8)
+        - hostname : firewall.example.com
+        - IP
+            # eth0 : 192.168.10.100
+            # GW : 192.168.10.2
+            # DNS : 168.126.63.1
+            # eth1 : 192.168.20.100
+    * Linux(Linux200)
+        - hostname : linux200.example.com
+        - IP
+            # eth0 : 192.168.20.200
+            # GW : 192.168.20.100
+            # DNS : 168.126.63.1
+    * Windows 2012 R2
+        - hostname : win2012r2
+        - IP
+            # eth0 : 192.168.20.201
+            # GW : 192.168.20.100
+            # DNS : 168.126.63.1
+    * Windows 8
+        - hostname : win8
+        - IP
+            # eth0 : 192.168.20.202
+            # GW : 192.168.20.100
+            # DNS : 168.126.63.1
+2. 환경 구축
+    * Firewall 설치
+        <VM 생성>
+        - CentOS 8 Stream, RAM 2G, HDD 40G
+        <OS 설치>
+        - 한국어, 자동 파티션
+        - root : soldesk1.
+        - fedora : fedora, 관리자 체크
+        <NAT 설정>
+        - sysctl -a | grep ip_forward
+        - vi /etc/sysctl.d/01-ip_forward.conf
+            # net.ipv4.ip_forward = 1
+            # SNAT(source NAT = masquerade) 기능 ON
+        - sysctl -p /etc/sysctl.d/01-ip_forward.conf
+            # 새로 생성한 설정 파일을 적용시킴
+        

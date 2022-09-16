@@ -400,19 +400,109 @@
 7. Windows 서비스 구성
     [Win2012]
     * Telnet 서비스
+        <기능 추가>
         - 서버 관리자 > 기능 추가 > 텔넷서버/클라이언트 체크
+        <서비스 시작>
         - services.msc > telnet 선택 > 자동 체크 > 시작
     * Web & FTP 서비스
-        - 
-    * Mail 서비스
-        - 
+        <Web 서비스 기능 추가>
+        - 서버 관리자 > 기능 추가 > 웹 서버(IIS) > 응용프로그램개발/FTP 서버 체크
+        <Web 서비스 설정>
+        - 서버 관리자 > IIS 관리자 > Default Web Site 선택 > 탐색 > index.htm 생성
+        <Web 서비스 확인>
+        - Internet Explorer 에서 192.168.20.201 접속
+        <FTP 서비스 설정>
+        - 서버 관리자 > IIS 관리자 > 사이트 선택 > FTP 사이트 추가
+            # Default FTP Site
+              C:\inetpub\ftproot
+            # SSL 사용 안함 체크
+              인증/사용권한 모두 체크
+              모든 사용자 선택
+        - 서버 관리자 > IIS 관리자 > Default FTP Site > 주소 및 도메인 제한 선택 > 허용 항목 추가
+            # IP 주소 범위 > 192.168.20.0/24, 192.168.10.0/24 추가
+        - 서버 관리자 > IIS 관리자 > Default FTP Site > 사용 권한 편집 선택
+        - 보안 > 편집 > 고급 > 지금 찾기 > IIS_IUSRS 그룹 추가 > 모든 권한 부여
     * DNS 서비스
-        - 
+        <기능 추가>
+        - 서버 관리자 > 기능 추가 > DNS 서버
+        <서비스 설정>
+        - dnsmgmt.msc > 정방향 조회 영역 선택 > 새 영역 > 주 영역 > test.com
+        - test.com 선택 > 해당 도메인 NS 선택 > 속성 > 편집
+        - ns1.test.com. / 192.168.20.201 입력 후 강제 확인
+            # 유효성 검사가 정상적으로 진행되지 않아도 상관없음
+        - test.com 선택 > 새 호스트(A) > www, ftp, mail 생성
+        - test.com 선택 > 새 MX > 메일 서버 FQDN 찾아보기 > mail 선택
+        - WIN2012 선택 > 속성 > 루트 힌트 > 모든 DNS 정보 삭제 > 추가
+            # DNS 쿼리를 보낼 수 있는 Well-Known 루트 DNS 정보
+        - ns1.com. / 192.168.20.100 입력 후 강제 확인
+            # 루트 DNS 를 Linux200(192.168.20.100) 으로 지정
+        <네트워크 재설정>
+        - ncpa.cpl > DNS 서버 '192.168.20.201' 입력
+        - cmd > ipconfig /flushdns
+        <서비스 확인>
+        - nslookup
+            # server 192.168.20.201
+              ns1.test.com
+              ns1.example.com
+    * Mail 서비스
+        <hMailServer 설치>
+        - 서버 관리자 > 기능 추가 > .NET framwork 3.5
+            # 필수 조건
+        - hMailServer 설치 암호 : soldesk1.
+        - hMailServer > connect > Add domain > test.com 입력
+        - domain > test.com 선택 > accounts 선택 > Add > soldesk / soldesk1. 입력 > save
+        - Settings > Advanced > Auto-ban > 'Enable' 체크해제 > save
     [Win8]
     * Telnet 서비스
         - appwiz.cpl > 기능 추가 > 텔넷서버/클라이언트 체크
         - services.msc > telnet 선택 > 자동 체크 > 시작
         - lusrmgr.msc > 사용자 > soldeks 선택 > 그룹 > 고급 > 지금 찾기 > TelnetClients 추가
             # Administrator 그룹에 속해있으면 추가할 필요는 없음
-    * DNS 서비스
-        - 
+    * Mail 서비스
+        <네트워크 설정>
+        - ncpa.cpl > DNS 서버를 '192.168.20.201' 로 지정
+        - cmd > ipconfig /flushdns
+        <Thunderbird 설치>
+        - 기본 설치 > 기존 계정 사용 > soldesk@test.com
+        <메일 테스트>
+        - 본인(Win8)에게 메일 보내기
+        - Win8(soldesk@test.com) -> Linux200(user01@example.com) 메일 보내기
+        - Linux200 -> Win8 메일 보내기
+8. KaliLinux
+    * 시스템 공격 테스트용 OS
+        - Debain OS 기반 + 모의해킹 Tool 포함
+    * 공식 홈페이지에서 설치 프로그램 및 ISO 이미지 선택하여 다운로드 가능
+        - www.kali.org
+    * 시스템 구성
+        <VM 구성>
+        - Debian 최신버전(x64), RAM 4G, 60G HDD
+        - 초기 구성시에는 DHCP 로 IP 정보를 받아올 수 있게 설정되어야함
+        <설치>
+        - Graphic Installation
+        - 한국어, 대만민국(South Korea)
+        - 호스트이름(kali), 도메인(example.com)
+        - 사용자 및 암호(soldesk/soldesk1.)
+        - 자동 디스크 전체 사용, 모두 한 파티션에 설치, 파티션하기
+        - 패키지 관리자 설정, 프록시 서버 없음
+            # 패키지 설치 항목에서 'xfce', 'default' 외 나머지 uncheck
+        - 하드 디스크에 GRUB 부트로더 설치, /dev/sda 선택
+        <루트 계정 패스워드 변경>
+        - sudo passwd root > 현재 접속한 soldesk 계정의 패스워드 입력
+        - soldesk. 입력
+        - su -
+    * 시스템 설정
+        <언어 패키지 설치>
+        - apt-get list fonts-nanum*
+        - apt-get install fonts-nanum*
+            # yum(redhat) = apt-get(debian)
+            # 초기 설치시에 한글 폰트가 깨지는걸 복구할 수 있음
+        - reboot
+        <네트워크 설정>
+        - 추가 NIC 설치 진행(NAT)
+        - nmcli device 에서 추가 장치명 확인 > nmtui
+        - eth0(eth0) : 192.168.10.50/24, 192.168.10.2, 168.126.63.1, example.com
+        - eth1(eth1) : 192.168.20.50/24
+        <언어 변경>
+        - localectl list-locales | grep -i ko
+        - localectl set-locale LANG=en_US.utf-8|ko_KR.utf-8
+        - reboot

@@ -6,12 +6,16 @@
             # GW : 192.168.10.2
             # DNS : 168.126.63.1
             # eth1 : 192.168.20.100
+        - Service : F/W(masquerade)
+            # 테스트 환경을 위해 SELinux OFF
     * Linux200(Linux, CentOS 8)
         - hostname : linux200.example.com
         - IP
             # eth0 : 192.168.20.200
             # GW : 192.168.20.100
             # DNS : 168.126.63.1
+        - Service : DNS(Root, .com), Web, FTP, Mail
+            # 테스트 환경을 위해 방화벽, SELinux OFF
     * Win2012
         - hostname : win2012
         - IP
@@ -24,7 +28,7 @@
             # eth0 : 192.168.20.202
             # GW : 192.168.20.100
             # DNS : 168.126.63.1
-2. 환경 구축
+2. 기본 환경 구축
     [Firewall]
     * VM 설치
         <VM 생성>
@@ -111,6 +115,23 @@
         - D:\ 선택 > 표준 > 리부팅 > 리부팅 후 다시 리부팅
     * 방화벽 설정
         - firewall.cpl > 설정 또는 해제 > 모든 옵션 해제 체크
+    * 추가 설정
+        <일반 PC 처럼 사용하기>
+        - 서버 관리자 > 기능 추가 > 데스크톱 경험 > 리부팅
+        <바탕화면 아이콘>
+        - 바탕화면 선택 > 개인 설정 > 바탕 화면 아이콘 체크
+        - 바탕화면 선택 > 보기 > 작은 아이콘
+        <로그온 시>
+        - pgedit.msc > Windows 설정 > 보안 설정 > 로컬 정책 > 보안 옵션
+        - '대화형 로그온: [Ctrl+Alt+Del] 사용할 필요 없음' 사용
+        - '대화형 로그온:~'에서 메시지 제목 > 경고 입력
+        - '대화형 로그온:~'에서 메시지 텍스트 > 인증된 사용자만 접근 가능 입력
+        <전원 옵션>
+        - control > 하드웨어 및 소리 > 전원 옵션 > 디스플레이 끄는 시간 > 모두 해당 없음
+        <업데이트 기능 끄기>
+        - control > 시스템 및 보안 > Windows Update > 설정 변경 > 업데이트를 확인하지 않음
+        <자동 로그온>
+        - control userpasswords2 > '사용자 이름과 암호를~' 체크 해제 > 암호 입력
     [Win8]
     * VM 설치
         <VM 생성>
@@ -119,6 +140,8 @@
         - 한글
         - 컴퓨터 이름 : win8
         - 로컬 계정 생성 : soldesk, soldesk1.
+        - PC 및 개인정보보호 모두 OFF
+        - Microsoft 새 계정 > 로컬 계정 만들기
         <네트워크 설정>
         - IP : 192.168.20.202/24
         - GW : 192.168.20.100/24
@@ -130,3 +153,266 @@
         - D:\ 선택 > 표준 > 리부팅 > 리부팅 후 다시 리부팅
     * 방화벽 설정
         - firewall.cpl > 설정 또는 해제 > 모든 옵션 해제 체크
+    * 추가 설정
+        <바탕화면 아이콘>
+        - 바탕화면 선택 > 개인 설정 > 바탕 화면 아이콘 체크
+        - 바탕화면 선택 > 보기 > 작은 아이콘
+        <로그온 시>
+        - pgedit.msc > Windows 설정 > 보안 설정 > 로컬 정책 > 보안 옵션
+        - '대화형 로그온:~'에서 메시지 제목 > '경고' 입력
+        - '대화형 로그온:~'에서 메시지 텍스트 > '인증된 사용자만 접근 가능' 입력
+        <전원 옵션>
+        - control > 하드웨어 및 소리 > 전원 옵션 > 디스플레이 끄는 시간 > 모두 해당 없음
+        <업데이트 기능 끄기>
+        - control > 시스템 및 보안 > Windows Update > 설정 변경 > 업데이트를 확인하지 않음
+        <자동 로그온>
+        - control userpasswords2 > '사용자 이름과 암호를~' 체크 해제 > 암호 입력
+3. DNS 서버 구성
+    * 기본 구성
+        - Firewall(192.168.20.100) : Root(.) / .com
+        - Linux200(192.168.20.200) : example.com
+        - Win2012(192.168.20.201) : test.com
+            # test.com 은 다른 서비스들을 구성한 후 설정
+    [Firewall]
+    * 네트워크 설정
+        - nm-connection-editor
+            # dns server: 192.168.20.100, 168.126.63.1
+    * 패키지 설치
+        - yum install -y bind bind-utils
+    * 서비스 설정
+        <주설정 파일 설정>
+        - vi /etc/named.conf
+            # listen-on port 53 { any; };
+              // listen-on-v6~
+              allow-query { any; };
+              dnssec-enable no;
+              dnssec-validation no;
+        - vi /etc/named.rfc1912.zones
+            # zone "com" IN {
+                  type master;
+                  file "com.zone";
+                  allow-update { none; };
+              };
+
+              zone "20.168.192.in-addr-arpa" IN {
+              type master;
+              file "com.rev";
+              allow-update { none; };
+              };
+        - cd /var/named
+        - cp -p named.ca named.ca.OLD
+        - > named.ca && vi named.ca
+            # .       86400 IN NS ns1.com
+              ns1.com 86400 IN A  192.168.20.100
+        - cp -p named.localhost com.zone
+        - > com.zone && vi com.zone
+            # $TTL 4
+              @       IN SOA  ns1.com. root.com. (
+                                        10      ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+              com.            IN  NS  ns1.com.
+              ns1.com.        IN  A   192.168.20.100
+              
+              ;; Domain Delegation
+              example         IN  NS  ns1.example
+              ns1.example     IN  A   192.168.20.200
+              test            IN  NS  ns1.test
+              ns1.test        IN  A   192.168.20.201
+        - cp -p named.loopback com.rev
+        - > com.rev && vi com.rev
+            # $TTL 4
+              @       IN SOA  ns1.com. root.com. (
+                                                      10      ; serial
+                                                      1D      ; refresh
+                                                      1H      ; retry
+                                                      1W      ; expire
+                                                      3H )    ; minimum
+              
+                              IN  NS          ns1.com.
+              100             IN  PTR         ns1.com.
+              
+              ;; Domain Delegation
+              200             IN  PTR         ns1.example.com.
+              201             IN  PTR         ns1.test.com.
+    * 방화벽 등록
+        - firewall-cmd --permanent --add-service=dns
+        - firewall-cmd --reload
+        - firewall-cmd --list-all
+    * 서비스 기동
+        - systemctl enable --now named
+    * 서비스 확인
+        - nslookup
+            # set q=NS
+            # com.
+            # set q=PTR
+            # 192.168.20.100
+    [Linux200]
+    * 네트워크 설정
+        - nm-connection-editor
+            # dns server: 192.168.20.200, 168.126.63.1
+    * 패키지 설치
+        - yum install -y bind bind-utils
+        * 서비스 설정
+        <주설정 파일 설정>
+        - vi /etc/named.conf
+            # listen-on port 53 { any; };
+              // listen-on-v6~
+              allow-query { any; };
+              dnssec-enable no;
+              dnssec-validation no;
+        - vi /etc/named.rfc1912.zones
+            # zone "example.com" IN {
+                  type master;
+                  file "example200.zone";
+              };
+
+              zone "20.168.192.in-addr-arpa" IN {
+              type master;
+              file "example200.rev";
+              };
+        - cd /var/named
+        - cp -p named.ca named.ca.OLD
+        - > named.ca && vi named.ca
+            # .       86400 IN NS ns1.com
+              ns1.com 86400 IN A  192.168.20.100
+        - cp -p named.localhost com.zone
+        - > com.zone && vi com.zone
+            # $TTL    4
+              @               IN SOA  ns1.example.com. root.example.com. (
+                                                      42              ; serial (d. adams)
+                                                      3H              ; refresh
+                                                      15M             ; retry
+                                                      1W              ; expiry
+                                                      1D )            ; minimum
+                                      IN NS           ns1.example.com.
+              ns1.example.com.        IN A            192.168.20.200
+  
+              ;; (1) WEB Server
+              www                     IN      A       192.168.20.200
+  
+              ;; (2) FTP Server
+              ftp                     IN      A       192.168.20.200
+  
+              ;; (3) MAIL Server
+              example.com.            IN      MX 10   mail.example.com.
+              mail                    IN      A       192.168.20.200
+  
+              ;; (4) etc
+              cafe                    IN      A       192.168.20.200
+        - cp -p named.loopback com.rev
+        - > com.rev && vi com.rev
+            # $TTL    4
+              @       IN      SOA     ns1.example.com. root.example.com.  (
+                                                    1997022700 ; Serial
+                                                    28800      ; Refresh
+                                                    14400      ; Retry
+                                                    3600000    ; Expire
+                                                    86400 )    ; Minimum
+                      IN      NS      ns1.example.com.
+              200     IN      PTR     ns1.example.com.
+    * 방화벽 등록
+        - firewall-cmd --permanent --add-service=dns
+        - firewall-cmd --reload
+        - firewall-cmd --list-all
+    * 서비스 기동
+        - systemctl enable --now named
+    * 서비스 확인
+        - nslookup
+            # server 192.168.20.200
+            # www.example.com
+4. Web 서버 구성
+    [Linux200]
+    * 패키지 설치
+        - yum install -y httpd mod_ssl
+    * 서비스 설정
+        - vi /etc/httpd/conf/httpd.conf
+            # ServerAdmin root@example.com
+              ServerName www.example.com:80
+    * 서비스 기동
+        - systemctl enable --now httpd
+    * HTTP 웹페이지 설정
+        - cd /var/www/html
+        - echo "hello world" > index.html
+    * 서비스 확인
+        - curl http://localhost
+5. FTP 서버 구성
+    [Linux200]
+    * 패키지 설치
+        - yum install -y vsftpd ftp
+    * 서비스 설정
+        - cd /etc/vsftpd
+        - sed -i 's/^root/#root/' ftpusers
+        - sed -i 's/^root/#root/' user_list
+    * 서비스 기동
+        - systemctl enable --now vsftpd
+    * 서비스 확인
+        - ftp ftp.example.com
+6. Mail 서버 구성
+    [Linux200]
+    * 기존 메일 패키지 서비스 OFF
+        - systemctl list-unit-files | grep postfix|sendmail
+            # 확인 시 disable
+    * 패키지 설치
+        - yum install -y sendmail sendmail-cf dovecot evolution
+    * 서비스 설정
+        <발신; sendmail>
+        - vi /etc/mail/sendmail.cf
+            # DJmail.example.com
+              O EightBitMode=pass8
+              O DaemonPortOptions=Port=smtp, Name=MTA
+        - vi /etc/mail/local-host/names
+            # example.com
+              mail.example.com
+        - vi /etc/mail/access
+            # Connect:mail.example.com RELAY
+              Connect:example.com RELAY
+              Connect:192.168.20 RELAY
+              Connect:192.168.10 RELAY
+        - makemap hash /etc/mail/access < /etc/mail/access
+            # 설정 내용으로 접근제어 파일 재적용
+        <수신; dovecot>
+        - vi /etc/dovecot/dovecot.conf
+            # protocols = imap pop3 lmtp submission
+            # listen = *, ::
+        - vi /etc/dovecot/conf.d/10-auth.conf
+            # disable_plaintext_auth = no
+            # auth_mechanism = plain
+        - vi /etc/dovecot/conf.d/10-mail.conf
+            # mail_location = mbox:MEMORY:INBOX=/var/spool/mail/%u:INDEX=MEMORY
+        - vi /etc/dovecot/conf.d/10-ssl.conf
+            # ssl = no
+    * 서비스 기동
+        - systemctl enable --now sendmail
+        - systemctl enable --now dovecot
+    * 계정 생성 & 사용자 클라이언트 설정
+        - useradd user01
+        - echo user01 | passwd --stdin user01
+        - evolution
+            # 신상정보에서 이름(user01), 메일주소(user01@example.com) 입력
+              메일 받기 : POP
+              서버 : mail.example.com
+              사용자이름 : user01
+              메일 보내기 : sendmail
+              적용
+7. Windows 서비스 구성
+    [Win2012]
+    * Telnet 서비스
+        - 서버 관리자 > 기능 추가 > 텔넷서버/클라이언트 체크
+        - services.msc > telnet 선택 > 자동 체크 > 시작
+    * Web & FTP 서비스
+        - 
+    * Mail 서비스
+        - 
+    * DNS 서비스
+        - 
+    [Win8]
+    * Telnet 서비스
+        - appwiz.cpl > 기능 추가 > 텔넷서버/클라이언트 체크
+        - services.msc > telnet 선택 > 자동 체크 > 시작
+        - lusrmgr.msc > 사용자 > soldeks 선택 > 그룹 > 고급 > 지금 찾기 > TelnetClients 추가
+            # Administrator 그룹에 속해있으면 추가할 필요는 없음
+    * DNS 서비스
+        - 

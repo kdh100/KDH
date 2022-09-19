@@ -506,3 +506,78 @@
         - localectl list-locales | grep -i ko
         - localectl set-locale LANG=en_US.utf-8|ko_KR.utf-8
         - reboot
+        <SSH 서비스 제어>
+        - vi /etc/ssh/sshd_config
+            # PermitRootLogin yes
+        - systemctl enable --now ssh
+        <루트 사용자 설정변경>
+        - sudo vi /etc/sudoers
+            # %sudo ALL=(ALL:ALL) NOPASSWD: ALL
+        - sudo usermod -s /usr/bin/bash root
+        - su -
+        - vi ~/.bashrc
+            # export PS1='\[\e[31;1m\][\u@\h\[\e[33;1m\] \w]\$ \[\e[m\]'
+        - . ~/.bashrc
+        - reboot
+9. Network Interface Layer
+    * 패킷(Packet)
+        - 헤더
+        - 데이터
+        - 트레일러(테일)
+    * 프로토콜(Protocol)
+        - 비접속 지향형
+            # UDP
+        - 접속 지향형
+            # TCP(3-Hand-Shake)
+        - 비라우팅 형
+        - 라우팅 형
+    * OSI 7 Layer
+        - 1) Physical
+            # 전기적인 신호 전달
+            # bit
+                ~ 허브, 리피터
+        - 2) Datalink
+            # 데이터 흐름을 위한 신호 제어
+            # frame
+                ~ 브릿지, 스위치
+                ~ MAC
+        - 3) Network
+            # 논리적 주소 통신 유지
+            # packet
+                ~ 라우터
+                ~ IPv4/6, ICMP
+                ~ ARP(2.5 계층)
+        - 4) Transport
+            # 패킷 전송의 에러를 보장하고 분할/조합
+            # segment
+                ~ TCP, UDP
+        - 5) Session
+            # 프로세스 간 통신 제어, 네트워크 오류 검사 및 재전송
+                ~ SSL/TLS
+        - 6) Presentation
+            # 데이터 변환(해석, 압축, 프로토콜 전환, 암호화)
+                ~ HTML, GIF
+        - 7) Application
+            # 파일 전송/접근
+            # data(message)
+                ~ HTTP, SSH, DNS 등
+    * TCP/IP 5 Layer
+        - 1) Hardware
+            # LAN Cable 등
+        - 2) Network Interface
+            # Ethernet, Token Ring, MAC 등
+        - 3) Internet
+            # ARP, ICMP, IPv4/6
+        - 4) Transport
+            # TCP, UDP
+        - 5) Application
+            # HTTP, SSH, DNS 등
+    * RFC(Request for Comments) 문서 검색 방법
+        - http://www.ietf.org/rfc.html
+            # http://www.ietf.org/rfc/rfcNNNN.txt
+10. Internet Layer
+    * 
+11. Transport Layer
+    * 
+12. Application Layer
+    * 

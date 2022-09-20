@@ -519,48 +519,30 @@
             # export PS1='\[\e[31;1m\][\u@\h\[\e[33;1m\] \w]\$ \[\e[m\]'
         - . ~/.bashrc
         - reboot
-9. Network Interface Layer
+9. Network
     * 패킷(Packet)
-        - 헤더
-        - 데이터
-        - 트레일러(테일)
+        - 헤더 + 데이터 + 테일러
     * 프로토콜(Protocol)
-        - 비접속 지향형
-            # UDP
-        - 접속 지향형
-            # TCP(3-Hand-Shake)
-        - 비라우팅 형
-        - 라우팅 형
+        - 비접속(UDP)/접속(TCP) 지향형
+        - 비라우팅/라우팅 형
     * OSI 7 Layer
         - 1) Physical
-            # 전기적인 신호 전달
-            # bit
+            # 전기적인 신호 전달(Bit)
                 ~ 허브, 리피터
         - 2) Datalink
-            # 데이터 흐름을 위한 신호 제어
-            # frame
+            # 데이터 흐름을 위한 신호 제어(Frame)
                 ~ 브릿지, 스위치
-                ~ MAC
         - 3) Network
-            # 논리적 주소 통신 유지
-            # packet
+            # 논리적 주소 통신 유지(Packet)
                 ~ 라우터
-                ~ IPv4/6, ICMP
-                ~ ARP(2.5 계층)
         - 4) Transport
-            # 패킷 전송의 에러를 보장하고 분할/조합
-            # segment
-                ~ TCP, UDP
+            # 패킷 전송의 에러를 보장하고 분할/조합(Segment)
         - 5) Session
             # 프로세스 간 통신 제어, 네트워크 오류 검사 및 재전송
-                ~ SSL/TLS
         - 6) Presentation
             # 데이터 변환(해석, 압축, 프로토콜 전환, 암호화)
-                ~ HTML, GIF
         - 7) Application
-            # 파일 전송/접근
-            # data(message)
-                ~ HTTP, SSH, DNS 등
+            # 파일 전송/접근(데이터)
     * TCP/IP 5 Layer
         - 1) Hardware
             # LAN Cable 등
@@ -575,9 +557,52 @@
     * RFC(Request for Comments) 문서 검색 방법
         - http://www.ietf.org/rfc.html
             # http://www.ietf.org/rfc/rfcNNNN.txt
-10. Internet Layer
-    * 
-11. Transport Layer
-    * 
-12. Application Layer
+10. Network Interface Layer
+    * 헤더(MAC), 테일러(CRC)
+        - MAC : 흐름 제어(Flow Control)
+        - CRC : 에러 제어(Error Control)
+    * 계층 프로토콜
+        <H/W>
+        - Ethernet, FDDI, ATM
+        <S/W>
+        - SLIP(Serial Link Interface Protocol), PPP(Point-to-Point Protocol)
+    * 토폴로지
+        - Bus
+            # 허브 통신 구조
+        - Star
+            # 스위치 통신 구조
+        - Ring
+            # 토큰 링 통신 구조
+        - VLAN
+            # 브로드캐스트 도메인 분할 통신 구조
+                ~ VLAN : LAN
+                ~ VPN(Virtual Private Network) : WAN
+    * LAN Media
+        - 유선 & 무선
+            # UTP, Fiber
+                ~ Cross, Direct, Console
+            # Wireless(WiFi)
+    * Ethernet 구성 요소
+        - CSMA/CD(Carrier Sense Multiple Access/Collision Detection)
+        - Frame
+            # Header{Preamble(8) +Dst.MAC(6) +Src.MAC(6) +Type(2)}
+            # Data(46~1500)
+            # Tailer{CRC(4)}
+        - MAC(Media Access Control) Address
+            # MAC 주소 찾기 : http://www.coffer.com/mac_find
+11. Internet Layer
+    * 헤더(IP)
+        - IP : 경로 지정(Routing)
+        - Fragmentation & Reassembly : 송신(분할) / 수신(조합)
+    * 계층 프로토콜
+        - ARP/RARP, ICMP, IPv4/6, IPSec
+            # ARP : IP > MAC
+            # RARP : MAC > IP
+12. Transport Layer
+    * 헤더(Port: TCP, UDP)
+        - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)
+            # 3-Hand-Shake : SYN(연결 확인) > ACK(확인), SYN(연결 허용) > ACK(확인, 연결)
+    * 계층 프로토콜
+        - TCP, UDP
+13. Application Layer
     * 

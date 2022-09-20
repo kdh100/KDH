@@ -544,6 +544,7 @@
         - 7) Application
             # 파일 전송/접근(데이터)
     * TCP/IP 5 Layer
+        - 범용 네트워크 통신 규약
         - 1) Hardware
             # LAN Cable 등
         - 2) Network Interface
@@ -590,6 +591,9 @@
             # Tailer{CRC(4)}
         - MAC(Media Access Control) Address
             # MAC 주소 찾기 : http://www.coffer.com/mac_find
+            # MAC 주소 변경
+                ~ 리눅스 : ifconfig <장비이름> hw ether <MAC>
+                ~ 윈도우 : devmgmt.msc > 네트워크 어댑터 > 속성 > 고급 > 로컬 주소 변경
 11. Internet Layer
     * 헤더(IP)
         - IP : 경로 지정(Routing)
@@ -597,6 +601,10 @@
     * 계층 프로토콜
         - ARP/RARP, ICMP, IPv4/6, IPSec
             # ARP : IP > MAC
+            # ARP 설정 변경
+                ~ 리눅스 : arp -an(목록), -s(static), -d(delete)
+                ~ 윈도우 : arp -a(목록), netsh interface ip add "장비이름" "IP" "MAC"(static)
+                                        netsh interface ip delete "장비이름" "IP"(delete)
             # RARP : MAC > IP
 12. Transport Layer
     * 헤더(Port: TCP, UDP)

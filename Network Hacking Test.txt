@@ -562,6 +562,10 @@
     * 헤더(MAC), 테일러(CRC)
         - MAC : 흐름 제어(Flow Control)
         - CRC : 에러 제어(Error Control)
+        - 헤더 구성
+            # Dst MAC Address(6)
+              Src MAC Address(6)
+              Ethernet type(2)
     * 계층 프로토콜
         <H/W>
         - Ethernet, FDDI, ATM
@@ -598,6 +602,19 @@
     * 헤더(IP)
         - IP : 경로 지정(Routing)
         - Fragmentation & Reassembly : 송신(분할) / 수신(조합)
+        - 헤더 구성
+            # Version(4)
+              Header Length(4)
+              Type of Service(8)
+              Total Length(16)
+              Identification(16)
+              Flags(3)
+              Fragment Offset(13)
+              TTL(8)
+              Protocol(8)
+              Header Checksum(16)
+              Src IP(32)
+              Dst IP(32)
     * 계층 프로토콜
         - ARP/RARP, ICMP, IPv4/6, IPSec
             # ARP : IP > MAC
@@ -607,6 +624,16 @@
                 ~ 리눅스 : arp -an(목록), -s(static), -d(delete)
                 ~ 윈도우 : arp -a(목록), netsh interface ip add "장비이름" "IP" "MAC"(static)
                                         netsh interface ip delete "장비이름" "IP"(delete)
+        - ARP 헤더 구성
+            # Hardware type(2)
+              Protocol type(2)
+              Hardware size(1)
+              Protocol size(1)
+              Opcode(2)
+              Sender MAC Address(6)
+              Sender IP Address(4)
+              Target MAC Address(6)
+              Target IP Address(4)
     * ARP Spoofing Attack
         - 다른 공격 작업 전 선행 작업으로 사용
         - Ethernet S/W 트래픽 변경 수단
@@ -637,6 +664,12 @@
                 ~ ARP Spoofing Attack 징후
             # 정상/비정상 결과를 로그로 기록하고 crontab 에 등록하여 백그라운드 실행
     * ICMP(Internet Control Messages Protocol)
+        - 헤더 구성
+            # Type
+              Code
+              Checksum
+              ID
+              Sequence Number
         - ping
             # 메시지
                 ~ 오류 type 3 : 목적지 도달 불가
@@ -647,7 +680,23 @@
                 ~ 오류 type 5 : 경로 리다이렉트
                 ~ 쿼리 type 8 : 질문
                 ~ 쿼리 type 0 : 응답
+            # CMD
+                ~ 리눅스 : ping -c 4 (IP)
+                ~ 윈도우 : ping -n 4 (IP)
         - traceroute
+            # TTL(Time to Live) 를 이용해서 목적지 네트워크 경로상에 있는 라우터 확인
+                ~ 리눅스 : 64
+                ~ 윈도우 : 128
+                ~ 네트워크장비(Cisco) : 255
+            # CMD
+                ~ 리눅스 : traceroute(default; TCP) (IP) / traceroute -I(ICMP) (IP)
+                ~ 윈도우 : tracert(ICMP) -d(not reserved) (IP)
+            # '*' 표시 의미
+                ~ 네트워킹 불가
+                ~ 보안 기능으로 인한 응답 불가
+        - VisualRoute(유료) & OpenVisualRoute(무료)
+            # traceroute 경로를 3D 그래픽 형태로 출력해주는 프로그램
+                ~ Java 종속 프로그램으로 필요한 버전으로 설치 진행
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)

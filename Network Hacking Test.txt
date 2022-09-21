@@ -697,6 +697,35 @@
         - VisualRoute(유료) & OpenVisualRoute(무료)
             # traceroute 경로를 3D 그래픽 형태로 출력해주는 프로그램
                 ~ Java 종속 프로그램으로 필요한 버전으로 설치 진행
+    * IP Address
+        - 10진수 형태의 4개의 옥텟
+        - 주소 체계
+            # A : 1 옥텟 가장 앞이 0(0 - 127)
+                ~ 클래스풀 : /8 넷마스크
+                ~ 클래스리스(사설) : 10.0.0.0/8 - 10.255.255.255/8
+            # B : 1 옥텟 가장 앞이 10(128 - 191)
+                ~ 클래스풀 : /16 넷마스크
+                ~ 클래스리스(사설) : 172.16.0.0/12 - 172.31.255.255/12
+            # C : 1 옥텟 가장 앞이 110(192 - 223)
+                ~ 클래스풀 : /24 넷마스크
+                ~ 클래스리스(사설) : 192.168.0.0/16 - 192.168.255.255/16
+            # D : 1 옥텟 가장 앞이 1110(224 - 239)
+                ~ 멀티 캐스트용
+            # E : 1 옥텟 가장 앞이 1111(240 - 255)
+                ~ 연구 목적용(IANA 에 요청해야 사용 가능)
+            # 윈도우 OS 는 IP Netmask 정보가 오등록되어도 클래스풀 내에서 제한적 통신 가능
+        - 표기법
+            # VLSM : /24
+            # CIDR : 255.255.255.0
+        - 라우팅 테이블 우선순위
+            # Without Gateway 
+                1) Self IP Address
+                2) Self Network Address
+            # With Gateway
+                3) IP Address
+                4) Network Address
+                5) Default Gateway
+        - 
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)

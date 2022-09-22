@@ -1,7 +1,7 @@
 1. IPSec : VPN 과 같은 Tunneling Protocol, 전송(Transport)/터널(Tunnel) 모드 지원
     - IKE(Internet Key Exchange) : 인증키 공유/생성 프로토콜
         # isakmp 
-    - Site-to-Site 설정(VPN 네트워크로 설정할 양측 라우터에 동일하게 설정)
+2. Site-to-Site 설정(VPN 네트워크로 설정할 양측 라우터에 동일하게 설정)
     1) isakmp(IKE) 정책 설정
         # crypto isakmp policy 100  \\ 정책 생성
            encription aes 256  \\ 대칭키 암호화 알고리즘 지정
@@ -26,6 +26,7 @@
         # interface fa0/0
            crypto map VPNMAP
         # Remote Access SSL(EasyVPN) 설정(원격 접근을 위해 AAA, 계정 필요)
+3. Cisco EasyVPN 설정(IPSec VPN)
     <서버>
     1) AAA 구성
         # aaa new-model  \\ AAA 활성화
@@ -55,12 +56,12 @@
     7) Dynamic VPN MAP(다중 클라이언트를 위한 범용 VPN MAP) 생성
         # crypto dynamic-map EVDMAP 10
            set transform-set EVSET
-           reverse-route remote-peer  \\ 사용자 측에 자동으로 라우팅 테이블을 추가시킴
+           reverse-route  \\ 사용자 측에 자동으로 라우팅 테이블을 추가(Injection)시킴
     8) Static VPN MAP 생성
         # crypto map EVSMAP client authentication list EV-USER
           crypto map EVSMAP client configuration address respond
           \\ 사용자로부터 IP 사용 요청에 대하여 응답
-          crypto map EVSMAP isakmp authentication list EV-GROUP
+          crypto map EVSMAP isakmp authorization list EV-GROUP
           \\ IKE 을 통한 권한 내역을 AAA 의 EV-GROUP 을 통해 관리
           crypto map EVSMAP 10 ipsec-isakmp dynamic EVDMAP
           \\ 동적 VPN MAP 연동을 통한 정보 확인으로 SA 연결성 확인 가능
@@ -83,3 +84,5 @@
         # crypto ipsec client EZVPN xauth  \\ XAuth 방식의 인증을 통해 사용자 권한 부여
           Username : root
           Password : toor
+4. Remote Access with SSL 설정
+    1) 

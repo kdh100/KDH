@@ -725,7 +725,19 @@
                 3) IP Address
                 4) Network Address
                 5) Default Gateway
-        - 
+        - IP 우회(Bypass)
+            # 패키지 확인
+                <Redhat>                        <Debian>
+                ~ rpm -qa                       ~ dkpg -l
+                ~ rpm -ql proxychains           ~ dpkg -L proxychains
+                ~ rpm -qf /bin/lf               ~ dpkg -s /bin/ls
+            # TOR 네트워크 사용
+                ~ apt-get install -y tor proxychains4
+                ~ systemctl enable --now tor
+                ~ proxychains nmap -sT -Pn -p 80 www.soldesk.com
+                  \\ TOR 네트워크를 거치면서 우회하여 해당 HTTP 서버의 80 포트 스캐닝
+        - VPN 프로그램(SoftEther)
+            # 
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)

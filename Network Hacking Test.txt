@@ -602,19 +602,6 @@
     * 헤더(IP)
         - IP : 경로 지정(Routing)
         - Fragmentation & Reassembly : 송신(분할) / 수신(조합)
-        - 헤더 구성
-            # Version(4)
-              Header Length(4)
-              Type of Service(8)
-              Total Length(16)
-              Identification(16)
-              Flags(3)
-              Fragment Offset(13)
-              TTL(8)
-              Protocol(8)
-              Header Checksum(16)
-              Src IP(32)
-              Dst IP(32)
     * 계층 프로토콜
         - ARP/RARP, ICMP, IPv4/6, IPSec
             # ARP : IP > MAC
@@ -697,23 +684,34 @@
         - VisualRoute(유료) & OpenVisualRoute(무료)
             # traceroute 경로를 3D 그래픽 형태로 출력해주는 프로그램
                 ~ Java 종속 프로그램으로 필요한 버전으로 설치 진행
-    * IP Address
-        - 10진수 형태의 4개의 옥텟
-        - 주소 체계
-            # A : 1 옥텟 가장 앞이 0(0 - 127)
-                ~ 클래스풀 : /8 넷마스크
-                ~ 클래스리스(사설) : 10.0.0.0/8 - 10.255.255.255/8
-            # B : 1 옥텟 가장 앞이 10(128 - 191)
-                ~ 클래스풀 : /16 넷마스크
-                ~ 클래스리스(사설) : 172.16.0.0/12 - 172.31.255.255/12
-            # C : 1 옥텟 가장 앞이 110(192 - 223)
-                ~ 클래스풀 : /24 넷마스크
-                ~ 클래스리스(사설) : 192.168.0.0/16 - 192.168.255.255/16
-            # D : 1 옥텟 가장 앞이 1110(224 - 239)
-                ~ 멀티 캐스트용
-            # E : 1 옥텟 가장 앞이 1111(240 - 255)
-                ~ 연구 목적용(IANA 에 요청해야 사용 가능)
-            # 윈도우 OS 는 IP Netmask 정보가 오등록되어도 클래스풀 내에서 제한적 통신 가능
+    * IPv4
+        - Decimal(10 진수), 4 Octet(32)
+        - 헤더 구성
+            # Version(4)
+              Header Length(4)
+              Type of Service(8)
+              Total Length(16)
+              Identification(16)
+              Flags(3)
+              Fragment Offset(13)
+              TTL(8)
+              Protocol(8)
+              Header Checksum(16)
+              Src IP(32)
+              Dst IP(32)
+        - A : 1 옥텟 가장 앞이 0(0 - 127)
+            # 클래스풀 : /8 넷마스크
+            # 클래스리스(사설) : 10.0.0.0/8 - 10.255.255.255/8
+        - B : 1 옥텟 가장 앞이 10(128 - 191)
+            # 클래스풀 : /16 넷마스크
+            # 클래스리스(사설) : 172.16.0.0/12 - 172.31.255.255/12
+        - C : 1 옥텟 가장 앞이 110(192 - 223)
+            # 클래스풀 : /24 넷마스크
+            # 클래스리스(사설) : 192.168.0.0/16 - 192.168.255.255/16
+        - D : 1 옥텟 가장 앞이 1110(224 - 239)
+            # 멀티 캐스트용
+        - E : 1 옥텟 가장 앞이 1111(240 - 255)
+            # 연구 목적용(IANA 에 요청해야 사용 가능)
         - 표기법
             # VLSM : /24
             # CIDR : 255.255.255.0
@@ -725,19 +723,91 @@
                 3) IP Address
                 4) Network Address
                 5) Default Gateway
-        - IP 우회(Bypass)
-            # 패키지 확인
-                <Redhat>                        <Debian>
-                ~ rpm -qa                       ~ dkpg -l
-                ~ rpm -ql proxychains           ~ dpkg -L proxychains
-                ~ rpm -qf /bin/lf               ~ dpkg -s /bin/ls
-            # TOR 네트워크 사용
-                ~ apt-get install -y tor proxychains4
-                ~ systemctl enable --now tor
-                ~ proxychains nmap -sT -Pn -p 80 www.soldesk.com
-                  \\ TOR 네트워크를 거치면서 우회하여 해당 HTTP 서버의 80 포트 스캐닝
-        - VPN 프로그램(SoftEther)
-            # 
+            # 윈도우 OS 는 IP Netmask 정보가 오등록되어도 클래스풀 내에서 제한적 통신 가능
+     * IPv6
+        - Hexa-Decimal(16 진수), 8 Octet(128)
+            # 64 Bit(prefix) + 64 Bit(suffix; EUI-64)
+        - 헤더 구성
+            # Version(4)
+              Traffic Class(1) = TOS
+              Flow Label(20)
+              Payload Length(2) = Header Length + Total Length
+              Next Header(1) = Protocol
+              Hop Limit(1) = TTL
+              Src IP(16)
+              Dst IP(16)
+        - 특징
+            # Broadcast 를 사용하지 않고 Multicast 사용, Anycast 신규
+                ~ ARP 대신 NDP(Neighbor Discovery Protocol) 사용
+                ~ 이웃 요청 메시지 : ICMPv6 type 135
+                  이웃 광고 메시지 : ICMPv6 type 136
+                ~ Ping Request : ICMPv6 type 128
+                  Ping Reply : ICMPv6 type 129
+            # 패킷 Fragmentation 을 진행하지 않고 MTU 를 자동 조정하여 전송
+            # DHCP 서비스를 (1) Statefull (2) Stateless 로 세분화
+                ~ yum install -y radvd
+                  vi /etc/radvd.conf (interface + prefix)
+                  systemctl enable --now radvd
+                ~ Client 의 IPv6 사용 체크 후 리부팅하여 IP 자동 할당 확인
+            # 0.0.0.0 = ::
+            # 127.0.0.1 = ::1
+        - FE80 : 1 옥텟 가장 앞이 FE80
+            # Link-Local Unicast Address(사설 IP: Host)
+                ~ fe80::EUI-61
+        - FEC0 : 1 옥텟 가장 앞이 FEC0
+            # Site-Local Unicast Address(사설 네트워크; IPv6 라우터(Gateway))
+                ~ fec0::0003:EUI-61(0003 은 서브넷 ID)
+        - 2/3 : 1 옥텟 가장 앞이 2 또는 3
+            # Global Unicast Address(공인 IP; IPv6 라우터 <-> WAN IPv6)
+                ~ (001 + TLA(국가, 38) + NLA(ISP, 32) + SLA(기업, 16)) + EUI-64
+                ~ 001 고정으로 TLA 앞 비트가 0이면 0010=2, 1이면 0011=3
+        - FF : 1 옥텟 가장 앞이 FF
+            # Multicast Address
+            # 객체 지정 주소(EUI-64 마지막 옥텟)
+                <Host>
+                ~ FF01::1 : Node-Local
+                ~ FF02::1 : Link-Local
+                <Router>
+                ~ FF01::2 : Node-Local
+                ~ FF02::2 : Link-Local
+                  FF02::9 : Link-Local RIP Router
+                ~ FF05::2 : Site-Local
+                <NTP Server>
+                ~ FF01::101 : Node-Local
+                ~ FF02::101 : Link-Local
+                ~ FF05::101 : Site-Local
+                ~ FF0E::101 : Global
+        - EUI-64(End-Unit-Identifier 64)
+            # MAC(48 Bit) 을 IPv6 주소변환체계를 적용시켜 EUI-64 주소 생성
+                ~ MAC(CID+VID) 사이에 FFFE 를 추가하고 CID 의 7 Bit('*V**:' V 부분) 에 +1
+        - 동작 원리
+            # IPv6 생성
+                ~ 부팅 > EUI-64 생성 > Link-Local 생성 > 라우터에게 prefix 요청
+                  Router 로부터 prefix 제공받음('fec0::XXXX:', '2:XXXX:')
+                  Site-Local(fec0::XXXX:EUI-64), Global(2:XXXX:EUI-64) 생성
+            # IPv6 Network 변경 업데이트
+                ~ Router 가 Site-Local 변경 시 클라이언트에게 자동 전달
+                  클라이언트들은 전달받은 정보를 통해 각자 Site-Local 수정함
+            # IPv6 Duplication Dectection
+                ~ IP 생성 당시 본인의 Link-Local 주소 중복 여부를 먼저 확인함
+                ~ NDP 를 사용하여 LAN 상에 설정을 희망하는 IP 대역을 목적지로 메시지 전송
+                  응답 O = duplicated
+                  응답 X = 사용 가능
+                ~ IPv6 Dup 발생 시 윈도우는 다른 IP 를 추가 생성, 리눅스는 강제 설정
+                  IPv4 Dup 발생 시 윈도우는 다른 IP(163.~) 생성, 리눅스는 강제 설정
+    * IP 우회(Bypass)
+        - 패키지 확인
+            <Redhat>                        <Debian>
+            # rpm -qa                       # dkpg -l
+            # rpm -ql proxychains           # dpkg -L proxychains
+            # rpm -qf /bin/lf               # dpkg -s /bin/ls
+        - TOR 네트워크 사용
+            # apt-get install -y tor proxychains4
+            # systemctl enable --now tor
+            # proxychains nmap -sT -Pn -p 80 www.soldesk.com
+              \\ TOR 네트워크를 거치면서 우회하여 해당 HTTP 서버의 80 포트 스캐닝
+        - VPN 네트워크 사용
+            # SoftEther(범용 VPN 클라이언트 프로그램)
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)

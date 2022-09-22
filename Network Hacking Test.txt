@@ -1,0 +1,818 @@
+1. 네트워크 모의해킹 구성 환경
+    * Firewall(Linux, CentOS 8)
+        - hostname : firewall.example.com
+        - IP
+            # eth0 : 192.168.10.100
+            # GW : 192.168.10.2
+            # DNS : 168.126.63.1
+            # eth1 : 192.168.20.100
+        - Service : F/W(masquerade)
+            # 테스트 환경을 위해 SELinux OFF
+    * Linux200(Linux, CentOS 8)
+        - hostname : linux200.example.com
+        - IP
+            # eth0 : 192.168.20.200
+            # GW : 192.168.20.100
+            # DNS : 168.126.63.1
+        - Service : DNS(Root, .com), Web, FTP, Mail
+            # 테스트 환경을 위해 방화벽, SELinux OFF
+    * Win2012
+        - hostname : win2012
+        - IP
+            # eth0 : 192.168.20.201
+            # GW : 192.168.20.100
+            # DNS : 168.126.63.1
+    * Win8
+        - hostname : win8
+        - IP
+            # eth0 : 192.168.20.202
+            # GW : 192.168.20.100
+            # DNS : 168.126.63.1
+2. 기본 환경 구축
+    [Firewall]
+    * VM 설치
+        <VM 생성>
+        - CentOS 8 Stream, RAM 2G, HDD 40G
+        <OS 설치>
+        - 한국어, 자동 파티션
+        - root : soldesk1.
+        - fedora : fedora, 관리자 체크
+        <네트워크 설정>
+        - connection : eth0
+        - IP : 192.168.10.100/24
+        - GW : 192.168.10.2/24
+        - DNS : 168.126.63.1
+        - domain search : example.com
+        - Hostname : firewall.example.com
+    * 추가 NIC(192.168.20.0/24) 설치
+        - connection : eth1
+        - IP : 192.168.20.100/24
+    * 가상 NIC 인터페이스(virbr0) 삭제
+        - systemctl disable --now libvirtd
+        - reboot
+    * TUI 환경 설정
+        - systemctl set-default multi-user.target
+        - systemctl isolate multi-user.target
+    * NAT 설정
+        <기본 설정>
+        - sysctl -a | grep ip_forward
+        - vi /etc/sysctl.d/01-ip_forward.conf
+            # net.ipv4.ip_forward = 1
+            # SNAT(source NAT = masquerade) 기능 ON
+        - sysctl -p /etc/sysctl.d/01-ip_forward.conf
+    * 방화벽 설정
+        - yum install -y firewalld firewall-config
+        - firewall-config &
+        - 퍼블릭 > 마스커레이드 체크 > 영구 적용
+    * SELinux 설정
+        - sestatus
+        - vi /etc/selinux/config
+            # SELINUX=disabled 수정
+            # 테스트 환경을 위해 SELinux 기능 OFF
+        - reboot
+    [Linux200]
+    * VM 설치
+        <VM 생성>
+        - CentOS 8 Stream, RAM 2G, HDD 40G
+        <OS 설치>
+        - 한국어, 자동 파티션
+        - root : soldesk1.
+        - fedora : fedora, 관리자 체크
+        <네트워크 설정>
+        - connection : eth0
+        - IP : 192.168.20.200/24
+        - GW : 192.168.20.100/24
+        - DNS : 168.126.63.1
+        - domain search : example.com
+        - Hostname : linux200.example.com
+    * 방화벽 설정
+        - systemctl status firewalld
+        - systemctl disable --now firewalld
+    * SELinux 설정
+        - sestatus
+        - vi /etc/selinux/config
+            # SELINUX=disabled 수정
+            # 테스트 환경을 위해 SELinux 기능 OFF
+        - reboot
+    * 가상 NIC 인터페이스(virbr0) 삭제
+        - systemctl disable --now libvirtd
+        - reboot
+    [Win2012]
+    * VM 설치
+        <VM 생성>
+        - Windows Server 2012 R2(DataCenter), RAM 2G, HDD 60G
+        <OS 설치>
+        - 한글, GUI 서버
+        - administrator : soldesk1.
+        <네트워크 설정>
+        - IP : 192.168.20.201/24
+        - GW : 192.168.20.100/24
+        - DNS : 168.126.63.1
+        <컴퓨터 이름 설정>
+        - 시스템 > 변경 > win2012 입력 > 리부팅
+        <VMware Tool 설치>
+        - VMware 에서 Player 선택 > VMware Tool 설치
+        - D:\ 선택 > 표준 > 리부팅 > 리부팅 후 다시 리부팅
+    * 방화벽 설정
+        - firewall.cpl > 설정 또는 해제 > 모든 옵션 해제 체크
+    * 추가 설정
+        <일반 PC 처럼 사용하기>
+        - 서버 관리자 > 기능 추가 > 데스크톱 경험 > 리부팅
+        <바탕화면 아이콘>
+        - 바탕화면 선택 > 개인 설정 > 바탕 화면 아이콘 체크
+        - 바탕화면 선택 > 보기 > 작은 아이콘
+        <로그온 시>
+        - pgedit.msc > Windows 설정 > 보안 설정 > 로컬 정책 > 보안 옵션
+        - '대화형 로그온: [Ctrl+Alt+Del] 사용할 필요 없음' 사용
+        - '대화형 로그온:~'에서 메시지 제목 > 경고 입력
+        - '대화형 로그온:~'에서 메시지 텍스트 > 인증된 사용자만 접근 가능 입력
+        <전원 옵션>
+        - control > 하드웨어 및 소리 > 전원 옵션 > 디스플레이 끄는 시간 > 모두 해당 없음
+        <업데이트 기능 끄기>
+        - control > 시스템 및 보안 > Windows Update > 설정 변경 > 업데이트를 확인하지 않음
+        <자동 로그온>
+        - control userpasswords2 > '사용자 이름과 암호를~' 체크 해제 > 암호 입력
+    [Win8]
+    * VM 설치
+        <VM 생성>
+        - Windows 8, RAM 2G, HDD 60G
+        <OS 설치>
+        - 한글
+        - 컴퓨터 이름 : win8
+        - 로컬 계정 생성 : soldesk, soldesk1.
+        - PC 및 개인정보보호 모두 OFF
+        - Microsoft 새 계정 > 로컬 계정 만들기
+        <네트워크 설정>
+        - IP : 192.168.20.202/24
+        - GW : 192.168.20.100/24
+        - DNS : 168.126.63.1
+        <VMware Tool 설치>
+        - windows 필수 업데이트 필요
+            # KB2919442 설치 후 KB2919355 설치 > 리부팅
+        - VMware 에서 Player 선택 > VMware Tool 설치
+        - D:\ 선택 > 표준 > 리부팅 > 리부팅 후 다시 리부팅
+    * 방화벽 설정
+        - firewall.cpl > 설정 또는 해제 > 모든 옵션 해제 체크
+    * 추가 설정
+        <바탕화면 아이콘>
+        - 바탕화면 선택 > 개인 설정 > 바탕 화면 아이콘 체크
+        - 바탕화면 선택 > 보기 > 작은 아이콘
+        <로그온 시>
+        - pgedit.msc > Windows 설정 > 보안 설정 > 로컬 정책 > 보안 옵션
+        - '대화형 로그온:~'에서 메시지 제목 > '경고' 입력
+        - '대화형 로그온:~'에서 메시지 텍스트 > '인증된 사용자만 접근 가능' 입력
+        <전원 옵션>
+        - control > 하드웨어 및 소리 > 전원 옵션 > 디스플레이 끄는 시간 > 모두 해당 없음
+        <업데이트 기능 끄기>
+        - control > 시스템 및 보안 > Windows Update > 설정 변경 > 업데이트를 확인하지 않음
+        <자동 로그온>
+        - control userpasswords2 > '사용자 이름과 암호를~' 체크 해제 > 암호 입력
+3. DNS 서버 구성
+    * 기본 구성
+        - Firewall(192.168.20.100) : Root(.) / .com
+        - Linux200(192.168.20.200) : example.com
+        - Win2012(192.168.20.201) : test.com
+            # test.com 은 다른 서비스들을 구성한 후 설정
+    [Firewall]
+    * 네트워크 설정
+        - nm-connection-editor
+            # dns server: 192.168.20.100, 168.126.63.1
+    * 패키지 설치
+        - yum install -y bind bind-utils
+    * 서비스 설정
+        <주설정 파일 설정>
+        - vi /etc/named.conf
+            # listen-on port 53 { any; };
+              // listen-on-v6~
+              allow-query { any; };
+              dnssec-enable no;
+              dnssec-validation no;
+        - vi /etc/named.rfc1912.zones
+            # zone "com" IN {
+                  type master;
+                  file "com.zone";
+                  allow-update { none; };
+              };
+
+              zone "20.168.192.in-addr-arpa" IN {
+              type master;
+              file "com.rev";
+              allow-update { none; };
+              };
+        - cd /var/named
+        - cp -p named.ca named.ca.OLD
+        - > named.ca && vi named.ca
+            # .       86400 IN NS ns1.com
+              ns1.com 86400 IN A  192.168.20.100
+        - cp -p named.localhost com.zone
+        - > com.zone && vi com.zone
+            # $TTL 4
+              @       IN SOA  ns1.com. root.com. (
+                                        10      ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+              com.            IN  NS  ns1.com.
+              ns1.com.        IN  A   192.168.20.100
+              
+              ;; Domain Delegation
+              example         IN  NS  ns1.example
+              ns1.example     IN  A   192.168.20.200
+              test            IN  NS  ns1.test
+              ns1.test        IN  A   192.168.20.201
+        - cp -p named.loopback com.rev
+        - > com.rev && vi com.rev
+            # $TTL 4
+              @       IN SOA  ns1.com. root.com. (
+                                                      10      ; serial
+                                                      1D      ; refresh
+                                                      1H      ; retry
+                                                      1W      ; expire
+                                                      3H )    ; minimum
+              
+                              IN  NS          ns1.com.
+              100             IN  PTR         ns1.com.
+              
+              ;; Domain Delegation
+              200             IN  PTR         ns1.example.com.
+              201             IN  PTR         ns1.test.com.
+    * 방화벽 등록
+        - firewall-cmd --permanent --add-service=dns
+        - firewall-cmd --reload
+        - firewall-cmd --list-all
+    * 서비스 기동
+        - systemctl enable --now named
+    * 서비스 확인
+        - nslookup
+            # set q=NS
+            # com.
+            # set q=PTR
+            # 192.168.20.100
+    [Linux200]
+    * 네트워크 설정
+        - nm-connection-editor
+            # dns server: 192.168.20.200, 168.126.63.1
+    * 패키지 설치
+        - yum install -y bind bind-utils
+        * 서비스 설정
+        <주설정 파일 설정>
+        - vi /etc/named.conf
+            # listen-on port 53 { any; };
+              // listen-on-v6~
+              allow-query { any; };
+              dnssec-enable no;
+              dnssec-validation no;
+        - vi /etc/named.rfc1912.zones
+            # zone "example.com" IN {
+                  type master;
+                  file "example200.zone";
+              };
+
+              zone "20.168.192.in-addr-arpa" IN {
+              type master;
+              file "example200.rev";
+              };
+        - cd /var/named
+        - cp -p named.ca named.ca.OLD
+        - > named.ca && vi named.ca
+            # .       86400 IN NS ns1.com
+              ns1.com 86400 IN A  192.168.20.100
+        - cp -p named.localhost com.zone
+        - > com.zone && vi com.zone
+            # $TTL    4
+              @               IN SOA  ns1.example.com. root.example.com. (
+                                                      42              ; serial (d. adams)
+                                                      3H              ; refresh
+                                                      15M             ; retry
+                                                      1W              ; expiry
+                                                      1D )            ; minimum
+                                      IN NS           ns1.example.com.
+              ns1.example.com.        IN A            192.168.20.200
+  
+              ;; (1) WEB Server
+              www                     IN      A       192.168.20.200
+  
+              ;; (2) FTP Server
+              ftp                     IN      A       192.168.20.200
+  
+              ;; (3) MAIL Server
+              example.com.            IN      MX 10   mail.example.com.
+              mail                    IN      A       192.168.20.200
+  
+              ;; (4) etc
+              cafe                    IN      A       192.168.20.200
+        - cp -p named.loopback com.rev
+        - > com.rev && vi com.rev
+            # $TTL    4
+              @       IN      SOA     ns1.example.com. root.example.com.  (
+                                                    1997022700 ; Serial
+                                                    28800      ; Refresh
+                                                    14400      ; Retry
+                                                    3600000    ; Expire
+                                                    86400 )    ; Minimum
+                      IN      NS      ns1.example.com.
+              200     IN      PTR     ns1.example.com.
+    * 방화벽 등록
+        - firewall-cmd --permanent --add-service=dns
+        - firewall-cmd --reload
+        - firewall-cmd --list-all
+    * 서비스 기동
+        - systemctl enable --now named
+    * 서비스 확인
+        - nslookup
+            # server 192.168.20.200
+            # www.example.com
+4. Web 서버 구성
+    [Linux200]
+    * 패키지 설치
+        - yum install -y httpd mod_ssl
+    * 서비스 설정
+        - vi /etc/httpd/conf/httpd.conf
+            # ServerAdmin root@example.com
+              ServerName www.example.com:80
+    * 서비스 기동
+        - systemctl enable --now httpd
+    * HTTP 웹페이지 설정
+        - cd /var/www/html
+        - echo "hello world" > index.html
+    * 서비스 확인
+        - curl http://localhost
+5. FTP 서버 구성
+    [Linux200]
+    * 패키지 설치
+        - yum install -y vsftpd ftp
+    * 서비스 설정
+        - cd /etc/vsftpd
+        - sed -i 's/^root/#root/' ftpusers
+        - sed -i 's/^root/#root/' user_list
+    * 서비스 기동
+        - systemctl enable --now vsftpd
+    * 서비스 확인
+        - ftp ftp.example.com
+6. Mail 서버 구성
+    [Linux200]
+    * 기존 메일 패키지 서비스 OFF
+        - systemctl list-unit-files | grep postfix|sendmail
+            # 확인 시 disable
+    * 패키지 설치
+        - yum install -y sendmail sendmail-cf dovecot evolution
+    * 서비스 설정
+        <발신; sendmail>
+        - vi /etc/mail/sendmail.cf
+            # DJmail.example.com
+              O EightBitMode=pass8
+              O DaemonPortOptions=Port=smtp, Name=MTA
+        - vi /etc/mail/local-host/names
+            # example.com
+              mail.example.com
+        - vi /etc/mail/access
+            # Connect:mail.example.com RELAY
+              Connect:example.com RELAY
+              Connect:192.168.20 RELAY
+              Connect:192.168.10 RELAY
+        - makemap hash /etc/mail/access < /etc/mail/access
+            # 설정 내용으로 접근제어 파일 재적용
+        <수신; dovecot>
+        - vi /etc/dovecot/dovecot.conf
+            # protocols = imap pop3 lmtp submission
+            # listen = *, ::
+        - vi /etc/dovecot/conf.d/10-auth.conf
+            # disable_plaintext_auth = no
+            # auth_mechanism = plain
+        - vi /etc/dovecot/conf.d/10-mail.conf
+            # mail_location = mbox:MEMORY:INBOX=/var/spool/mail/%u:INDEX=MEMORY
+        - vi /etc/dovecot/conf.d/10-ssl.conf
+            # ssl = no
+    * 서비스 기동
+        - systemctl enable --now sendmail
+        - systemctl enable --now dovecot
+    * 계정 생성 & 사용자 클라이언트 설정
+        - useradd user01
+        - echo user01 | passwd --stdin user01
+        - evolution
+            # 신상정보에서 이름(user01), 메일주소(user01@example.com) 입력
+              메일 받기 : POP
+              서버 : mail.example.com
+              사용자이름 : user01
+              메일 보내기 : sendmail
+              적용
+7. Windows 서비스 구성
+    [Win2012]
+    * Telnet 서비스
+        <기능 추가>
+        - 서버 관리자 > 기능 추가 > 텔넷서버/클라이언트 체크
+        <서비스 시작>
+        - services.msc > telnet 선택 > 자동 체크 > 시작
+    * Web & FTP 서비스
+        <Web 서비스 기능 추가>
+        - 서버 관리자 > 기능 추가 > 웹 서버(IIS) > 응용프로그램개발/FTP 서버 체크
+        <Web 서비스 설정>
+        - 서버 관리자 > IIS 관리자 > Default Web Site 선택 > 탐색 > index.htm 생성
+        <Web 서비스 확인>
+        - Internet Explorer 에서 192.168.20.201 접속
+        <FTP 서비스 설정>
+        - 서버 관리자 > IIS 관리자 > 사이트 선택 > FTP 사이트 추가
+            # Default FTP Site
+              C:\inetpub\ftproot
+            # SSL 사용 안함 체크
+              인증/사용권한 모두 체크
+              모든 사용자 선택
+        - 서버 관리자 > IIS 관리자 > Default FTP Site > 주소 및 도메인 제한 선택 > 허용 항목 추가
+            # IP 주소 범위 > 192.168.20.0/24, 192.168.10.0/24 추가
+        - 서버 관리자 > IIS 관리자 > Default FTP Site > 사용 권한 편집 선택
+        - 보안 > 편집 > 고급 > 지금 찾기 > IIS_IUSRS 그룹 추가 > 모든 권한 부여
+    * DNS 서비스
+        <기능 추가>
+        - 서버 관리자 > 기능 추가 > DNS 서버
+        <서비스 설정>
+        - dnsmgmt.msc > 정방향 조회 영역 선택 > 새 영역 > 주 영역 > test.com
+        - test.com 선택 > 해당 도메인 NS 선택 > 속성 > 편집
+        - ns1.test.com. / 192.168.20.201 입력 후 강제 확인
+            # 유효성 검사가 정상적으로 진행되지 않아도 상관없음
+        - test.com 선택 > 새 호스트(A) > www, ftp, mail 생성
+        - test.com 선택 > 새 MX > 메일 서버 FQDN 찾아보기 > mail 선택
+        - WIN2012 선택 > 속성 > 루트 힌트 > 모든 DNS 정보 삭제 > 추가
+            # DNS 쿼리를 보낼 수 있는 Well-Known 루트 DNS 정보
+        - ns1.com. / 192.168.20.100 입력 후 강제 확인
+            # 루트 DNS 를 Linux200(192.168.20.100) 으로 지정
+        <네트워크 재설정>
+        - ncpa.cpl > DNS 서버 '192.168.20.201' 입력
+        - cmd > ipconfig /flushdns
+        <서비스 확인>
+        - nslookup
+            # server 192.168.20.201
+              ns1.test.com
+              ns1.example.com
+    * Mail 서비스
+        <hMailServer 설치>
+        - 서버 관리자 > 기능 추가 > .NET framwork 3.5
+            # 필수 조건
+        - hMailServer 설치 암호 : soldesk1.
+        - hMailServer > connect > Add domain > test.com 입력
+        - domain > test.com 선택 > accounts 선택 > Add > soldesk / soldesk1. 입력 > save
+        - Settings > Advanced > Auto-ban > 'Enable' 체크해제 > save
+    [Win8]
+    * Telnet 서비스
+        - appwiz.cpl > 기능 추가 > 텔넷서버/클라이언트 체크
+        - services.msc > telnet 선택 > 자동 체크 > 시작
+        - lusrmgr.msc > 사용자 > soldeks 선택 > 그룹 > 고급 > 지금 찾기 > TelnetClients 추가
+            # Administrator 그룹에 속해있으면 추가할 필요는 없음
+    * Mail 서비스
+        <네트워크 설정>
+        - ncpa.cpl > DNS 서버를 '192.168.20.201' 로 지정
+        - cmd > ipconfig /flushdns
+        <Thunderbird 설치>
+        - 기본 설치 > 기존 계정 사용 > soldesk@test.com
+        <메일 테스트>
+        - 본인(Win8)에게 메일 보내기
+        - Win8(soldesk@test.com) -> Linux200(user01@example.com) 메일 보내기
+        - Linux200 -> Win8 메일 보내기
+8. KaliLinux
+    * 시스템 공격 테스트용 OS
+        - Debain OS 기반 + 모의해킹 Tool 포함
+    * 공식 홈페이지에서 설치 프로그램 및 ISO 이미지 선택하여 다운로드 가능
+        - www.kali.org
+    * 시스템 구성
+        <VM 구성>
+        - Debian 최신버전(x64), RAM 4G, 60G HDD
+        - 초기 구성시에는 DHCP 로 IP 정보를 받아올 수 있게 설정되어야함
+        <설치>
+        - Graphic Installation
+        - 한국어, 대만민국(South Korea)
+        - 호스트이름(kali), 도메인(example.com)
+        - 사용자 및 암호(soldesk/soldesk1.)
+        - 자동 디스크 전체 사용, 모두 한 파티션에 설치, 파티션하기
+        - 패키지 관리자 설정, 프록시 서버 없음
+            # 패키지 설치 항목에서 'xfce', 'default' 외 나머지 uncheck
+        - 하드 디스크에 GRUB 부트로더 설치, /dev/sda 선택
+        <루트 계정 패스워드 변경>
+        - sudo passwd root > 현재 접속한 soldesk 계정의 패스워드 입력
+        - soldesk. 입력
+        - su -
+    * 시스템 설정
+        <언어 패키지 설치>
+        - apt-get list fonts-nanum*
+        - apt-get install fonts-nanum*
+            # yum(redhat) = apt-get(debian)
+            # 초기 설치시에 한글 폰트가 깨지는걸 복구할 수 있음
+        - reboot
+        <네트워크 설정>
+        - 추가 NIC 설치 진행(NAT)
+        - nmcli device 에서 추가 장치명 확인 > nmtui
+        - eth0(eth0) : 192.168.10.50/24, 192.168.10.2, 168.126.63.1, example.com
+        - eth1(eth1) : 192.168.20.50/24
+        <언어 변경>
+        - localectl list-locales | grep -i ko
+        - localectl set-locale LANG=en_US.utf-8|ko_KR.utf-8
+        - reboot
+        <SSH 서비스 제어>
+        - vi /etc/ssh/sshd_config
+            # PermitRootLogin yes
+        - systemctl enable --now ssh
+        <루트 사용자 설정변경>
+        - sudo vi /etc/sudoers
+            # %sudo ALL=(ALL:ALL) NOPASSWD: ALL
+        - sudo usermod -s /usr/bin/bash root
+        - su -
+        - vi ~/.bashrc
+            # export PS1='\[\e[31;1m\][\u@\h\[\e[33;1m\] \w]\$ \[\e[m\]'
+        - . ~/.bashrc
+        - reboot
+9. Network
+    * 패킷(Packet)
+        - 헤더 + 데이터 + 테일러
+    * 프로토콜(Protocol)
+        - 비접속(UDP)/접속(TCP) 지향형
+        - 비라우팅/라우팅 형
+    * OSI 7 Layer
+        - 1) Physical
+            # 전기적인 신호 전달(Bit)
+                ~ 허브, 리피터
+        - 2) Datalink
+            # 데이터 흐름을 위한 신호 제어(Frame)
+                ~ 브릿지, 스위치
+        - 3) Network
+            # 논리적 주소 통신 유지(Packet)
+                ~ 라우터
+        - 4) Transport
+            # 패킷 전송의 에러를 보장하고 분할/조합(Segment)
+        - 5) Session
+            # 프로세스 간 통신 제어, 네트워크 오류 검사 및 재전송
+        - 6) Presentation
+            # 데이터 변환(해석, 압축, 프로토콜 전환, 암호화)
+        - 7) Application
+            # 파일 전송/접근(데이터)
+    * TCP/IP 5 Layer
+        - 범용 네트워크 통신 규약
+        - 1) Hardware
+            # LAN Cable 등
+        - 2) Network Interface
+            # Ethernet, Token Ring, MAC 등
+        - 3) Internet
+            # ARP, ICMP, IPv4/6
+        - 4) Transport
+            # TCP, UDP
+        - 5) Application
+            # HTTP, SSH, DNS 등
+    * RFC(Request for Comments) 문서 검색 방법
+        - http://www.ietf.org/rfc.html
+            # http://www.ietf.org/rfc/rfcNNNN.txt
+10. Network Interface Layer
+    * 헤더(MAC), 테일러(CRC)
+        - MAC : 흐름 제어(Flow Control)
+        - CRC : 에러 제어(Error Control)
+        - 헤더 구성
+            # Dst MAC Address(6)
+              Src MAC Address(6)
+              Ethernet type(2)
+    * 계층 프로토콜
+        <H/W>
+        - Ethernet, FDDI, ATM
+        <S/W>
+        - SLIP(Serial Link Interface Protocol), PPP(Point-to-Point Protocol)
+    * 토폴로지
+        - Bus
+            # 허브 통신 구조
+        - Star
+            # 스위치 통신 구조
+        - Ring
+            # 토큰 링 통신 구조
+        - VLAN
+            # 브로드캐스트 도메인 분할 통신 구조
+                ~ VLAN : LAN
+                ~ VPN(Virtual Private Network) : WAN
+    * LAN Media
+        - 유선 & 무선
+            # UTP, Fiber
+                ~ Cross, Direct, Console
+            # Wireless(WiFi)
+    * Ethernet 구성 요소
+        - CSMA/CD(Carrier Sense Multiple Access/Collision Detection)
+        - Frame
+            # Header{Preamble(8) +Dst.MAC(6) +Src.MAC(6) +Type(2)}
+            # Data(46~1500)
+            # Tailer{CRC(4)}
+        - MAC(Media Access Control) Address
+            # MAC 주소 찾기 : http://www.coffer.com/mac_find
+            # MAC 주소 변경
+                ~ 리눅스 : ifconfig <장비이름> hw ether <MAC>
+                ~ 윈도우 : devmgmt.msc > 네트워크 어댑터 > 속성 > 고급 > 로컬 주소 변경
+11. Internet Layer
+    * 헤더(IP)
+        - IP : 경로 지정(Routing)
+        - Fragmentation & Reassembly : 송신(분할) / 수신(조합)
+    * 계층 프로토콜
+        - ARP/RARP, ICMP, IPv4/6, IPSec
+            # ARP : IP > MAC
+                ~ RARP : MAC > IP
+                ~ 더 이상 안쓰임(RXE Boot + DHCP 로 대체)
+            # ARP 설정 변경
+                ~ 리눅스 : arp -an(목록), -s(static), -d(delete)
+                ~ 윈도우 : arp -a(목록), netsh interface ip add "장비이름" "IP" "MAC"(static)
+                                        netsh interface ip delete "장비이름" "IP"(delete)
+        - ARP 헤더 구성
+            # Hardware type(2)
+              Protocol type(2)
+              Hardware size(1)
+              Protocol size(1)
+              Opcode(2)
+              Sender MAC Address(6)
+              Sender IP Address(4)
+              Target MAC Address(6)
+              Target IP Address(4)
+    * ARP Spoofing Attack
+        - 다른 공격 작업 전 선행 작업으로 사용
+        - Ethernet S/W 트래픽 변경 수단
+        <공격 과정>
+        - apt-get install -y dsniff
+        - IP Forwarding
+            # vi /etc/sysctl.conf
+              net.ipv4.ip_forward=1
+                ~ IPv4 Forwarding 기능 ON
+        - ARP Spoofing
+            # arpspoof -i eth1 -t 192.168.20.200 192.168.20.201
+            # arpspoof -i eth1 -t 192.168.20.201 192.168.20.200
+                ~ 양 장비들에게 자신의 MAC 주소로 스푸핑
+        - Sniffing
+            # dsniff -i eth1 -t 21/tcp=ftp host 192.168.20.200
+                ~ Win2012 > Linux200 FTP 접속 시 로그인 정보가 Kali 에서 Plaintext 로 확인
+        <방지 방법>
+        - 스크립트를 통한 NIC MAC Static
+            # 'ip addr' 를 통해 NIC MAC 확인
+            # 해당 MAC 주소를 'arp -s' 로 등록하는 스크립트를 생성
+            # vi /etc/rc.local 에서 부팅 시 자동 실행될 수 있게 스크립트 위치 입력
+                ~ chmod +x /etc/rc.local
+            # systemctl start rc-local.service
+            # reboot
+        - 스크립트를 통한 ARP Spoofing Attack Detection
+            # 'arp -an' 결과값에서 MAC 주소의 라인 개수를 중복값 없이 정렬 추출
+            # 그 값이 1 보다 크면 동일 MAC 주소에 2개 이상의 IP 가 설정되었다는 뜻
+                ~ ARP Spoofing Attack 징후
+            # 정상/비정상 결과를 로그로 기록하고 crontab 에 등록하여 백그라운드 실행
+    * ICMP(Internet Control Messages Protocol)
+        - 헤더 구성
+            # Type
+              Code
+              Checksum
+              ID
+              Sequence Number
+        - ping
+            # 메시지
+                ~ 오류 type 3 : 목적지 도달 불가
+                    code 0) network(라우팅 경로 없음)
+                    code 1) host(최종 목적지 도달 불가)
+                    code 2) protocol(특정 프로토콜 사용 불가)
+                    code 3) port(특정 포트 사용 불가)
+                ~ 오류 type 5 : 경로 리다이렉트
+                ~ 쿼리 type 8 : 질문
+                ~ 쿼리 type 0 : 응답
+            # CMD
+                ~ 리눅스 : ping -c 4 (IP)
+                ~ 윈도우 : ping -n 4 (IP)
+        - traceroute
+            # TTL(Time to Live) 를 이용해서 목적지 네트워크 경로상에 있는 라우터 확인
+                ~ 리눅스 : 64
+                ~ 윈도우 : 128
+                ~ 네트워크장비(Cisco) : 255
+            # CMD
+                ~ 리눅스 : traceroute(default; TCP) (IP) / traceroute -I(ICMP) (IP)
+                ~ 윈도우 : tracert(ICMP) -d(not reserved) (IP)
+            # '*' 표시 의미
+                ~ 네트워킹 불가
+                ~ 보안 기능으로 인한 응답 불가
+        - VisualRoute(유료) & OpenVisualRoute(무료)
+            # traceroute 경로를 3D 그래픽 형태로 출력해주는 프로그램
+                ~ Java 종속 프로그램으로 필요한 버전으로 설치 진행
+    * IPv4
+        - Decimal(10 진수), 4 Octet(32)
+        - 헤더 구성
+            # Version(4)
+              Header Length(4)
+              Type of Service(8)
+              Total Length(16)
+              Identification(16)
+              Flags(3)
+              Fragment Offset(13)
+              TTL(8)
+              Protocol(8)
+              Header Checksum(16)
+              Src IP(32)
+              Dst IP(32)
+        - A : 1 옥텟 가장 앞이 0(0 - 127)
+            # 클래스풀 : /8 넷마스크
+            # 클래스리스(사설) : 10.0.0.0/8 - 10.255.255.255/8
+        - B : 1 옥텟 가장 앞이 10(128 - 191)
+            # 클래스풀 : /16 넷마스크
+            # 클래스리스(사설) : 172.16.0.0/12 - 172.31.255.255/12
+        - C : 1 옥텟 가장 앞이 110(192 - 223)
+            # 클래스풀 : /24 넷마스크
+            # 클래스리스(사설) : 192.168.0.0/16 - 192.168.255.255/16
+        - D : 1 옥텟 가장 앞이 1110(224 - 239)
+            # 멀티 캐스트용
+        - E : 1 옥텟 가장 앞이 1111(240 - 255)
+            # 연구 목적용(IANA 에 요청해야 사용 가능)
+        - 표기법
+            # VLSM : /24
+            # CIDR : 255.255.255.0
+        - 라우팅 테이블 우선순위
+            # Without Gateway 
+                1) Self IP Address
+                2) Self Network Address
+            # With Gateway
+                3) IP Address
+                4) Network Address
+                5) Default Gateway
+            # 윈도우 OS 는 IP Netmask 정보가 오등록되어도 클래스풀 내에서 제한적 통신 가능
+     * IPv6
+        - Hexa-Decimal(16 진수), 8 Octet(128)
+            # 64 Bit(prefix) + 64 Bit(suffix; EUI-64)
+        - 헤더 구성
+            # Version(4)
+              Traffic Class(1) = TOS
+              Flow Label(20)
+              Payload Length(2) = Header Length + Total Length
+              Next Header(1) = Protocol
+              Hop Limit(1) = TTL
+              Src IP(16)
+              Dst IP(16)
+        - 특징
+            # Broadcast 를 사용하지 않고 Multicast 사용, Anycast 신규
+                ~ ARP 대신 NDP(Neighbor Discovery Protocol) 사용
+                ~ 이웃 요청 메시지 : ICMPv6 type 135
+                  이웃 광고 메시지 : ICMPv6 type 136
+                ~ Ping Request : ICMPv6 type 128
+                  Ping Reply : ICMPv6 type 129
+            # 패킷 Fragmentation 을 진행하지 않고 MTU 를 자동 조정하여 전송
+            # DHCP 서비스를 (1) Statefull (2) Stateless 로 세분화
+                ~ yum install -y radvd
+                  vi /etc/radvd.conf (interface + prefix)
+                  systemctl enable --now radvd
+                ~ Client 의 IPv6 사용 체크 후 리부팅하여 IP 자동 할당 확인
+            # 0.0.0.0 = ::
+            # 127.0.0.1 = ::1
+        - FE80 : 1 옥텟 가장 앞이 FE80
+            # Link-Local Unicast Address(사설 IP: Host)
+                ~ fe80::EUI-61
+        - FEC0 : 1 옥텟 가장 앞이 FEC0
+            # Site-Local Unicast Address(사설 네트워크; IPv6 라우터(Gateway))
+                ~ fec0::0003:EUI-61(0003 은 서브넷 ID)
+        - 2/3 : 1 옥텟 가장 앞이 2 또는 3
+            # Global Unicast Address(공인 IP; IPv6 라우터 <-> WAN IPv6)
+                ~ (001 + TLA(국가, 38) + NLA(ISP, 32) + SLA(기업, 16)) + EUI-64
+                ~ 001 고정으로 TLA 앞 비트가 0이면 0010=2, 1이면 0011=3
+        - FF : 1 옥텟 가장 앞이 FF
+            # Multicast Address
+            # 객체 지정 주소(EUI-64 마지막 옥텟)
+                <Host>
+                ~ FF01::1 : Node-Local
+                ~ FF02::1 : Link-Local
+                <Router>
+                ~ FF01::2 : Node-Local
+                ~ FF02::2 : Link-Local
+                  FF02::9 : Link-Local RIP Router
+                ~ FF05::2 : Site-Local
+                <NTP Server>
+                ~ FF01::101 : Node-Local
+                ~ FF02::101 : Link-Local
+                ~ FF05::101 : Site-Local
+                ~ FF0E::101 : Global
+        - EUI-64(End-Unit-Identifier 64)
+            # MAC(48 Bit) 을 IPv6 주소변환체계를 적용시켜 EUI-64 주소 생성
+                ~ MAC(CID+VID) 사이에 FFFE 를 추가하고 CID 의 7 Bit('*V**:' V 부분) 에 +1
+        - 동작 원리
+            # IPv6 생성
+                ~ 부팅 > EUI-64 생성 > Link-Local 생성 > 라우터에게 prefix 요청
+                  Router 로부터 prefix 제공받음('fec0::XXXX:', '2:XXXX:')
+                  Site-Local(fec0::XXXX:EUI-64), Global(2:XXXX:EUI-64) 생성
+            # IPv6 Network 변경 업데이트
+                ~ Router 가 Site-Local 변경 시 클라이언트에게 자동 전달
+                  클라이언트들은 전달받은 정보를 통해 각자 Site-Local 수정함
+            # IPv6 Duplication Dectection
+                ~ IP 생성 당시 본인의 Link-Local 주소 중복 여부를 먼저 확인함
+                ~ NDP 를 사용하여 LAN 상에 설정을 희망하는 IP 대역을 목적지로 메시지 전송
+                  응답 O = duplicated
+                  응답 X = 사용 가능
+                ~ IPv6 Dup 발생 시 윈도우는 다른 IP 를 추가 생성, 리눅스는 강제 설정
+                  IPv4 Dup 발생 시 윈도우는 다른 IP(163.~) 생성, 리눅스는 강제 설정
+    * IP 우회(Bypass)
+        - 패키지 확인
+            <Redhat>                        <Debian>
+            # rpm -qa                       # dkpg -l
+            # rpm -ql proxychains           # dpkg -L proxychains
+            # rpm -qf /bin/lf               # dpkg -s /bin/ls
+        - TOR 네트워크 사용
+            # apt-get install -y tor proxychains4
+            # systemctl enable --now tor
+            # proxychains nmap -sT -Pn -p 80 www.soldesk.com
+              \\ TOR 네트워크를 거치면서 우회하여 해당 HTTP 서버의 80 포트 스캐닝
+        - VPN 네트워크 사용
+            # SoftEther(범용 VPN 클라이언트 프로그램)
+12. Transport Layer
+    * 헤더(Port: TCP, UDP)
+        - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)
+            # 3-Hand-Shake : SYN(연결 확인) > ACK(확인), SYN(연결 허용) > ACK(확인, 연결)
+    * 계층 프로토콜
+        - TCP, UDP
+13. Application Layer
+    * 

@@ -844,10 +844,13 @@
                 2) SYN, ACK <-
                 3) ACK ->
                 <종료; 4-Hand-Shake>
-                1) FIN ->
+                1) FIN/ACK ->
                 2) ACK <-
-                3) FIN <-
+                3) FIN/ACK <-
                 4) ACK ->
+                <비정상종료>
+                1) ACK ->
+                2) RST/ACK <-
         - 상태기반(Stateful)                            - 상태무관(Stateless)
             # 데이터 전송 시 상대로부터 응답(ACK)을 받음       # 일방적 데이터 전송
         - 신뢰성(Reliable)                              - 비신뢰성(Unreliable)
@@ -860,6 +863,14 @@
         - 서비스 포트 설정 파일
             # 윈도우 : C:\Windows\system32\drivers\etc\services
             # 리눅스 : /etc/services
-                ~ 열려있는 포트 확인 : netstat -antup / nmap localhost      
+    * 열려있는 포트 확인
+        - 리눅스
+            # netstat -antup | grep :21
+            # nmap localhost
+        - 윈도우
+            # netstat -ano -p tcp|udp | findstr :21
+    * 원격 통신을 포함한 모든 통신은 메시지의 송수신 과정
+        - telnet : 입력하는 명령어와 원격지 OS 프롬프트 정보등을 모두 메시지 형태로 전달
+        - FTP : 
 13. Application Layer
     * 

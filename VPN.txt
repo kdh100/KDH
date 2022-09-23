@@ -85,4 +85,36 @@
           Username : root
           Password : toor
 4. Remote Access with SSL 설정
-    1) 
+    * 각 네트워크의 라우터는 내부/외부 NAT 설정이 되어있고 인터넷에 연결되어있음
+    1) AAA 구성
+        # aaa new-model
+          aaa authentication login uservpn local
+          aaa authorization network groupvpn local
+    2) 계정 생성
+        # username root password centos
+    3) isakmp(IKE) 정책 설정
+        # crypto isakmp policy 100
+           authentication pre-share
+           encription aes 256
+           hash sha
+           group 5
+    4) 사용자 측에서 사용될 정책 설정
+        # ip local pool poolvpn (IP address pool; DHCP)
+        # crypto isakmp client configuration group groupvpn
+           key linux
+           pool poolvpn
+    5) ipsec 보안 정책 설정
+        # crypto ipsec transform-set setvpn esp-aes esp-md5-hmac
+    6) Dynamic VPN MAP 생성
+        # crypto dynamic-map dmap 10
+           set transform-set setvpn
+           reverse-route
+    7) Static VPN MAP 생성
+        # crypto map smap client authentication list uservpn
+          crypto map smap client configuration address respond
+          crypto map smap isakmp authorization list groupvpn
+          crypto map smap 20 ipsec-isakmp dynamic dmap
+    8) Static VPN MAP 인터페이스 적용
+        # interface fa0/0
+           crypto map smap
+    9) 사용자가 VPN 클라이언트로 사전에 설정된 그룹,계정정보와 VPN 서버 IP 입력하여 터널링 시도

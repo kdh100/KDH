@@ -1,29 +1,29 @@
-FTP-data		        TCP/20
-FTP-control		        TCP/21
-SSH			            TCP/22
-telnet			        TCP/23
-SMTP			        TCP/25
-TACACS+			        TCP/49
-DNS			            UDP/53
-DHCP			        UDP/67
-DHCP-client		        UDP/68
-HTTP			        TCP/80
-Kerberos		        UDP/88
-POP3			        TCP/110
-NetBIOS-name		    UDP/137
-NetBIOS-data		    UDP/138
-NetBIOS-session		    UDP/139
-IMAP4			        TCP/143
-SNMP			        UDP/161
-SNMP-trap		        UDP/162
-HTTPS			        TCP/443
-CIFS			        TCP/445
-SMTPs			        TCP/465
-IPSec			        UDP/500
-IMAPs			        TCP/993
-POPs			        TCP/995
-MS-SQL			        TCP/1443
-OracleDB		        TCP/1521
-PPTP			        TCP/1723
-MySQL			        TCP/3306
-RDP			            TCP,UDP/3389
+S           FTP-data		        TCP/20
+S           FTP-control		        TCP/21
+S           SSH			            TCP/22
+S           telnet			        TCP/23
+S           SMTP			        TCP/25
+S           TACACS+			        TCP/49
+S           DNS			            UDP/53
+S           DHCP			        UDP/67
+S           DHCP-client		        UDP/68
+S           HTTP			        TCP/80
+S           Kerberos		        UDP/88
+S           POP3			        TCP/110
+S           NetBIOS-name		    UDP/137
+S           NetBIOS-data		    UDP/138
+S           NetBIOS-session		    UDP/139
+S           IMAP4			        TCP/143
+S           SNMP			        UDP/161
+S           SNMP-trap		        UDP/162
+S           HTTPS			        TCP/443
+S           CIFS			        TCP/445
+S           SMTPs			        TCP/465
+S           IPSec			        UDP/500
+S           IMAPs			        TCP/993
+S           POPs			        TCP/995
+D           MS-SQL			        TCP/1443
+D           OracleDB		        TCP/1521
+S           PPTP			        TCP/1723
+D           MySQL			        TCP/3306
+S           RDP			            TCP,UDP/3389

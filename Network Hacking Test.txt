@@ -860,7 +860,6 @@
         - 서비스 포트 설정 파일
             # 윈도우 : C:\Windows\system32\drivers\etc\services
             # 리눅스 : /etc/services
-                ~ 열려있는 포트 확인 : netstat -antup / nmap localhost
-        
+                ~ 열려있는 포트 확인 : netstat -antup / nmap localhost      
 13. Application Layer
     * 

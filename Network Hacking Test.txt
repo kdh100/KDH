@@ -811,8 +811,24 @@
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)
-            # 3-Hand-Shake : SYN(연결 확인) > ACK(확인), SYN(연결 허용) > ACK(확인, 연결)
     * 계층 프로토콜
         - TCP, UDP
+    * TCP & UDP
+        <TCP>                                           <UDP>
+        - 연결형(Connection-Oriented)                   - 비연결성(Connectionless)
+            # 데이터 전송 경로 확보 과정                      * 일방적 데이터 전송 
+                <연결; 3-Hand-Shake>
+                1) SYN ->
+                2) SYN, ACK <-
+                3) ACK ->
+                <종료; 4-Hand-Shake>
+                1) FIN ->
+                2) ACK <-
+                3) FIN <-
+                4) ACK ->
+        - 상태기반(Stateful)                            - 상태무관(Stateless)
+            * 데이터 전송 시 상대로부터 응답(ACK)을 받음       * 일방적 데이터 전송
+        - 신뢰성(Reliable)                              - 비신뢰성(Unreliable)
+            * 응답을 받지 못하면 해당 데이터 재전송            * 일방적 데이터 전송
 13. Application Layer
     * 

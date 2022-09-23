@@ -870,7 +870,14 @@
         - 윈도우
             # netstat -ano -p tcp|udp | findstr :21
     * 원격 통신을 포함한 모든 통신은 메시지의 송수신 과정
-        - telnet : 입력하는 명령어와 원격지 OS 프롬프트 정보등을 모두 메시지 형태로 전달
-        - FTP : 
+        - FTP Mode 에 따른 통신 방식
+            # 리눅스 : passive mode 기본
+              윈도우 : active mode 기본
+            # Passive
+                ~ 접속 : IP1:port1 -> IP2:21
+                ~ 전송 : IP1:port2 -> IP2:20(fixed)
+            # Active
+                ~ 접속 : IP1:port1 -> IP2:21
+                ~ 전송 : IP1:port2 -> IP2:port3(variable)
 13. Application Layer
     * 

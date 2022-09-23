@@ -811,12 +811,34 @@
 12. Transport Layer
     * 헤더(Port: TCP, UDP)
         - TCP : 흐름 제어(송신(Sliding Window)/수신(Congestion Window)) + 에러 제어(ACK)
+        - 헤더 구성
+            <TCP>
+            # Src Port(16)
+              Dst Port(16)
+              Sequence(32) : 신뢰성 확인
+              Acknowledge(32) : 신뢰성 제공
+              Header Length(4)
+              Flag(6) : 전체 흐름 제어
+                ~ URN : 긴급 처리 요청
+                  ACK : 응답
+                  SYN : 연결 요청
+                  PSH : 데이터 전송
+                  RST : 비정상 연결 종료(리셋)
+                  FIN : 정상 연결 종료
+              Window Size(16) : 흐름제어 제공, 버퍼 가용량 통보
+              Checksum(16)
+              Urgent Pointer(16) : 긴급 데이터 포함
+            <UDP>
+            # Src Port(16)
+              Dst Port(16)
+              Packet Total Length(16)
+              Checksum(16)
     * 계층 프로토콜
         - TCP, UDP
     * TCP & UDP
         <TCP>                                           <UDP>
         - 연결형(Connection-Oriented)                   - 비연결성(Connectionless)
-            # 데이터 전송 경로 확보 과정                      * 일방적 데이터 전송 
+            # 데이터 전송 경로 확보 과정                      # 일방적 데이터 전송 
                 <연결; 3-Hand-Shake>
                 1) SYN ->
                 2) SYN, ACK <-
@@ -827,8 +849,18 @@
                 3) FIN <-
                 4) ACK ->
         - 상태기반(Stateful)                            - 상태무관(Stateless)
-            * 데이터 전송 시 상대로부터 응답(ACK)을 받음       * 일방적 데이터 전송
+            # 데이터 전송 시 상대로부터 응답(ACK)을 받음       # 일방적 데이터 전송
         - 신뢰성(Reliable)                              - 비신뢰성(Unreliable)
-            * 응답을 받지 못하면 해당 데이터 재전송            * 일방적 데이터 전송
+            # 응답을 받지 못하면 해당 데이터 재전송            # 일방적 데이터 전송
+    * 서비스 포트(IANA 에서 관리)
+        - 포트 번호
+            # 잘 알려진 포트 : 0     - 1023
+            # 등록 가능 포트 : 1024  - 49151
+            # 동적 할당 포트 : 49152 - 65535
+        - 서비스 포트 설정 파일
+            # 윈도우 : C:\Windows\system32\drivers\etc\services
+            # 리눅스 : /etc/services
+                ~ 열려있는 포트 확인 : netstat -antup / nmap localhost
+        
 13. Application Layer
     * 

@@ -142,10 +142,11 @@
     * Direct Connect
         - B2B 전용 회선
         - 별도의 리전 내 전용 회선 팀과 상의하여 물리 회선 제공받아야 함
-    * ACL(Access Control List) & 보안 그룹
+    * ACL(Access Control List)
         - VPC 를 구성할 때 기본 네트워크 ACL 이 포함되어있음
             # 사용자 지정 ACL 생성 적용 가능
             # ACL 은 항상 적용되는 가상 방화벽으로 상태 비저장 필터링 제공
+    * 보안 그룹
         - EC2 생성시 기본 보안 그룹에 모두 포함되어있음
             # 기본값은 인트래픽 거부, 아웃트래픽 허용
             # 사용자 지정 규칙을 추가 적용 가능
@@ -206,11 +207,100 @@
                 ~ 비용 최대 1/10 로 절감
             # 3개의 복사본을 3개의 AZ에 복제하고 S3 에 지속적으로 백업
     * NRDS(Non-Relational Database Service)
-        - 비관계형 DB 는 키를 생성하여 그 위에 데이터를 저장하고 쿼리
+        - 비관계형 DB 는 키를 생성하여 그 위에 데이터를 저장하고 쿼리(키-값)
             # 키 위에 저장되는 속성값은 모두 동일한 속성값을 가질 필요가 없어 유연함
         - AWS DynamoDB
             # Serverless DB 서비스
                 ~ 모든 규모에서 엄청나게 빠른 응답속도
             # 기존의 RDS 와 다르게 빠른 처리 속도로 다량의 작업량 수행 가능
+                ~ DAX(DynamoDB Accelerator) 서비스 사용 시 3배 더 빠르게 수행 가능
+                ~ 기본 캐싱 계층
     * Redshift
-        - 
+        - 과거에 있었던 기록들을 분석/처리하는데 필요성이 있음
+            # 현재 : 커피 원두 얼만큼 남았는지 확인해 줘
+            # 과거 : 지난 1주일 간의 판매 실적 확인해 줘
+        - 이러한 필요성은 현재 DB 모델에서는 처리하기 어려울 수 있음
+        - 빅 데이터 분석에 필요한 데이터 웨어하우징 서비스
+            # 단일 API 호출 작업으로 빅데이터 BI(Business Intelligent) 실현
+    * DMS(DB Migration Service)
+        - 원본 DB <-> 대상 DB 간 데이터 이동 서비스
+            # 동종 DB 이거나 이종 DB 상관없이 지원 가능
+            # 이종의 경우 AWS Schema Conversion Tool 을 통해 스키마, 코드 변환
+              그 다음, DMS 를 통해 마이그레이션 진행
+        - 개발/테스트 목적, 다중 DB 를 단일 DB 로 통합, 연속 복제 활용 가능
+    * DocumentDB
+        - 컨텐츠 관리, 카탈로그, 사용자 프로필에 적합한 문서형 DB(MongoDB)
+    * Neptune
+        - 추천 엔진, 사기 탐지, 지식 그래프같은 소셜 웹에 효과적인 그래프형 DB
+    * QLDB(Quantum Ledger Database)
+        - 데이터 불변성을 보장하여 어플리케이션에서 발생한 모든 기록 검토 가능
+            # 불변성에 따른 다른 서비스로는 Managed Blockchain 이 있음
+                ~ 대량의 분산화 요소가 추가되어 부담될 수 있음
+    * ElastiCache
+        - DB 내 캐싱 계층을 추가하여 응답 속도를 3배 개선할 수 있는 서비스
+            # Memcached 및 Redis 유형의 저장소를 지원
+            # DAX 와 비슷함
+10. 보안 정책
+    * 공동 책임 모델
+        - AWS 는 클라우드 자체(물리적 인프라, 네트워크/가상화 인프라) 보안 담당
+        - 고객은 클라우드 내부(OS, 어플리케이션, 데이터) 보안 담당
+    * 사용자 권한 및 액세스
+        - IAM(Identity and Access Management)
+            # 최초 계정은 루트 사용자로 로그온
+                ~ 모든 사용자는 MFA(Multi-Factor Authentication) 활성화 권장
+                ~ 이메일, 암호, 일회용 토큰(OTP 코드)까지 있어야 로그인 가능
+            # IAM 을 통해 사용자, 그룹, 역할 생성/부여 가능
+                ~ 사용자 기본 권한은 all deny
+                ~ IAM 정책(.json) 을 통해 권한 정의 가능
+                ~ 정책은 사용자 혹은 그룹에 설정할 수 있음
+            # IAM 역할(Role) 은 임시 권한 증명
+                ~ 역할 기반 액세스를 사용하여 기업의 자체 자격 증명과 연동 가능
+        - Organizations
+            # AWS 계정을 중앙에서 관리하는 서비스
+                ~ 계정 전체에서 결제, 액세스, 보안 정책 관리 가능
+            # 최초 조직은 루트 컨테이너에 포함
+                ~ 필요에 따라 계정을 OU, BU 로 그룹화 가능
+            # SCP(Service Control Policy) 를 통해 조직 내 계정 권한 제어 가능
+                ~ 사용자 권한 및 역할 제어
+    * 규정 준수
+        - Artifact
+            # AWS 보안 및 규정 준수 보고서, 온라인 계약 온디맨드 엑세스 서비스
+            # Agreements
+                ~ 개별 계정 혹은 Organizations 에 대한 계약 검토/수락 및 관리
+            # Reports
+                ~ 외부 감사 기관이 작성한 규정 준수 보고서 제공
+                ~ 리전별, 사업별 보안 표준 및 규정을 준수했음을 검증함
+                ~ 감사 시 외부 제출용 보안 검증 문서 제공
+        - 고객 규정 준수 센터
+            # 보안 감사 체크리스트, AWS 위험 및 규정 준수 개요 등 확인
+    * DDoS(Distributed Denial of Service)
+        - 이미 AWS 시스템이 대부분의 DDoS 공격을 방어해주고 있음
+            # EC2 의 보안 그룹을 통한 정해진 트래픽 통신을 통해 UDP Flood 방어
+            # 프론트엔드에 위치한 ELB 를 통해 HTTP 레벨 공격 방어
+        - WAF(Web Application Firewall)
+            # 어플리케이션으로 들어오는 네트워크 요청을 모니터링하는 웹 방화벽
+                ~ CloudFront 및 ALB(Applicatiton Load Balancer) 와 함께 작동
+                ~ 웹 ACL 구성을 통해 액세스 관리
+        - Shield
+            # AWS WAF(Web Application Firewall)을 이용한 DDoS 방어 서비스
+            # Standard
+                ~ 무료
+                ~ 실시간 악성 트래픽 감지 및 자동 완화
+            # Advanced
+                ~ 유료
+                ~ 상세한 공격 진단 및 정교한 DDoS 공격 탐지, 완화
+                ~ CloudFront, Route 53, ELB 서비스와 통합 가능
+    * KMS(Key Management Service)
+        - 데이터의 저장 상태, 전송 중 암호화 작업을 키를 통해 수행하는 서비스
+        - 암호화 키를 생성, 관리, 사용
+            # IAM 사용자 및 역할을 통해 키 관리 설정 가능
+    * Inspector
+        - 자동 보안 평가 서비스
+            # EC2 인스턴스 오픈 액세스, 소프트웨어 버전 취약점 등을 검사
+            # 보안 탐지 결과 목록 제공
+                ~ 심각도 수준에 따라 우선 순위 부여, 설명 및 Workaround 제공
+    * GuardDuty
+        - AWS 인프라 및 리소스에 대한 지능형 위협 탐지 기능 제공 서비스
+            # 네트워크, 계정 활동을 지속적으로 분석
+            # Management Console 에서 탐지된 위협의 결과(Workaround 포함) 확인 가능
+                ~ Troubleshooting 을 위한 Lambda 함수 구성 가능

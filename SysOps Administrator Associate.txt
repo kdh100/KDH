@@ -304,3 +304,5 @@
             # 네트워크, 계정 활동을 지속적으로 분석
             # Management Console 에서 탐지된 위협의 결과(Workaround 포함) 확인 가능
                 ~ Troubleshooting 을 위한 Lambda 함수 구성 가능
+11. 모니터링
+    * 

@@ -879,5 +879,108 @@
             # Active
                 ~ 접속 : IP1:port1 -> IP2:21
                 ~ 전송 : IP1:port2 -> IP2:port3(variable)
+    * HTTP(Hypertext Transper Protocol) 패킷 분석
+        - HTTP Request
+            # Method : GET, POST...
+        - HTTP Response
+            # Code : 200, 404...
+    * HTTPS 복호화 패킷 분석
+        - HTTPS 복호화 가능(암호화 방식, Key 값 필요)
+            # curl -k -v https://192.168.20.200
+                ~ HTTP 헤더를 통해 암호화 방식(SSL connection using...) 확인 가능
+    * SSH 패킷 분석
+        - SSH 복호화 불가능
+            # https, smtps, pops, imaps... 복호화 가능
+                ~ 'SSH Protocol explained' 검색하여 통신 절차 확인
+        - openssl CMD
+            # openssl genrsa ... : private key generate
+            # openssl rsa ... : public key generate with prikey
+            # openssl rsautl -encrypt ... : encryption data with pubkey
+            # openssl rsautl -decrypt ... : decryption data with prikey
+    * SMB/CIFS 패킷 분석
+        - wireshakr 
+            # [Ctrl] + F > string 체크 > sample.pcap 검색
+            # 원하는 정보 선택 > Export Packet bytes(데이터 추출)
+        - Write Request
+            # sample.pcap
+        - Write Response
+    * nslookup CMD 패킷 분석
+        - 리눅스 : 
+            # DNS 서버 지정 -> 외부(168.126.63.1)
+              DNS 서버 지정 -> 내부(192.168.20.200) + 외부(168.126.63.1)
+        - 윈도우 : DNS 서버 지정 -> 내부(192.168.20.200)
+    * Ping 안되는 사이트에 hping3 CMD 사용
+        - ICMP 는 막혀있으나 다른 서비스 포트를 통해 서버 alive 를 체크
+        - hping3 -S www.daum.net -p 80 -c 3
+            # -S : TCP SYN flag
+              -p : port
+    * DoS(1:1), DDoS(N:1)
+        - Flood Attack
+            # TCP SYN Flood
+                ~ TCP 의 3-Hand-Shake 를 이용한 DoS 공격 종류
+                ~ IP 스푸핑하고 half-open TCP 연결을 시도하여 Backlog(listen) Queue 고갈
+                ~ hping3 -S -a 192.168.20.205(spoofing) 192.168.20.200 -p 80 --flood
+            # UDP Flood
+                ~ UDP 패킷에 쓸데없는 데이터를 추가해서 전달하여 리소스 고갈
+            # ICMP Flood
+                ~ ICMP 패킷에 쓸데없는 데이터를 추가해서 전달하여 리소스 고갈
+            # ICMP Smurf
+                ~ IP 스푸핑을 피해자 IP 로 돌리고 브로드캐스트로 request
+        - Software Attack
+            # Ping of death
+                ~ ICMP request 송신 시 패킷 크기를 크게해서 다량으로 보내 리소스 고갈
+                ~ 윈도우 : ping -l 64000 192.168.20.200
+                ~ 리눅스 : ping -s 64000 192.168.20.201
+                <공격 스크립트 작성>
+                ~ "ping -s 60000 <IP> <NUM>" + for 구문 + 백그라운드 실행
+            # Teardrop
+                ~ 패킷 Offset 을 조정하여 Reassembly 과정에서 hold 시켜 리소스 고갈
+        - SYN Flooding Attack 방지
+            <Network>
+            # 네트워크/보안 장비 차단
+                ~ IP 차단, 방화벽 룰셋 적용, WAF 를 이요한 방어 등
+            <Server>
+            # SYN Cookie 설정
+                ~ 백로그 큐가 꽉차면 활성화되는 설정
+                ~ sysctl -w net.ipv4.tcp_syncookies=1
+            # Backlog Queue 설정
+                ~ sysctl -w net.ipv4.tcp_max_syn_backlog=1024
+            # 보안 솔루션(Anti-DDoS, IDS/IPS 등) 사용
+                ~ 보안 솔루션으로 막을 수 있으면 최우선 적용
+        - TCP Session Hijacking Attack
+            # Hunt Tool 사용
+                ~ http://wildpup.cafe24.com/archives/277
+                ~ https://m.blog.naver.com/sbd38/220232339370
+       - UDP Flooding Attack
+            # LOIC(Low Orbit Ion Cannon; 공격 툴)
+                ~ .NET 4.x 필요
 13. Application Layer
-    * 
+    * DHCP(Dynamic Host Configuration Protocol)
+        - DHCP 클라이언트의 요청에 동적으로 IP 를 할당하는 프로토콜(D.O.R.A.)
+            # 브로드캐스트 > 유니캐스트 > 브로드캐스트 > 유니캐스트
+                ~ D, R 의 차이는 DHCP 서버를 인식하는지와 요청 IP 대역이 제공한 IP 로 변경되는 것
+                ~ O, A 의 차이는 Message Type 이 변경되는 것
+        - DHCP 헤더
+            # Message type
+              Hardware type
+              Hardware address length
+              Transaction ID
+              Seconds elapsed
+              Bootp flags
+              Client IP address
+              Your (Client) IP address
+              Next Server IP address
+              Relay agent IP address
+              Client MAC address
+              Client hardware address padding
+              Server hostname
+              Boot filename
+              Magic Cookie(OPTIONS)
+        - 임대 시간(Lease time)
+            # 임대시간(T) : IP 사용 임대 시간, 계속 사용하려면 서버에게 연장 요청
+                ~ 기본 임대 시간 : 1일
+                ~ 최대 임대 시간 : 7일
+            # 연장요청(T1; T/2) : 임대 갱신을 위해 연장 요청, T 의 절반
+            # 리바인딩(T2; 7/8T) : 갱신 한계 시간, T 의 87.5%
+            # 재연결 : 부팅 전 설정을 재배당 요청
+

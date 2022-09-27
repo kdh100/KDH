@@ -1050,3 +1050,42 @@
             # 사전 정의된 파일을 기반으로 다중 크랙 시도 공격
                 ~ 스크립트 작성으로 동일한 공격 가능
             # onesixtyone -c dict.txt 192.168.20.200
+    * Hacking Concept
+        - Foot Printing : 정보 수집
+            # 정보가 많을수록 공격이 수월해짐
+        - Sniffing
+        - Spoofing
+        - Session Hijacking
+        - DDoS
+14. 보안 장비
+    * 단일 보안 솔루션
+        - VPN
+        - Firewall
+            # 접근 제어 + NAT/PAT 기능
+        - IDS/IPS
+            # IDS
+                ~ 시스템 공격에 대한 패턴을 대입하여 탐지/차단
+            # IPS
+                ~ IDS + Firewall
+        - WAF
+            # L7 웹 공격에 대한 거의 모든 패턴을 탐지하고 차단하는 전문적인 웹방화벽
+        - Anti-DDoS
+        - L4/L7 Switch
+            # L4
+                ~ IP, Port 기준 LB
+            # L7
+                ~ 어플리케이션 기준 LB
+    * 통합 보안 솔루션
+        - TMS(Threat Management System) : 보안 운영
+            # 위협 관리 시스템(원격 IDS)
+        - SIEMS(Security Information & Event Management Solutions) : 보안관제(모니터링+차단)
+            # UTM + ESM
+        - ESM(Enterprise Security Management) : 공격 모니터링
+            # UTM + 통합 로그 관리/모니터링
+        - UTM(Unified Threat Management) : 공격 차단
+            # F/W + VPN + IPS + WAF + Spam Filter + NAC ...
+        - NAC(Network Access Control)
+            # IP 관리시스템의 상위 버전 솔루션
+                ~ 접근제어/인증
+                ~ PC/네트워크 통제
+                ~ 유해트래픽 탐지/차단

@@ -1,10 +1,10 @@
- 1. 클라우드 관리
+1. 클라우드 관리
     * 수동
         - AWS 관리 콘솔
         - AWS API
         - AWS CLI
     * 자동
-        - AWS CloudFormation(Infrastructure as Code; 소스 제어 시스템에 저장된 템플릿)
+        - CloudFormation(Infrastructure as Code; 소스 제어 시스템에 저장된 템플릿)
             # Infrastructure as Code
                 ~ 간편한 유지관리
                 ~ 손쉬운 보안 설정
@@ -124,10 +124,10 @@
             # 게시자는 그룹화된 주제에 따라 메시지 전달
             # 구독자는 구독한 그룹의 주제에 따라 메시지 수신
                 ~ 일반 사용자(A2P), 다른 어플리케이션(A2A)
-5. Serverless Computing
+5. 서버리스 컴퓨팅
     * EC2 는 지속적으로 인스턴스 관리를 해줘야하는 번거로움이 있음
     * 오로지 어플리케이션(코딩)만 신경쓰고 나머지는 자동으로 처리
-    * Lambda 서비스
+    * Lambda
         - 단순 서비스(코드)만 실행할 수 있는 서비스
             # 이벤트 소스에서 트리거되도록 설정하여 필요시에만 실행되게 함
         - 서비스(코드)를 실행한 동안만 요금 부과
@@ -269,7 +269,7 @@
               그 다음, DMS 를 통해 마이그레이션 진행
         - 개발/테스트 목적, 다중 DB 를 단일 DB 로 통합, 연속 복제 활용 가능
     * DocumentDB
-        - 컨텐츠 관리, 카탈로그, 사용자 프로필에 적합한 문서형 DB(MongoDB)
+        - 컨텐츠 관리, 카탈로그, 사용자 프로필에 적합한 문서형 DB(MongoDB 워크로드)
     * Neptune
         - 추천 엔진, 사기 탐지, 지식 그래프같은 소셜 웹에 효과적인 그래프형 DB
     * QLDB(Quantum Ledger Database)
@@ -363,4 +363,59 @@
         - 5대 핵심 원칙을 기반으로 AWS 권장 사항을 실시간으로 제시하는 무료 웹 서비스
             # 비용 최적화, 성능, 보안, 내결함성, 서비스 한도
 12. 마이그레이션
+    * CAF(Cloud Adoption Framework)
+        [사업 중점]
+        - 비지니스 : 사업 및 회계
+        - 인력 : 인력 관리
+        - 거너번스 : 기술 및 프로세스
+        [기술 중점]
+        - 플랫폼 : IT 기술
+        - 보안 : IT 정보보안
+        - 운영 : IT 운영/지원
+    * 6R Stratage
+        - 이관(Rehosting) ; Rift and Shift
+            # 기존 시스템을 그대로 클라우드 환경으로 이동
+        - 설정(Replatforming)
+            # 이관시킨 시스템을 더 나은 환경으로 설정
+        - 폐기(Retire)
+            # 마이그레이션 중 기존 시스템의 불필요한 부분들을 제거
+        - 유지(Retain)
+            # 마이그레이션 중 기존 시스템에서 아직 필요한 부분들을 현재 상태로 유지
+        - 구매(Repurchasing)
+            # 마이그레이션 중 클라우드 환경에서 더 적합한 리소스 구매(계약)
+                ~ 선행 비용 상승
+        - 생산(Refactoring)
+            # 마이그레이션 후 새로운 환경에서의 생산 시도
+                ~ 초기 비용 가장 높음
+    * Snow 원격 장비
+        - AWS Management Console 에서 주문 가능
+        - Snowcone
+            # CPU 2개, 4G 메모리, 8TB 가용 스토리지
+            # 간단한 엣지컴퓨팅(EC2, IoT Greengrass) + 데이터 전송
+                ~ 데이터 복사 > AWS 전송 > AWS S3 에 데이터 백업
+        - Snowball Edge
+            # Edge Compute Optimized
+                ~ 52개 vCPU, 208G 메모리, 42TB HDD(S3, EBS 호환) + 7.68TB NVMe SSD(EBS 호환)
+                ~ 고성능 컴퓨팅 특화
+            # Edge Storage OPtimized
+                ~ 40개 vCPU, 80G 메모리, 80T HDD(S3, EBS 호환) + 1TB SATA SSD(EBS 호환)
+                ~ 고용량 마이그레이션 특화
+        - Snowmobile
+            # 트레일러 트럭 컨테이너로 이동하는 엑사바이트 규모의 데이터 전송 서비스
+                ~ 최대 100페타바이트 데이터 전송 가능
+    * 혁신 기술
+        - Serverless Application
+            # AWS Lambda
+        - AI(Aritificial Intelligent)
+            # Lex : 음성 및 텍스트 챗봇 빌드
+            # Transcribe : 음성 -> 텍스트 변환
+            # Textract : 문서에서 텍스트/데이터 추출
+            # Comprehend : 텍스트에서 패턴 검색
+            # Fraud Detector : 온라인 사기 행위 식별
+        - ML(Machine Learning)
+            # SageMaker : 머신러닝 모델 빌드, 훈련, 배포 특화 서비스
+        - VMware on AWS
+        - DeepRacer
+        - Ground Station
+13. 잘 만들어진 프레임워크란?
     * 

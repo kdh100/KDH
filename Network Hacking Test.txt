@@ -1001,10 +1001,38 @@
                 ~ -di : 디코딩(인코딩 알파벳 외 다른 캐릭터 무시하고 디코딩)
     * Brute Force Attack
         - password attack
-            ~ guessing attack
-            ~ default password attack
-            ~ dictionary attack
-            ~ brutus attack
+            # guessing attack
+            # default password attack
+            # dictionary attack
+            # brutus attack
         - password crack tools
-            ~ 로컬 : John The Ripper
-            ~ 원격 : Hydra(CLI), xHydra(GUI)
+            # 로컬 : John The Ripper
+            # 원격 : Hydra(CLI), xHydra(GUI)
+    * Packet Sniffing
+        - ettercap
+            # ARP Spoofing(Poisoning)
+                ~ etthercap -G &
+                ~ Hosts > Scan for hosts
+                  Hosts > Host list
+                  검색된 호스트 선택 > Add to Target{1,2}
+                  MITM > ARP Poisoning > Sniff Remote Connection
+                  Start
+            # DNS Spoofing(Fake WEB)
+                ~ vi /etc/ettercap/etter.dns
+                  "www.daum.net    A    192.168.20.50" 설정
+                ~ ettercap -G &
+                ~ Hosts > Scan for hosts
+                  Hosts > Host list
+                  검색된 호스트 선택 > Add to Target{1,2}
+                  MITM > ARP Poisoning > Sniff Remote Connection
+                  Plugins > Manage Plugins > dns_spoof 선택
+                  Start
+    * SNMPv3(Simple Network Management Protocol)
+        - 정보 운반
+            # GET/SET(161/UDP; 동기적 요청/전송), TRAP(162/UDP; 비동기적 전달)
+                ~ NMS, MRTG 등에서 사용
+        - 정보 구조
+            # SMI(Structure of Management Information)
+            # MIB(Manangement Information Base)
+                ~ 트리형 구조로 각 객체(MIB)들은 OID(Object ID) 라는 번호로 식별
+        - Community String 를 통해 'Manager - Agent' 간의 정보 적합성(Validation) 판단

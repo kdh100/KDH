@@ -20,6 +20,8 @@ S           HTTPS			        TCP/443
 S           CIFS			        TCP/445
 S           SMTPs			        TCP/465
 S           IPSec			        UDP/500
+S           DHCPv6-client           UDP/546
+S           DHCPv6                  UDP/547
 S           IMAPs			        TCP/993
 S           POPs			        TCP/995
 D           MS-SQL			        TCP/1443

@@ -1000,4 +1000,11 @@
             # base64 데이터 : 인코딩
                 ~ -di : 디코딩(인코딩 알파벳 외 다른 캐릭터 무시하고 디코딩)
     * Brute Force Attack
-        - 
+        - password attack
+            ~ guessing attack
+            ~ default password attack
+            ~ dictionary attack
+            ~ brutus attack
+        - password crack tools
+            ~ 로컬 : John The Ripper
+            ~ 원격 : Hydra(CLI), xHydra(GUI)

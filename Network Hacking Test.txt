@@ -1089,3 +1089,29 @@
                 ~ 접근제어/인증
                 ~ PC/네트워크 통제
                 ~ 유해트래픽 탐지/차단
+15. 패킷 분석
+    * 패킷 분석 무료 툴
+        - 와이어샤크 : 네트워크 패킷 분석
+            # 무차별 모드(promiscuous mode)를 인터페이스에 추가
+        - 피들러 : HTTP 모니터링 + 성능 보안 시험
+        - 네트워크마이너 : 패킷 포렌식
+        - TCPDUMP : 리눅스 운영체제 기본 내장
+    * Wireshark(GUI)
+        - 필터
+            # Capture : 패킷 덤프 전 필터링
+            # Display : 패킷 덤프 중 필터링
+        - Capture Filter Configuration
+            # 프로토콜 + 방향 + 네트워크/호스트
+        - Display Filter Configuration
+            # 비교연산자, 논리표현식 사용 가능
+    * Tshark(TUI)
+        - tshark -i ens160 -w test.pkt -c 10
+            # -i : 인터페이스
+            # -w : 파일 생성
+            # -c : 패킷 덤프 개수
+            # -r : 읽기
+            # -R '(ip.addr==192.168.20.200)' : 필터링
+            # -V : 패킷 상세 내용
+    * 멀웨어 패킷 분석
+        - https://malware-traffic-analysis.net
+            # 암호 : infected

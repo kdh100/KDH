@@ -1112,6 +1112,33 @@
             # -r : 읽기
             # -R '(ip.addr==192.168.20.200)' : 필터링
             # -V : 패킷 상세 내용
-    * 멀웨어 패킷 분석
-        - https://malware-traffic-analysis.net
-            # 암호 : infected
+16. 멀웨어
+    * 자습사이트 : https://malware-traffic-analysis.net
+        - 암호 : infected
+    * 암호화 데이터 복호화 방법
+        - Key 로그 파일 필요
+            # Edit > Preference > Protocols > TLS > log filename 찾기 > 적용
+    * 감염 특징
+        - 악성 스팸 메일을 통해 링크, 파일(.zip, .exe 등)을 첨부하여 클릭 시 감염
+            # 직접적인 감염 외 후속 감염을 유발시키는 멀웨어를 통해 감염 가능
+        - 감염된 호스트 IP 주소를 확인
+            # 정상 트래픽으로 보일 수 있으나 멀웨어 패킷들의 일반적인 패턴 중 하나
+        - 실제는 실행파일(.exe, .dll 등)인 이미지 파일(.png, .jpg 등) 다운로드
+            # Linux 터미널, Window Powershell 등에서 파일 분류정보 확인
+        - 감염된 피해자 장비에 다양한 피해 발생
+            # 사용자 정보 도난/도용
+            # 좀비 PC 로 DDoS 공격자로 활용
+            # 스팸메일 서버로 무작위 메일 발송
+    * 멀웨어 종류
+        - Trickbot
+        - Ursnif ; Gozi, IFSB
+            # 레지스트리에 영구 존속 가능
+        - Qakbot
+            # .vbs 파일을 통한 감염
+                ~ 분할 압축되어 일반적인 단일 데이터 축출로 파일 확인 불가
+                ~ TCP Stream 에서 Raw 데이터 형태로 .bin 저장
+                ~ 16진수 편집기에서 해당 파일의 HTTP 헤더를 제거하고 저장/확인
+        - Dridex
+            # MS Office 파일 형태의 악성 파일 또는 하이퍼링크가 포함될 수 있는 이미지로 감염
+        - Emotet
+            # MS Office 파일 형태의 악성 파일 또는 하이퍼링크가 포함될 수 있는 이미지로 감염

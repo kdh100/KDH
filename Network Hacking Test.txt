@@ -492,8 +492,8 @@
         - su -
     * 시스템 설정
         <언어 패키지 설치>
-        - apt-get list fonts-nanum*
-        - apt-get install fonts-nanum*
+        - apt list fonts-nanum*
+        - apt install fonts-nanum*
             # yum(redhat) = apt-get(debian)
             # 초기 설치시에 한글 폰트가 깨지는걸 복구할 수 있음
         - reboot

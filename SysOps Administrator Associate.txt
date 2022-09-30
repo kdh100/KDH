@@ -447,5 +447,5 @@
     * 기술(33%)
     * 결제 및 요금(16%)
 [ SysOps-Associate ]
-1. AMS(AWS Managed Services)
+1. AWS IAM Architecture
     * 

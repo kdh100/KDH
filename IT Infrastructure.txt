@@ -1,0 +1,28 @@
+1. 시스템 기초 지식
+    * 온프레미스(On-Premisses)
+        - 자사에서 데이터센터를 보유하고 시스템 구축, 운용까지 모두 수행
+    * 퍼블릭 클라우드
+        - 인터넷을 경유하여 불특정 다수에게 제공되는 클라우드 서비스
+            # IaaS
+            # PaaS
+            # SaaS
+    * 프라이빗 클라우드
+        - 특정 기업 그룹에게만 제공되는 클라우드 서비스
+2. 하드웨어와 네트워크 기초 지식
+    * 하드웨어
+        - CPU, MEMORY, DISK, NIC...
+    * 네트워크
+        - MAC, IP, PORT...
+3. OS 기초 지식
+    * 커널(Kernel)
+        - OS 코어 프로그램으로 H/W 를 컨트롤하는 핵심 프로그램
+        - Debian, CentOS, SUSE...
+4. 미들웨어(Middleware) 기초 지식
+    * 웹서버/웹어플리케이션서버(Web, WAS)
+        - Apache HTTP Server, Nginx...
+    * 데이터베이스서버(관계형 데이터베이스)
+        - Oracle, MS-SQL, MySQL, PostgreQSL...
+        - AWS ELB
+    * NoSQL(비관계형 데이터베이스; Key-Value)
+        - MongoDB, Redis, Apache Cassandra...
+        - AWS 

@@ -55,9 +55,11 @@
             # ansible-config init --disabled > ansible.cfg
     * Ad-Hoc CMD
         - ansible HOST -m MODULE -a "ELEMENTS"
-            # ansible-doc MODULE : documentation for module usage
+            # ansible-doc MODULE : 모듈 사용법 메뉴얼 문서
                 ~ ansible web1.example.com -m user -a 'name=user01 uid=4000 state=present'
         - Module
+            # 플레이북에서 모듈 사용시 에러 무시하고 다음 작업으로 넘어가고 싶을 때
+                ~ 'ignore_error: yes' 를 모듈 라인과 같은 블록에 사용
             # File
                 ~ copy
                 ~ file
@@ -80,7 +82,44 @@
                 ~ uri
                 ~ nmcli
 7. Playbook
-    * Ad-Hoc is single-excutable command to adjust objective host or groups
-    * Playbook is designated working list which is excutes on selected host
-        - 'key: value' format(.yml)
-        - 
+    * Ad-Hoc 은 일회성 실행 명령어로 대상 호스트 혹은 그룹에 적용시킨다,
+    * Playbook 설정한 호스트에게 지정한 작업(Task) 목록들을 적용시킨다.(1회 이상의 지정 작업 포함 가능)
+        - '키: 값' 형식(.yml)
+            # 첫 라인 시작은 '---', 마지막 라인 끝은 '...'
+                ~ '...' 은 생략 가능
+            # 동일한 들여쓰기(indent) 로 작업, 모듈 구분됨
+        - 양식
+            ---
+            - name: Disable and uninstall apache HTTPD
+              hosts: webservers
+              tasks:
+                # firewall-cmd --permanent --remove-service={http,https}
+                # firewall-cmd --reload
+                - name: Configure firewall
+                  firewalld:
+                    service: "{{ item }}"
+                    zone: public
+                    permanent: yes
+                    immediate: yes
+                    state: disabled
+                  loop:
+                    - http
+                    - https
+                # rm files/index.html ansible1:/var/www/html/index.html
+                - name: Corrent index.html is absent
+                  file:
+                    path: /var/www/html/index.html
+                    state: absent
+                  ignore_errors: yes
+                # yum remove htppd
+                - name: httpd package is absent
+                  yum: 
+                    name: 
+                      - httpd
+                      - mod_ssl
+                    state: absent
+                  ignore_errors: yes
+            ...
+        - 각 작업은 기본값으로 become 모듈 없으면 sudo 로 진행
+            # become: true 지정하고 원격 사용자 지정하여 특정 사용자로 작업 수행 가능
+                ~ become: true\n remote_user: devops

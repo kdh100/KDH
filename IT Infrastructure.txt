@@ -32,3 +32,55 @@
         - 로컬 PC에 가상 환경 구축을 위한 Vagrant
     * OS/Middleware 설정 자동화
         - Ansible, Chef, Puppet...
+6. Ansible(Infrastructure as a code)
+    * 설치
+        - useradd -G wheel ansible
+        - echo ansible | passswd --stdin ansible
+        - hostnamectl set-hostname CONTEXT
+        - nm-cli-connection(IP 설정)
+        - sudo -l(사용자 루트 권한 설정)
+        - sudo vi /etc/sudoers > %wheel NOPASSWD: ALL
+        - sudo vi /etc/hosts(노드 정보 리스트)
+        - ssh NODE > cd ~/.ssh > ssh-keygen > ssh-copy-id -i id_rsa.pub NODE
+    * Inventory
+        - Static : 텍스트 파일로 정의
+            # Default Static Inventory : /etc/ansible/hosts > ansible all --list-hosts
+                ~ recommanded : ~/ansible/inventory > ansible all -i inventory --list-hosts
+                ~ '-i' 옵션이 기본 호스트 파일보다 우선순위 높음
+        - Dynamic : 다른 정보 제공 프로그램 등으로 정의
+        - CMD
+            # ansible {all,ungrouped,GROUP} [-i INVENTORY] --list-hosts
+    * ansible.cfg
+        - cat /etc/ansible/ansible.cfg
+            # ansible-config init --disabled > ansible.cfg
+    * Ad-Hoc CMD
+        - ansible HOST -m MODULE -a "ELEMENTS"
+            # ansible-doc MODULE : documentation for module usage
+                ~ ansible web1.example.com -m user -a 'name=user01 uid=4000 state=present'
+        - Module
+            # File
+                ~ copy
+                ~ file
+                ~ lineinfile
+                ~ synchronize
+            # Package
+                ~ yum
+                ~ apt
+                ~ dnf
+                ~ pip
+                ~ gem
+                ~ package
+            # System
+                ~ firewalld
+                ~ service
+                ~ user
+                ~ reboot
+            # Net Tools
+                ~ get_url
+                ~ uri
+                ~ nmcli
+7. Playbook
+    * Ad-Hoc is single-excutable command to adjust objective host or groups
+    * Playbook is designated working list which is excutes on selected host
+        - 'key: value' format(.yml)
+        - 

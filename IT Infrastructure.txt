@@ -42,7 +42,7 @@
         - sudo vi /etc/sudoers > %wheel NOPASSWD: ALL
         - sudo vi /etc/hosts(노드 정보 리스트)
         - ssh NODE > cd ~/.ssh > ssh-keygen > ssh-copy-id -i id_rsa.pub NODE
-    * Inventory
+    * 인벤토리(Inventory; 호스트 리스트)
         - Static : 텍스트 파일로 정의
             # Default Static Inventory : /etc/ansible/hosts > ansible all --list-hosts
                 ~ recommanded : ~/ansible/inventory > ansible all -i inventory --list-hosts
@@ -50,7 +50,7 @@
         - Dynamic : 다른 정보 제공 프로그램 등으로 정의
         - CMD
             # ansible {all,ungrouped,GROUP} [-i INVENTORY] --list-hosts
-    * ansible.cfg
+    * 설정파일(ansible.cfg)
         - cat /etc/ansible/ansible.cfg
             # ansible-config init --disabled > ansible.cfg
     * Ad-Hoc CMD
@@ -81,17 +81,15 @@
                 ~ get_url
                 ~ uri
                 ~ nmcli
-7. Playbook
+7. 플레이북(Playbook)
+    * 'ansible.cfg', 'inventory', 'pb.yml' 총 3개의 파일이 구성되어야 구현 가능
     * Ad-Hoc 은 일회성 실행 명령어로 대상 호스트 혹은 그룹에 적용시킨다,
-    * Playbook 설정한 호스트에게 지정한 작업(Task) 목록들을 적용시킨다.(1회 이상의 지정 작업 포함 가능)
-        - '키: 값' 형식(.yml)
-            # 첫 라인 시작은 '---', 마지막 라인 끝은 '...'
-                ~ '...' 은 생략 가능
-            # 동일한 들여쓰기(indent) 로 작업, 모듈 구분됨
+    * Playbook 은 호스트에게 지정 작업(Task) 목록들을 수행한다.(1회 이상의 지정 작업 포함 가능)
         - 양식
             ---
             - name: Disable and uninstall apache HTTPD
               hosts: webservers
+              gather_facts: no
               tasks:
                 # firewall-cmd --permanent --remove-service={http,https}
                 # firewall-cmd --reload
@@ -120,6 +118,80 @@
                     state: absent
                   ignore_errors: yes
             ...
-        - 각 작업은 기본값으로 become 모듈 없으면 sudo 로 진행
+        - 각 작업은 ansible.cfg 에 명시된 'become = true' 에 따라 sudo 명령어 수행
             # become: true 지정하고 원격 사용자 지정하여 특정 사용자로 작업 수행 가능
                 ~ become: true\n remote_user: devops
+        - '키: 값' 형식(.yml)
+            # 첫 라인 시작은 '---', 마지막 라인 끝은 '...'
+                ~ '...' 은 생략 가능
+                ~ 들여쓰기(indent) 주의
+            # 여러줄의 문자열은 파이프(|), 비교자(>) 사용하여 표시 가능
+            # 사전(Dictionaly)
+                ~ name: KDH(Key: Value) : Vertical
+                  or
+                  {name: KDH} : Horizontal
+            # 목록(List)
+                ~ name: \n  - KDH : Vertical
+                  or
+                  name: [KDH] : Horizontal
+        - CMD
+            # ansible-playbook --syntax-check : 플레이북 문법 점검
+            # ansible-playbook *.yml : 플레이북 실행
+                ~ -v(1~4개(vvvv), 많을수록 더 자세하게) : 자세한 설명
+8. 변수(Variable), 시크릿(Secret), 팩트(Facts)
+    [변수]
+    * 변수 범위(좁은 범위가 넓은 범위보다 우선 순위)
+        - 글로벌 범위 : 명령어줄 또는 ansible 구성에서 설정한 변수
+        - 플레이 범위 : 플레이북 및 관련 구조에서 설정한 변수
+        - 호스트 범위 : 인벤트뢰, 팩트 수집 또는 등록된 작업별 호스트, 호스트그룹에 설정한 변수
+    * 변수 선언
+        - 직접 선언
+            # 플레이북 내 변수값을 직접 지정해서 선언
+        - 차용 선언
+            # 변수값을 지정한 파일을 플레이북 내에 해당 파일 경로를 지정하여 차용 선언
+    * 변수 사용
+        - 글로벌 범위 변수 사용 : 
+        - 플레이 범위 변수 사용 : "{{ 변수 }}"
+        - 호스트 범위 변수 사용 : ~/ansible/{group_vars|host_vars}/{그룹명|호스트명}
+            # 그룹별 변수 혹은 호스트별 변수 지정을 위해 디렉토리 생성하여 하위에 관리
+        - 배열 변수 : 
+            # users: \n  user01: \n  name: gildong\n...(중략)user02:  \n  ...(중략)
+                ~ Key 안에 Value(Key) 안에 Value(Key) 와 Value
+                ~ 올바른 표기법 : users['user01']['name'] = 'gildong' 출력(Python 양식)
+    [시크릿]
+    * Ansible Vault
+        - 구조화된 데이터 파일을 암호화/복호화
+            # 명령줄 도구로 파일 생성 > 편집 > 암호화 > 복호화 > 확인
+        - CMD
+            # 생성 : ansible-vault create file.yml > 암호 입력/확인
+                ~ ansible-vault create --vault-password-file=pw.txt file.yml
+                ~ pw.txt 는 암호가 들어있는 파일, chmod 로 퍼미션 제한해둘 것
+            # 확인 : ansible-vault view file.yml > 암호 인증
+            # 편집 : ansible-vault edit file.yml > 암호 인증
+            # 암호화 : ansible-vault encrypt file1.yml file2.yml > 암호 입력/확인
+                ~ 기존 파일을 암호화, 여러개를 동시에 암호화 가능
+            # 복호화 : ansible-vault decrpyt file.yml --output=dec_file.yml > 암호 입력/확인
+                ~ 암호 파일을 복호화, 다른 이름으로 저장 가능
+            # 암호화 암호변경 : ansible-vault rekey file.yml > 암호 확인 > 암호 입력/확인
+        - 플레이북에서 사용
+            # ansible-playbook --vault-id @prompt file.yml
+                ~ 암호 입력 프롬프트 출력되면 암호 인증을 해야 정상적으로 플레이 가능
+    [팩트]
+    * Ansible Facts
+        - 관리호스트에서 자동으로 검색한 변수
+            # 플레이 조건문, 반복문, 기타 명령문의 일반 변수 등 정보 포함
+                ~ hostname, kernel, NIC, ipaddr, CPU, OS, available MEM/Disk...
+        - 일반적으로 setup 모듈이 자동 실행되어 정보 수집함
+            # Ansible 2.3 이상 버전에서는 gathering facts 작업으로 자동 정보 수집
+        - 관리호스트에서 수집된 팩트 확인
+            # debug 모듈을 사용하는 플레이북 실행 > ansible_facts 변수 출력값 확인
+                ~ ...tasks: ...debug:\n  var: ansible_facts
+            # ansible localhost -m setup -a 'filter=ansible_hostname'
+                ~ setup 으로 확인된 팩트 별 키 값을 필터 적용시키면 특정 팩트값 추출 가능
+            # ansible localhost -m debug -a 'var=hostvars["localhost"]'
+                ~ 일부 변수 중 ansible 에 의해 자동으로 구성되어지는 매직 변수
+        - 플레이북 작업 속도를 빠르게 하려면 각 플레이마다 'gather_facts: no' 설정
+        
+
+        
+        

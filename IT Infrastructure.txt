@@ -61,8 +61,6 @@
         - ansible-doc MODULE : 모듈 사용법 메뉴얼 문서
             # ansible-doc $1 | sed -n '/EXAMPLES/,$p' | more
         - Module
-            # 플레이북에서 모듈 사용시 에러 무시하고 다음 작업으로 넘어가고 싶을 때
-                ~ 'ignore_error: yes' 를 모듈 라인과 같은 블록에 사용
             # File
                 ~ copy
                 ~ file
@@ -219,12 +217,28 @@
         - 'loop' 모듈과 'when' 모듈은 같은 레벨에서 실행되어야 함
             # 'register: result' 으로 저장한 결과를 'when: result.rc == 0' 로 비교 조건문
                 ~ rc : 실행 결과($?)
-10. 핸들러
+10. 제어문
     * ansible 은 멱등성(반복 연산에도 결과가 달라지지 않는 성질) 보장
-        - 서비스의 설정 파일(.cfg, .conf) 변경 시 서비스 재시작이 되어야 적용됨
+        - 서비스의 설정 파일(.cfg, .conf) 수정 시 서비스 재시작이 되어야 적용됨
+            # started 대신 restarted
     * 'notify ~ handlers' 모듈
         - 'notify' 모듈이 호출되면(triggered), 'handlers' 작업 수행(only 'changed', not 'ok')
             # 'handlers' 에서 지정한 작업 순서대로 실행
                 ~ 중복 작업에 대해서 오직 작업 하나만 처리됨
             # 'handlers' 작업은 모든 플레이 작업 완료 후 마지막 실행
-    
+11. 작업 오류 처리
+    * ansible 은 작업 변환 코드를 평가하여 작업의 성공 여부를 판단, 실패 시 플레이 중단
+    * 'ignore-errors' 모듈
+        - 플레이 정의 레벨, 작업이 실패해도 무시하고 다음 작업 진행
+    * 'force-handlers' 모듈
+        - 플레이 정의 레벨, 작업이 실패해도 강제로 작업 호출
+    * 'failed_when' 모듈
+        - 작업 정의 레벨, 작업 실패 조건을 정의
+            # 'register' 로 작업 결과 저장, 'failed_when' 으로 저장된 결과 참조
+                ~ 해당 모듈로 실패했을 경우 플레이 결과의 failed_count 는 올라가지 않음
+    * 'changed_when' 모듈
+        - 작업 정의 레벨, 상태 changed 변경 조건을 정의
+            # 'register' 로 작업 결과 저장, 'changed_when' 으로 결과 참조 후 notify 호출
+    * 'block ~ rescue ~ always' 모듈
+        - 플레이 정의 레벨, 플레이 작업을 논리적으로 그룹화
+        - block 실패 > rescue 작업, always 항상 작업(block + [rescue] + always)

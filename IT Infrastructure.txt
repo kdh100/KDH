@@ -242,4 +242,5 @@
     * 'block ~ rescue ~ always' 모듈
         - 플레이 정의 레벨, 플레이 작업을 논리적으로 그룹화
         - block 실패 > rescue 작업, always 항상 작업(block + [rescue] + always)
+12. 파일 배포
     * 

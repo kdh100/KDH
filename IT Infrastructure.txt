@@ -251,6 +251,8 @@
         - stat : 파일 상태 확인
         - synchronize : 원격동기화
     * 'jinja2' 템플릿 사용
+        - CONTEXT with {{ ansible_facts['sub']['sub']}}
+            # boolean 형태 혹은 string 형태 데이터 작성 가능
 13. 프로젝트 관리
     * import|include_tasks
         - 작업을 가져오면 플레이북이 실행되면서 정적으로 처리됨(최상위 플레이북 영향 없음)
@@ -260,4 +262,12 @@
     * 이미 수많은 사람들이 작성해놓은 코드 패키지(플레이, 작업, 변수, 템플릿 등 포함)
         - RHEL-system-roles(공식) 의 검증/무결성 테스트 완료된 소스
         - Ansible Galaxy Web(커뮤니티) 의 다양한 소스
-     
+    * ansible-galaxy init $DIR
+        - 구조 생성
+    * ansible-galaxy CMD
+        - search : 역할 검색
+        - init : 역할 구조(skeleton) 생성
+        - install : 역할 설치
+        - info : 역할 정보 확인
+        - list : 설치된 역할 리스트 확인
+        - remove : 설치된 역할 삭제

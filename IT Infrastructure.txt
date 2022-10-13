@@ -253,7 +253,7 @@
     * 'jinja2' 템플릿 사용
         - CONTEXT with {{ ansible_facts['sub']['sub']}}
             # boolean 형태 혹은 string 형태 데이터 작성 가능
-            # ansible localhost -m setup -a "filter=ansible_facts"
+            # ansible localhost -m setup | grep ansible_
             or
             # fact 덤프.yml 생성해서 실행시키기
               ---

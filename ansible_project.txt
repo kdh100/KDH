@@ -206,7 +206,7 @@ $ ansible-galaxy install -r roles/requirements.yml -p roles
 
 $ cd ~/project
 $ ansible localhost -m shell -a 'filter="fqdn"'
-$ mkdir -p template && cd template
+$ mkdir -p templates && cd templates
 $ vi index.html.j2
 ------------------
 hello world from {{ ansible_facts['fqdn'] }}
@@ -230,7 +230,7 @@ $ vi webservers.yml
     # /var/www/html/index.html -> hello world from {{ ansible_facts['fqdn'] }}
     - name: configure web server - /var/www/html/intex.html
       template:
-        src: ./template/index.html.j2
+        src: templates/index.html.j2
         dest: /var/www/html/index.html
 
     # systemctl enable --now httpd firewalld
@@ -830,3 +830,20 @@ $ ansible test -m shell -a 'crontab -l'
 =========
 18. 종합
 =========
+
+$ cd ~/project
+$ vi total.yml
+---------------
+---
+- name: install packages with packages.yml
+  import_playbook: packages.yml
+
+- name: syncronize the time with sync_time.yml
+  import_playbook: time_sync.yml
+
+- name: configure web server with webservers.yml
+  import_playbook: webservers.yml
+---------------
+
+$ ansible-playbook total.yml --syntex-check
+$ ansible-playbook total.yml

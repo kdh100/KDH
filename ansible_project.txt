@@ -1,0 +1,832 @@
+========================
+1. Ansible 설치 및 구성
+========================
+
+(선수작업)
+ansible.example.com (IP/NET: 192.168.10.10/24, GW: 192.168.10.2, DNS: 192.168.10.2)
+ansible1.example.com(IP/NET: 192.168.10.11/24, GW: 192.168.10.2, DNS: 192.168.10.2)
+ansible2.example.com(IP/NET: 192.168.10.12/24, GW: 192.168.10.2, DNS: 192.168.10.2)
+ansible3.example.com(IP/NET: 192.168.10.13/24, GW: 192.168.10.2, DNS: 192.168.10.2)
+ansible4.example.com(IP/NET: 192.168.10.14/24, GW: 192.168.10.2, DNS: 192.168.10.2)
+
+[ ] SSH 설정
+
+# useradd -G wheel ansible
+# echo ansible | passwd --stdin ansible
+# su - ansible
+$ sudo -l
+$ sudo vi /etc/sudoers
+----------------------
+%wheel NOPASSWD: ALL
+----------------------
+
+$ sudo vi /etc/hosts
+---------------------
+#
+# Ansible Server List
+#
+192.168.10.10  ansible.example.com      ansible      control.example.com  control
+192.168.10.11  ansible1.example.com     ansible1     web1.example.com     web1
+192.168.10.12  ansible2.example.com     ansible2     web2.example.com     web2
+192.168.10.13  ansible3.example.com     ansible3     web3.example.com     web3
+192.168.10.14  ansible4.example.com     ansible4     web4.example.com     web4
+192.168.10.20  ansibletest.example.com  ansibletest  test.example.com     test
+---------------------
+
+$ ssh ansible1 > exit
+$ cd ~/.ssh > ssh-keygen > ssh-copy-id -i id_rsa.pub ansible{1,2,3,4}
+
+$ ssh ansible{1,2,3,4} (암호인증없이 접속되는지 확인)
+
+[ ] 필요 패키지 설치
+
+ansible 사용자로 작업
+$ sudo yum install ansible rhel-system-roles epel-release yum-utils
+
+[ ] inventory 파일 생성
+
+$ mkdir -p ~/project && cd ~/project
+$ vi inventory
+---------------
+[dev]
+ansible1
+
+[test]
+ansible2
+
+[prod]
+ansible3
+ansible4
+
+[webservers:children]
+prod
+---------------
+
+[ ] ansible.cfg 파일 생성
+
+$ vi ansible.cfg
+-----------------
+[defaults]
+inventory = /home/ansible/project/inventory
+roles_path = roles:/home/ansible/project/roles:/usr/share/ansible/roles:/etc/ansible/roles
+
+[privilege_escalation]
+become = true
+-----------------
+
+===================================
+2. Ansible Ad Hoc 명령 생성 및 실행
+===================================
+
+[ ] 실습 환경 구축 - CD 장착
+
+$ sudo yum install -y httpd mod_ssl
+$ cd /var/www/html
+$ mkdir pkg
+$ cd /run/media/ansible/CentOS-Stream-8-x86_64-dvd
+$ sudo cp -a * /var/www/html/pkg
+$ sudo systemctl enable --now httpd
+
+[ ] 레포지토리 생성
+
+Repository 1:
+* repository name: MyBASE
+* description: base software
+* baseurl:
+	http://192.168.10.10/pkg/BaseOS
+* gpgcheck: no
+
+Repository 2:
+* repository name: EPEL_APPSTREAM
+* description: EPEL appstream software
+* base url:
+	http://192.168.10.10/pkg/AppStream
+* gpgcheck: no
+
+$ ansible-doc yum_repository
+$ vi adhoc.sh
+--------------
+#!/bin/bash
+
+ansible all -b -m shell \
+-a "rm -rf /etc/yum.repos.d/*"
+
+ansible all -b -m yum_repository \
+-a "file=MyBaseOS name=MyBase description='base software' baseurl=http://192.168.10.10/pkg/BaseOS gpgcheck=no"
+
+ansible all -b -m yum_repository \
+-a "file=MyAppStream name=MyAppStream description='appstream software' baseurl=http://192.168.10.10/pkg/AppStream gpgcheck=no"
+--------------
+
+$ chmod +x adhoc.sh
+$ ./adhoc.sh
+
+===============
+3. 패키지 설치
+===============
+
+$ cd ~/project
+$ vi packages.yml
+------------------
+---
+- name: Install the packages - all host
+  hosts: dev, test, prod
+  tasks:
+    - name: php, mariadb
+      yum: 
+        name:
+          - php
+          - mariadb
+        state: present
+
+- name: Install the packages - dev group
+  hosts: dev
+  tasks:
+    - name: "@Development tools, htop"
+      yum:
+        name:
+          - "@Development tools"
+          - iotop
+        state: present
+------------------
+
+$ ansible-playbook packages.yml --syntax-check
+$ ansible-playbook packages.yml
+
+$ ansible all -m shell -a 'rpm -qa php mariadb iotop gcc'
+
+===================
+4. 역할 패키지 설치
+===================
+
+$ cd ~/project
+$ cat /usr/share/doc/rhel-system-roles/timesync/README.md
+
+$ vi time_sync.yml
+-------------------
+---
+- name: configure NTP
+  hosts: all
+  vars:
+    timesync_ntp_servers:
+    - hostname: time.bora.net
+      iburst: yes
+  roles:
+    - rhel-system-roles.timesync
+-------------------
+
+$ ansible-playbook time_sync.yml --syntax-check
+$ ansible-playbook time_sync.yml
+
+=====================================
+5. Ansible-Galaxy 를 이용한 역할 설치
+=====================================
+
+	ansible-galaxy init
+	ansible-galaxy install
+	ansible-galaxy list
+	ansible-galaxy info
+	ansible-galaxy remove
+	ansible-galaxy search
+
+$ ansible-galaxy search docker
+$ cd ~/project
+$ mkdir -p roles
+$ vi roles/requirements.yml
+---------------------------
+- name: docker
+  src: https://galaxy.ansible.com/download/community-docker-3.1.0.tar.gz
+---------------------------
+
+$ ansible-galaxy install -r roles/requirements.yml -p roles
+
+===========================
+6. Web Server 구성 및 확인
+===========================
+
+$ cd ~/project
+$ ansible localhost -m shell -a 'filter="fqdn"'
+$ mkdir -p template && cd template
+$ vi index.html.j2
+------------------
+hello world from {{ ansible_facts['fqdn'] }}
+------------------
+
+$ vi webservers.yml
+-------------------
+---
+- name: configure web server
+  hosts: webservers
+  tasks:
+    # yum install httpd mod_ssl firewalld
+    - name: install packages - httpd, mod_ssl, firewalld
+      yum:
+        name:
+          - httpd
+          - mod_ssl
+          - firewalld
+        state: present
+    
+    # /var/www/html/index.html -> hello world from {{ ansible_facts['fqdn'] }}
+    - name: configure web server - /var/www/html/intex.html
+      template:
+        src: ./template/index.html.j2
+        dest: /var/www/html/index.html
+
+    # systemctl enable --now httpd firewalld
+    - name: Start the service - httpd, firewalld
+      service:
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+      with_items:
+        - httpd
+        - firewalld
+
+    # firewall-cmd --permanent --add-service={http,https}
+    - name: configure service port
+      firewalld:
+        service: "{{ item }}"
+        zone: public
+        permanent: yes
+        immediate: yes
+        state: enabled
+      with_items:
+        - http
+        - https
+-------------------
+
+$ ansible-playbook webservers.yml --syntax-check
+$ ansible-playbook webservers.yml
+
+$ ansible webservers -m shell -a 'cat /var/www/html/hello.html'
+$ ansible webservers -m shell -a 'curl -k https://localhost'
+
+=============
+7. 역할 생성
+=============
+
+$ cd ~/project
+$ ansible-galaxy init roles/apache
+$ tree roles/apache
+$ vi roles/apache/tasks/main.yml
+--------------------------------
+---
+# yum install httpd mod_ssl firewalld
+- name: install packages - httpd, mod_ssl, firewalld
+  yum:
+    name:
+      - httpd
+      - mod_ssl
+      - firewalld
+    state: present
+
+# /var/www/html/index.html
+# -> Welcome to {{ ansible_facts['hostname'] }} to {{ ansible_facts['default_ipv4']['address'] }}
+- name: configure web server - /var/www/html/index.html
+  template:
+    src: templates/index.html.j2
+    dest: /var/www/html/index.html
+
+# systemctl enable --now httpd firewalld
+- name: Start the service - httpd, firewalld
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+  with_items:
+    - httpd
+    - firewalld
+
+# firewall-cmd --permanent --add-service={http,https}
+- name: configure service port
+  firewalld:
+    service: "{{ item }}"
+    zone: public
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - http
+    - https
+--------------------------------
+
+$ vi roles/apache/templates/index.html.j2
+----------------------------------------
+Welcome to {{ ansible_facts['hostname'] }} to {{ ansible_facts['default_ipv4']['address'] }}
+----------------------------------------
+
+$ vi newrole.yml
+-------------------
+- name: Apache role - install and configure and start webserver
+  hosts: webservers
+  roles:
+    - apache
+----------------
+
+$ ansible-playbook newrole.yml --syntax-check
+$ ansible-playbook newrole.yml
+
+$ ansible webservers -m shell -a 'ls -l /var/www/html'
+$ ansible webservers -m shell -a 'cat /var/www/html/index.html'
+$ ansible webservers -m shell -a 'curl http://localhost'
+
+=========================
+8. 논리 볼륨 생성 및 사용
+=========================
+
+$ cd ~/project
+$ vi lv.yml
+------------
+---
+- name: configure lvm
+  hosts: webservers
+  tasks:
+    # partition -> /dev/sdb
+    - name: create a partition - /dev/sdb1
+      parted:
+        device: /dev/sdb
+        number: 1
+        flags: [ lvm ]
+        fs_type: ext4
+        state: present
+        part_start: 1MiB
+        part_end: "100%"
+      when: ansible_facts['devices']['sdb'] is defined
+
+    # lvm -> pv, vg(/dev/research, *)
+    - name: create a vg - research
+      lvg:
+        vg: research
+        pvs: /dev/sdb1
+      when: ansible_facts['devices']['sdb']['partitions']['sdb1'] is defined
+
+    # lvm -> lv(/dev/research/data, 500MiB)
+    - name: create a lv - data
+      lvol:
+        vg: research
+        lv: data
+        size: 500M
+
+    # filesystem -> ext4
+    - name: create a filesystem - ext4
+      filesystem:
+        fstype: ext4
+        dev: /dev/research/data
+ 
+    # mount -> /mnt/research
+    - name: mount filesystem
+      mount:
+        path: /mnt/research
+        src: /dev/research/data
+        fstype: ext4
+        state: mounted
+------------
+
+$ ansible-playbook lv.yml --syntax-check
+$ ansible-playbook lv.yml
+
+$ ansible webservers -m shell -a 'sudo pvs'
+$ ansible webservers -m shell -a 'sudo vgs'
+$ ansible webservers -m shell -a 'sudo lvs'
+$ ansible webservers -m shell -a 'lsblk -fp'
+
+====================
+9. 호스트 파일 생성 ---> 앤서블 2.12.7 버전에선 ansible_facts 미정의로 실습 불가!
+====================
+
+$ cd ~/project
+$ vi templates/hosts.j2
+--------------
+{% for host in groups['all'] %}
+{{ hostvars[host]['ansible_facts']['default_ipv4']['address'] }} {{
+hostvars[host]['ansible_facts']['fqdn'] }} {{
+hostvars[host]['ansible_facts']['hostname'] }}
+{% endfor %}
+--------------
+
+$ vi hosts.yml
+--------------
+---
+- name: template hosts file
+  hosts: dev
+  tasks:
+    - name: templates/hosts.j2 -> /etc/myhosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/myhosts
+        owner: root
+        group: root
+        mode: "0644"
+--------------
+
+
+$ ansible-playbook hosts.yml --syntax-check
+$ ansible-playbook hosts.yml
+
+$ ansible dev -m shell -a 'cat /etc/myhosts'
+
+=====================
+10. 파일 컨텐츠 수정
+=====================
+
+$ cd ~/project
+$ mkdir -p group_vars
+$ touch group_vars/{dev,test,prod}
+$ vi group_vars/{dev,test,prod} ---> 각 파일마다 진행해줘야함
+-------------------------------
+mystring: {Development,Test,Production}
+-------------------------------
+
+$ vi issue.yml
+--------------
+---
+- name: configure file content
+  hosts: all
+  tasks:
+    - name: delete a file
+      file:
+        path: /etc/issue
+        state: absent
+        
+    - name: create a file
+      lineinfile:
+        path: /etc/issue
+        line: "{{ mystring }}"
+        owner: root
+        group: root
+        mode: "0644"
+        create: yes
+--------------
+
+$ ansible-playbook issue.yml --syntax-check
+$ ansible-playbook issue.yml
+
+$ ansible dev -m shell -a 'cat /etc/issue'
+
+===========================
+11. 웹 컨텐츠 디렉토리 생성
+===========================
+
+$ cd ~/project
+$ vi selinux.yml
+----------------
+---
+- name: selinux on and reboot
+  hosts: all
+  tasks:
+    - name: selinux on
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX=disabled'
+        line: SELINUX=enforcing
+      notify: system reboot
+
+    - name: selinux status check
+      command: sestatus
+      register: sestatus
+
+    - debug: var=sestatus.stdout_lines
+
+  handlers:
+    - name: system reboot
+      reboot:
+----------------
+
+$ vi webcontent.yml
+-------------------
+---
+- name: configure a web server
+  hosts: webservers
+  tasks:
+    - name: create a directory - /webdev
+      file:
+        path: /webdev
+        state: directory
+        group: apache
+        mode: '2775'
+
+    - name: configure selinux fcontext - /webdev
+      sefcontext:
+        target: '/webdev(/.*)?'
+        setype: httpd_sys_content_t
+        state: present
+    
+    - name: apply selinux fcontext - /webdev
+      command: restorecon -irv /webdev
+    
+    - name: create a symbolic-link - /var/www/html/webdev -> /webdev
+      file:
+        src: /webdev
+        dest: /var/www/html/webdev
+        state: link
+
+    - name: create a file - /webdev/index.html
+      lineinfile:
+        path: /webdev/index.html
+        line: "WEBSERVERS"
+        create: yes
+
+- name: check service
+  hosts: dev
+  tasks:
+    - name: connect to web site - http://ansible3.example.com/webdev
+      uri:
+        url: http://ansible3.example.com/webdev/
+        return_content: yes
+        status_code: 200
+-------------------
+
+$ ansible-playbook webcontent.yml --syntax-check
+$ ansible-playbook webcontent.yml
+
+========================
+12. 하드웨어 보고서 작성
+========================
+
+$ cd ~/project
+$ vi hwreport.empty
+-------------------
+HOST=inventory hostname 
+BIOS=bios version
+MEMORY=toal memory in mb
+SDA_DISK_SIZE=disk size
+SDB_DISK_SIZE=disk size
+SDC_DISK_SIZE=disk size
+-------------------
+
+$ vi hwreport.yml
+-----------------
+---
+- name: create hwreport file
+  hosts: all
+  tasks:
+    - name: create a file - /root/hwreport.txt
+      copy:
+        src: hwreport.empty
+        dest: /root/hwreport.txt
+
+    - name: modify hostname
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^HOST'
+        line: "HOST={{ ansible_facts['hostname'] }}"
+        state: present
+
+    - name: modify bios version
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^BIOS'
+        line: "BIOS={{ ansible_facts['bios_version'] }}"
+        state: present
+
+    - name: modify memory
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^MEMORY'
+        line: "MEMORY={{ ansible_facts['memtotal_mb'] }} MiB"
+        state: present
+
+    - name: modify disk size - /dev/sda
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^SDA_DISK'
+        line: |
+          {% if ansible_facts['devices']['sda'] is defined %}
+          SDA_DISK_SIZE={{ ansible_facts['devices']['sda']['size'] }}
+          {% else %}
+          SDA_DISK_SIZE=NONE
+          {% endif %}
+        state: present
+ 
+    - name: replace disk size - /dev/sdb
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^SDB_DISK'
+        line: |
+          {% if ansible_facts['devices']['sdb'] is defined %}
+          SDB_DISK_SIZE={{ ansible_facts['devices']['sdb']['size'] }}
+          {% else %}
+          SDB_DISK_SIZE=NONE
+          {% endif %}
+        state: present
+
+    - name: replace disk size - /dev/sdc
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^SDC_DISK'
+        line: |
+          {% if ansible_facts['devices']['sdc'] is defined %}
+          SDC_DISK_SIZE={{ ansible_facts['devices']['sdc']['size'] }}
+          {% else %}
+          SDC_DISK_SIZE=NONE
+          {% endif %}
+        state: present
+-----------------
+
+$ ansible-playbook hwreport.yml --syntax-check
+$ ansible-playbook hwreport.yml
+
+$ ansible all -m shell -a 'cat /root/hwreport.txt'
+
+============================
+13. 암호 자격 증명 모음 생성
+============================
+
+$ cd ~/project
+$ echo "soldesk1." > secret.txt
+$ mkdir -p vars
+
+$ ansible-vault create vars/pw.yml --vault-password-file=secret.txt
+-------------------------------------------------------------------
+---
+pw_developer: 'Imadev'
+pw_manager: 'Imamgr'
+-------------------------------------------------------------------
+
+$ ansible-vault view vars/pw.yml
+
+====================
+14. 사용자 계정 생성
+====================
+
+$ cd ~/project
+$ vi vars/userlist.yml
+------------------
+---
+users:
+  - username: developer
+    groups: daemon
+  - username: manager
+    groups: adm
+------------------
+
+$ vi users.yml
+---------------
+---
+- name: useradd developer user
+  hosts: dev, test
+  vars_files:
+    - vars/pw.yml
+    - vars/userlist.yml
+  tasks:
+    - name: create a user - developer
+      user:
+        name: "{{ item.username }}"
+        password: "{{ pw_developer|password_hash('sha512') }}"
+        groups: "{{ item.groups }}"
+        append: yes
+        state: present
+      loop: "{{ users }}"
+      when: item.username == "developer"
+
+- name: useradd manager user
+  hosts: prod
+  vars_files:
+    - vars/pw.yml
+    - vars/userlist.yml
+  tasks:
+    - name: create a user - manager
+      user:
+        name: "{{ item.username }}"
+        password: "{{ pw_manager|password_hash('sha512') }}"
+        groups: "{{ item.groups }}"
+        append: yes
+        state: present
+      loop: "{{ users }}"
+      when: item.username == "manager"
+---------------
+
+$ ansible-playbook users.yml --syntex-check --vault-id @prompt
+$ ansible-playbook users.yml
+
+$ ansible all -m shell -a 'grep {developer|manager} /etc/passwd' ---> 하나씩 검색
+
+================
+15.FTP 서버 구성
+================
+
+$ cd ~/project
+$ vi ftp.yml
+------------
+---
+- name: configure FTP server
+  hosts: test
+  tasks:
+    - name: install the package - vsftpd, ftp
+      yum:
+        name:
+          - vsftpd
+          - ftp
+        state: present
+    
+    - name: configure service - /etc/vsftpd/vsftpd.conf
+      lineinfile:
+        path: /etc/vsftpd/vsftpd.conf
+        regexp: '^anonymous_enable'
+        line: anonymous_enable=NO
+      ignore_errors: yes
+      notify: restart vsftpd
+    
+    - name: configure service - /etc/vsftpd/ftpusers
+      lineinfile:
+        path: /etc/vsftpd/ftpusers
+        regexp: '^root'
+        line: \#root
+      ignore_errors: yes
+      notify: restart vsftpd
+
+    - name: configure service - /etc/vsftpd/user_list
+      lineinfile:
+        path: /etc/vsftpd/user_list
+        regexp: '^root'
+        line: \#root
+      ignore_errors: yes
+      notify: restart vsftpd
+
+    - name: start the service - vsftpd
+      service:
+        name: vsftpd
+        state: started
+        enabled: yes
+
+    - name: append the service port on firewall
+      firewalld:
+        service: ftp
+        zone: public
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+  handlers:
+    - name: restart vsftpd
+      service:
+        name: vsftpd
+        state: restarted
+------------
+
+$ ansible-playbook ftp.yml --syntex-check
+$ ansible-playbook ftp.yml
+
+$ ansible test -m shell -a 'cat /etc/vsftpd/{ftpusers|user_list}' ---> 하나씩 확인
+$ ftp ansible2.example.com
+
+=======================================
+16. 시스템 런레벨(default.target) 변경
+=======================================
+
+$ cd ~/project
+$ vi target.yml
+---------------
+---
+- name: change the default target
+  hosts: all
+  tasks:
+    - name: change the default target at boot time
+      file:
+        #src: /usr/lib/systemd/system/graphical.target
+        #dest: /etc/systemd/system/default.target
+        src: /usr/lib/systemd/system/multi-user.target
+        dest: /etc/systemd/system/default.target
+        state: link
+
+    - name: change the default target at concurrent
+      command:
+        cmd: systemctl isolate multi-user.target
+        #cmd: systemctl isolate graphical.target
+---------------
+
+$ ansible-playbook target.yml --syntex-check
+$ ansible-playbook target.yml
+
+$ ansible all -m shell -a 'ls -l /etc/systemd/system/default.target'
+
+=========================
+17. 정기적인 잡(JOB) 수행
+=========================
+
+$ cd ~/project
+$ vi cronjob.yml
+----------------
+---
+- name: create a cron file under /etc/cron.d
+  hosts: test
+  become: false
+  tasks:
+    - name: cron job
+      cron:
+        name: datejob
+        minute: "0,30"
+        weekday: "1-5"
+        job: "date >> /home/ansible/datefile"
+----------------
+
+$ ansible-playbook cronjob.yml --syntex-check
+$ ansible-playbook cronjob.yml
+
+$ ansible test -m shell -a 'ls -l /var/spool/cron'
+$ ansible test -m shell -a 'crontab -l'
+
+=========
+18. 종합
+=========

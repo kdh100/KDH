@@ -6,4 +6,9 @@
         - FaaS(Function as a Service)
 2. 인프라 구성 관리 기초 지식
     * IaC(Infrastructure as a Code) : 인프라 구성/관리를 코드를 통해서 진행
-    * CI/CD(Continuous Integration/Delivery; 지속적 통합/배포)
+    * CI/CD(Continuous Integration/Delivery&Deployment; 지속적 통합/배포)
+        - CI : 소스코드 작성(build) + 테스트 + 이미지 생성(merge)
+        - CD : 내부 저장소에 이미지 전달(Delivery) + 이미지 배포(Deployment)
+3. 실습을 위한 OS 준비
+    * WMware Workstation
+    * CentOS

@@ -1,0 +1,9 @@
+1. 시스템 기반 기초 지식
+    * 클라우드 : 인터넷를 통해 컴퓨팅 리소스(서버,스토리지 등)를 주문형(On-Demand)으로 제공
+        - IaaS(Infrastructure as a Service)
+        - PaaS(Platform as a Service)
+        - SaaS(Service as a Service)
+        - FaaS(Function as a Service)
+2. 인프라 구성 관리 기초 지식
+    * IaC(Infrastructure as a Code) : 인프라 구성/관리를 코드를 통해서 진행
+    * CI/CD(Continuous Integration/Delivery; 지속적 통합/배포)

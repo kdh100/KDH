@@ -70,8 +70,8 @@
         - systemctl enable --now docker
         <도커 실행>
         - docker run hello-world
-7. Docker CMD
-    * 이미지 CMD
+7. Docker 관리
+    * 이미지
         - search : 검색
         - pull : 다운로드
             # Docker Image Repository(Local Registry)
@@ -94,19 +94,42 @@
         - tag : 태그 설정
             # 하드 링크 형식으로 새로운 이미지 생성됨
         - login : 허브(퍼블릭 레지스트리) 로그인
+            # https://hub.docker.com
             # /root/.docker/config.json 파일에 base64 방식으로 ID/PW 저장됨
                 ~ 보안에 매우 취약(https://www.base64decode.org/)
-    * 컨테이너 CMD
-        - create -d --name webserver -p 80:80 nginx : 컨테이너 생성
+    * 컨테이너
+        - create -d --name webserver -p 80:80 nginx : 컨테이너 생성(pull + create)
             # --name : 컨테이너 이름
                 ~ 해당 옵션이 없으면 자동으로 이름 생성됨
             # -d : 백그라운드 실행
-            # -p : 서비스 포트(In/Out)
-                ~ 해당 옵션이 없으면 외부에 포트 공개 안됨
+            # -p : 서비스 포트 매칭(Port-Forwarding)
+                ~ '외부포트:내부포트'
+                ~ 해당 옵션이 없으면 외부에 포트 공개가 안되서 서비스 불가
+        - run -d -it --rm --name myos1 centos : 컨테이너 시작(pull + create + start)
+            # --rm : 컨테이너 종료 시 자동으로 삭제
+            # -it : 표준 입출력 추가(키보드+모니터; 포어그라운드 실행)
+                ~ OS 컨테이너는 기본 쉘 실행이며, -it 옵션 없으면 컨테이너가 중지상태 유지됨
+                ~ 모든 OS 이미지는 기본값으로 백그라운드로 컨테이너 실행
         - ps -aq : 컨테이너 목록 확인
             # -a : 모든 정보(활성화 + 비활성화)
             # -q : ID 정보만 출력
         - rm -f : 컨테이너 삭제
             # docker rm -f $(docker ps -aq) : 모든 컨테이너 삭제
-        - run -d --rm --name webserver -p 80:80 nginx : 컨테이너 시작(pull + create + start)
-            # --rm : 컨테이너 종료 시 자동으로 삭제
+        - logs -f -t ID : 컨테이너(ID) 로그 확인
+            # -f : 지속적으로 로그 확인(tail 과 동일)
+            # -t : timestamp 확인
+        - stop(kill -s 15) : 정상 종료
+        - kill(kill -s 9) : 비정상 강제종료
+    * 볼륨
+        - volume : 지정 위치(/var/lib/docker) 공간 일부를 컨테이너가 사용(Over-Lay 방식)
+            # docker run -v [testvol:]/usr/share/nginx/html:ro... 
+                ~ 볼륨 이름 생략 가능, 볼륨 생략하면 자동 생성
+                ~ ':ro' 마운트 포인트의 권한 옵션 부여 가능
+            # volume create : 볼륨 생성
+            # volume ls : 볼륨 목록 확인
+            # volume rm : 볼륨 삭제
+                ~ 컨테이너 삭제 시 '-v' 옵션 추가(rm -f -v)하면 자동생성 볼륨도 같이 삭제됨
+        - bind mount : 도커 호스트 내 공간 일부를 컨테이너가 사용(Over-Mount 방식)
+            # docker run -v /web:/usr/share/nginx/html:ro...
+                ~ 볼륨 이름 필수, 디렉토리가 없으면 자동 생성
+            

@@ -1,0 +1,70 @@
+[압축]
+    * .bz2 : j
+    * .xz : J
+    * .gz : z
+    * .zip : Z
+
+[패키지]
+    * 온라인기반 패키지 관리
+        - debain : apt-get
+        - redhat : yum
+        - suse : zypper
+    * 의존성 무시 강제 삭제
+        - rpm -e --nodeps
+    * 윈도우 매니저
+        - Metacity, Mutter, Kwin, Gnome
+    * 이미지뷰어
+        - eog, GIMP, gwenview
+    * 사운드
+        - OSS(hannu), ALSA(Jaroslav), totem
+    * 프린트
+        - systemV : lp, lpstat, cancel
+        - lpr, lpc, lpq, lprm
+    * 파일탐색기
+        - nautilus, dolpin
+    * 라이브러리
+        - QT, GTK+
+
+[편집기]
+    * pico(리눅스 초기) --> nano(복제판)
+    * cat > '.exrc' --> set nu
+
+[백그라운드]
+    * nohup : 백그라운드로 프로세스 유지
+
+[시그널]
+    * kill : 15번 시그널(정상 종료)
+
+[스케쥴링]
+    * crontab : <분> <시> <일> <월> <일주일> <작업>
+
+[쉘]
+    * sh(본), csh(빌조이), tcsh(캔그리어), ksh(콘), bash(폭스,GNU), zsh(스티븐슨)
+
+[환경변수]
+    * '~/.bash_profile' 에 PATH 등록 사용
+
+[파티션]
+    * xfs_repair : 파티션 점검 및 복구
+    * 디스크 쿼터 설정
+        - /etc/fstab --> quota, uquota, usrquota
+
+[권한]
+    * 기본 파일 권한 : 0644(-rw-r--r--)
+
+[운영체제]
+    * 리눅스 커널 기반 : webOS, GENIVI, Tizen
+
+[기술동향]
+    * Hadoop : 큰 컴퓨터 클러스터에서 동작하는 분산 응용 프로그램 지원, 자바 소프트웨어
+
+[네트워크]
+    * ip : 라우팅 테이블 정보 출력
+    * enp0s3 : CentOS7 버전에서 이더넷카드 장착 시 장치명
+    * IANA(인터넷 등장 초기) --> ICANN(국제기구)
+    * MAN : 도시 상의 공중 영역 연결을 위한 표준
+        - 802.3 이더넷
+        - 802.4 토큰 버스
+        - 802.5 토큰 링
+        - 802.6 MAN
+    * X 서버 접근 : xhost 8.8.8.8

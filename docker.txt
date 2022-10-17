@@ -12,3 +12,76 @@
 3. 실습을 위한 OS 준비
     * WMware Workstation
     * CentOS
+    * 기본 설정 및 스냅샷
+        - docker1|2 : 192.168.10.10|20/24, (gw)192.168.10.2, (dns)192.168.10.2
+        - hostnamectl set-hostname docker{1|2}.example.com
+        - reboot
+4. Docker
+    * Image : 파일시스템과 실행할 어플리케이션 설정을 하나로 합친 것
+        - 컨테이너를 생성하는 템플릿 역할
+    * Container : 이미지를 기반으로 생성되는 파일시스템과 어플리케이션이 구체화되어 실행되는 상태
+    * Build : 이미지를 생성
+    * Ship : 이미지를 공유(리포지터리 혹은 레지스트리)
+        - 기본값으로 도커 레지스트리(https://hub.docker.com) 지정
+            # Github, Bitbucket 등 사용 가능
+    * Run : 이미지를 동작시켜 컨테이너를 생성
+    * Component
+        - Engine
+            # client
+            # REST API
+            # daemon
+        - Ojbect
+            # Image/Container
+            # Network(NAT; masquerading/port-forwarding)
+            # volume
+            # plugins
+        - Registry
+        - Compose
+        - Swarm
+5. Docker 기술
+    * 'chroot + namespace + cgroup'
+        - chroot : 파일시스템 구획(최상위 폴더를 제한하여 실행되는 범위를 지정)
+        - namespace : 시스템자원 라벨링(특정 컨테이너가 사용할 수 있는 라벨을 지정하기)
+        - cgroup : 자원의 제한 설정
+    * 네트워크(가상 브리지/가상 NIC)
+        - 도커 설치 시 서버의 물리 NIC 가 docker0 이라는 가상 브리지에 연결(기본값)
+        - 컨테이너가 실행되면 172.17.0.0/16 이라는 서브넷 사설주소가 eth0 에 자동 할당
+6. Docker 설치하기
+    * 직접 설치
+        <yum 설정매니저 설치>
+        - yum install -y yum-utils
+        - yum-config-manager --add-repo \
+          https://download.docker.com/linux/centos/docker-ce.repo
+        <중복 패키지 삭제>
+        - yum remove -y runc
+        <도커 설치>
+        - yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+        <도커 실행>
+        - systemctl enable --now docker
+        <도커 시험>
+        - docker run hello-world
+    * 스크립트를 사용한 설치
+        <중복 패키지 삭제>
+        - yum remove -y runc
+        <스크립트 다운로드>
+        - curl -fsSL https://test.docker.com -o test-docker.sh
+        - ./test-docker.sh
+        <도커 실행>
+        - systemctl enable --now docker
+        <도커 시험>
+        - docker run hello-world
+7. Docker 실행하기
+    * docker container run hello-world
+        - 이미지를 검색해보고 없으면 온라인 레지스트리에서 검색하여 다운로드하고 실행
+    * docker container run ubuntu /bin/echo 'hello world'
+    * docker container ps -a
+        - 이미지를 통해 실행시킨 컨테이너 프로세스 전체 확인
+    * docker container rm ID ID
+        - 컨테이너 아이디를 여러개 적어서 동시에 삭제 가능
+    * docker search nginx
+        - 이미지를 레지스트리에서 검색
+    * docker image pull nginx
+        - 이미지를 로컬로 다운로드
+    * docker image ls
+        - 도커 이미지 확인
+    * 

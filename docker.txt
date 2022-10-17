@@ -17,12 +17,12 @@
         - hostnamectl set-hostname docker{1|2}.example.com
         - reboot
 4. Docker
-    * Image : 파일시스템과 실행할 어플리케이션 설정을 하나로 합친 것
+    * Image : 파일시스템과 실행할 어플리케이션 및 설정을 하나로 합친 것
         - 컨테이너를 생성하는 템플릿 역할
     * Container : 이미지를 기반으로 생성되는 파일시스템과 어플리케이션이 구체화되어 실행되는 상태
     * Build : 이미지를 생성
-    * Ship : 이미지를 공유(리포지터리 혹은 레지스트리)
-        - 기본값으로 도커 레지스트리(https://hub.docker.com) 지정
+    * Ship : 이미지를 공유(퍼블릭 레지스트리)
+        - 기본값으로 도커 공개저장소(https://hub.docker.com) 지정
             # Github, Bitbucket 등 사용 가능
     * Run : 이미지를 동작시켜 컨테이너를 생성
     * Component
@@ -46,7 +46,7 @@
     * 네트워크(가상 브리지/가상 NIC)
         - 도커 설치 시 서버의 물리 NIC 가 docker0 이라는 가상 브리지에 연결(기본값)
         - 컨테이너가 실행되면 172.17.0.0/16 이라는 서브넷 사설주소가 eth0 에 자동 할당
-6. Docker 설치하기
+6. Docker 설치
     * 직접 설치
         <yum 설정매니저 설치>
         - yum install -y yum-utils
@@ -56,9 +56,9 @@
         - yum remove -y runc
         <도커 설치>
         - yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-        <도커 실행>
+        <도커 서비스 시작>
         - systemctl enable --now docker
-        <도커 시험>
+        <도커 실행>
         - docker run hello-world
     * 스크립트를 사용한 설치
         <중복 패키지 삭제>
@@ -66,22 +66,47 @@
         <스크립트 다운로드>
         - curl -fsSL https://test.docker.com -o test-docker.sh
         - ./test-docker.sh
-        <도커 실행>
+        <도커 서비스 시작>
         - systemctl enable --now docker
-        <도커 시험>
+        <도커 실행>
         - docker run hello-world
-7. Docker 실행하기
-    * docker container run hello-world
-        - 이미지를 검색해보고 없으면 온라인 레지스트리에서 검색하여 다운로드하고 실행
-    * docker container run ubuntu /bin/echo 'hello world'
-    * docker container ps -a
-        - 이미지를 통해 실행시킨 컨테이너 프로세스 전체 확인
-    * docker container rm ID ID
-        - 컨테이너 아이디를 여러개 적어서 동시에 삭제 가능
-    * docker search nginx
-        - 이미지를 레지스트리에서 검색
-    * docker image pull nginx
-        - 이미지를 로컬로 다운로드
-    * docker image ls
-        - 도커 이미지 확인
-    * 
+7. Docker CMD
+    * 이미지 CMD
+        - search : 검색
+        - pull : 다운로드
+            # Docker Image Repository(Local Registry)
+            # Private Registry
+            # Public Registry
+                ~ 도커 허브
+        - images : 이미지 목록 확인
+            # '레지스트리/사용자명' 안붙어있는 이미지는 도커 허브 공식(Official) 이미지
+            # '태그' 안붙어있는 이미지는 최신(Latest) 이미지
+        - inspect : 자세한 내용 확인
+            # docker inspect nginx
+            # docker inspect -f "{{ .Config.Env }}" nginx
+                ~ Go 언어(jinja2) 방식의 필터(-f; filter)를 통해 원하는 정보만 출력
+        - rmi : 이미지 삭제
+            # docker rmi $(docker images -q) : 모든 이미지 삭제
+        - push : 업로드
+            1) 이미지를 '아이디/이름:태그' 형식으로 생성
+            2) 도커 허브 로그인
+            3) 이미지 푸시
+        - tag : 태그 설정
+            # 하드 링크 형식으로 새로운 이미지 생성됨
+        - login : 허브(퍼블릭 레지스트리) 로그인
+            # /root/.docker/config.json 파일에 base64 방식으로 ID/PW 저장됨
+                ~ 보안에 매우 취약(https://www.base64decode.org/)
+    * 컨테이너 CMD
+        - create -d --name webserver -p 80:80 nginx : 컨테이너 생성
+            # --name : 컨테이너 이름
+                ~ 해당 옵션이 없으면 자동으로 이름 생성됨
+            # -d : 백그라운드 실행
+            # -p : 서비스 포트(In/Out)
+                ~ 해당 옵션이 없으면 외부에 포트 공개 안됨
+        - ps -aq : 컨테이너 목록 확인
+            # -a : 모든 정보(활성화 + 비활성화)
+            # -q : ID 정보만 출력
+        - rm -f : 컨테이너 삭제
+            # docker rm -f $(docker ps -aq) : 모든 컨테이너 삭제
+        - run -d --rm --name webserver -p 80:80 nginx : 컨테이너 시작(pull + create + start)
+            # --rm : 컨테이너 종료 시 자동으로 삭제

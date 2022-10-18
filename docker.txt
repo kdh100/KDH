@@ -105,6 +105,7 @@
             # -p : 서비스 포트 매칭(Port-Forwarding)
                 ~ '외부포트:내부포트'
                 ~ 해당 옵션이 없으면 외부에 포트 공개가 안되서 서비스 불가
+        - rename <OLD> <NEW> : 컨테이너 이름 변경
         - run -d -it --rm --name myos1 centos : 컨테이너 시작(pull + create + start)
             # --rm : 컨테이너 종료 시 자동으로 삭제
             # -it : 표준 입출력 추가(키보드+모니터; 포어그라운드 실행)
@@ -115,13 +116,9 @@
             # -q : ID 정보만 출력
         - rm -f : 컨테이너 삭제
             # docker rm -f $(docker ps -aq) : 모든 컨테이너 삭제
-        - logs -f -t ID : 컨테이너(ID) 로그 확인
-            # -f : 지속적으로 로그 확인(tail 과 동일)
-            # -t : timestamp 확인
-        - stop(kill -s 15) : 정상 종료
-        - kill(kill -s 9) : 비정상 강제종료
-    * 볼륨
+    * 볼륨(컨테이너를 위한 영구적인 저장 공간)
         - volume : 지정 위치(/var/lib/docker) 공간 일부를 컨테이너가 사용(Over-Lay 방식)
+            # 일반적인 상황에서 가장 보편적인 방식
             # docker run -v [testvol:]/usr/share/nginx/html:ro... 
                 ~ 볼륨 이름 생략 가능, 볼륨 생략하면 자동 생성
                 ~ ':ro' 마운트 포인트의 권한 옵션 부여 가능
@@ -130,6 +127,75 @@
             # volume rm : 볼륨 삭제
                 ~ 컨테이너 삭제 시 '-v' 옵션 추가(rm -f -v)하면 자동생성 볼륨도 같이 삭제됨
         - bind mount : 도커 호스트 내 공간 일부를 컨테이너가 사용(Over-Mount 방식)
+            # 특정 임의의 저장공간이 필요한 경우(공유 NAS, DB Storage 등) 사용
             # docker run -v /web:/usr/share/nginx/html:ro...
                 ~ 볼륨 이름 필수, 디렉토리가 없으면 자동 생성
-            
+    * 네트워크
+        - SDN(Software Defined Network)를 사용하여 컨테이너 통신 관리
+        - 172.17.0.0/16 기본 할당되어 게이트웨이는 172.17.0.1/16 사용
+        - 네트워크 드라이브
+            # bridge : 가상 스위치
+            # host : 원본 호스트의 네트워크 사용
+            # none : 할당 없음(내부망 목적)
+            # overlay : 다중 도커 bridge 를 하나로 묶어서 단일 네트워크로 설정(스웜 기능)
+        - network
+            # ls : 목록 확인
+            # inspect : 자세한 정보 확인
+            # connect|disconnect : 네트워크에 연결|연결해제
+            # create : 사용자 정의 네트워크 생성
+                ~ --driver : 네트워크 드라이브 지정
+                ~ --subnet : 서브넷 지정(CIDR; /24 or VLSM; 255.255.255.0)
+                ~ --gateway : 게이트웨이 지정
+            # prune|rm : 미사용중인 네트워크 삭제|삭제
+        - container run CMD 의 네트워크 옵션
+            # --network mynet : 네트워크를 선택하여 컨테이너에 연결
+            # --ip 172.17.0.3 : 컨테이너에 할당시킬 호스트 아이피 지정
+            # --link mysql:mysql : <컨테이너이름>:<별칭> 설정으로 이름 통신 가능
+            # --dns : DNS 서버 지정
+            # --add-host : /etc/hosts 등록하는것처럼 호스트 매핑 설정
+            # --hostname : 컨테이너의 호스트명 지정
+8. Docker 운영
+    [컨테이너 운영]
+    * attach : 컨테이너의 실행중인 프로세스에 연결(입출력 연결)
+        - 연결한 프로세스에서 빠져나올때(detach)는 "Ctrl + P + Q" 로 빠져나와야함
+           # exit 로 빠져나오면 프로세스 자체가 종료됨
+        - 'exec -it' 와 동일함
+           # 'exec /bin/bash' : 추가 프로세스를 가동하여 접근했기 때문에 exit 가능
+    * cp : 파일 복사
+        - 컨테이너 --> 호스트 : web:/usr/share/nginx/html/index.html /tmp/index.html
+        - 호스트 --> 컨테이너 : /tmp/index2.html web:/usr/share/nginx/index2.html
+    * diff : 원본 이미지와 현재 컨테이너의 차이점 확인
+        - A(add), C(changed), D(delete)
+    * logs -ft ID : 컨테이너(ID) 로그 확인
+        - -f : 지속적으로 로그 확인(tail 과 동일)
+        - -t : timestamp 확인
+            # /var/lib/docker/containers 하위에 '.json.log' 로그 파일
+    * top : 컨테이너 프로세스 상태 확인
+        - aux : 프로세스 상태 확인 표기 정보 변경
+    * port : 컨테이너 포트 노출(-p 를 통해 설정한 port-forwarding) 상태 확인
+    * kill : 비정상 강제종료(9번 시그널; 15번 정상종료=stop)
+    [불필요한 데이터 삭제]
+    * docker image|container|network|volume|system prune
+        - docker system prune -af : 모든 불필요한 데이터(이미지,컨테이너 등) 삭제
+    [리소스 제한 및 모니터링]
+    * 리소스 제한
+        - 메모리(단위: b, k, m, g) : 'run' 옵션으로 설정
+            # --memory 500m : 컨테이너의 최대 메모리 사용 제한
+                ~ 제한 넘으면 kill
+            # --memory-reservation 500m : 컨테이너의 최소 메모리 사용 보장
+            # --memory-swap 1g : 컨테이너의 SWAP 메모리(SWAP 설정 - 할당 메모리 = 설정값)
+                ~ -m 500m --memory-swap 1g --> 1g - 500m = swap '500m'
+            # --oom-disable : 제한 넘으면 kill 기능 OFF
+        - CPU
+            # --cpus=".5" : 코어 개수 설정
+                ~ 0.5개의 코어만큼만 사용
+            # --cpu-share 2048 : CPU 가중치(컨테이너 별 상대적인 가중치) 설정
+                ~ 기본값 1024, 2배 더 중요하게 처리
+            # --cpuset-cpus 0-3 : 여러개의 CPU 중 담당하는 CPU 지정
+                ~ 0번부터 3번 CPU 할당
+        - BLOCK I/O
+            # --blkio-weight[-device] : 저장소 입출력 쿼터(quota) 설정, 100 - 1000 범위 지정
+                ~ 기본값 500
+            # --device-read|write-bps : 저장소 읽기/쓰기 작업량 제한(kb, mb, gb)
+            # --device-read|write-iops : 저장소 읽기/쓰기 작업량 제한 쿼터 설정(iops * blk_size)
+        

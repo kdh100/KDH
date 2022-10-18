@@ -1,5 +1,75 @@
-[ELB]
-1. Sticky session
-    - 사용자의 서비스 접속을 위한 세션을 특정 EC2 인스턴스에 바인딩 해주는 기술
-      동일 사용자로부터 들어오는 요청은 바인딩된 동일 인스턴스를 향해 리다이렉션 처리
+* ELB
+    - Sticky session
+        # 사용자의 서비스 접속을 위한 세션을 특정 EC2 인스턴스에 바인딩 해주는 기능.
+          동일 사용자로부터 들어오는 요청은 바인딩된 동일 인스턴스를 향해 리다이렉션 처리한다.
+    - Connection draining
+        # 백엔드 인스턴스가 비정상적인 상태에 빠졌을 경우 대기 임계 시간을 갖고 연결을 지속시키는
+          기능로, 기본값은 300 초(5분), 최대 3600 초(60분) 설정 가능하다.
+          Auto-Scaling 서비스가 켜져있는 경우 해당 해당 인스턴스는 자동 제거된다.
+        # EC2 콘솔을 통해 ELB 에 접근하거나, CLI 를 통해서 해당 기능을 설정할 수 있다.
 
+* SNS
+    - Sending notification
+        # 사용자의 구독 요청에 따라 SQS, SMS, Email/Email(JSON), HTTP/HTTPS 로 전송 가능하다.
+
+* SQS
+    - Sequencing information
+        # SQS 는 선입선출을 보장하지 못한다(어떻게든 전달만 하면 되니까). 하지만 시스템 상
+          메시지의 순서가 중요할 경우 대기열에 있는 메시지에 Sequencing information 을 배치해서 
+          반환할 때 메시지 순서를 재정렬할 수 있다.
+
+* CloudFormation
+    - Application Management tool
+        # 이 제품은 기본적으로 무료지만 생성된 서비스에 대해서만 요금을 받는다.
+          application bootstrapping 을 제공하여 소프트웨어 패키지 설치, 폴더 생성을 지원하고
+          그 외 다양한 AWS 서비스(EC2, EBS, RDS 등)를 지원한다.
+          유일한 문제는 DevOps 모델을 따르지 않고 사용자가 직접 정의한 템플릿에 의해 동작한다.
+
+
+* Auto Scaling Group
+    - Desired capacity
+        # 원하는 용량을 설정하면 새로운 값을 바탕으로 자동 확장된다.
+    - Minimum size
+        # 최소 용량을 설정하면 초과되는 인스턴스는 자동 축소된다.
+    - Maximum size
+        # 최대 용량을 설정하면 인스턴스 수만 제한하고 변화는 없다.
+    - Aggregate Statistics
+        # 동일 그룹 내 존재하는 모든 EC2 인스턴스에 대한 집계된 통계를 확인할 수 있다.
+          모든 리전에서 수집되므로, CloudWatch 의 단일 리전 내 통계보다 광범위하다.
+
+* EBS
+    - Encryption
+        # AES-256 방식으로 암호화되며, 새 볼륨을 만들거나 인스턴스 <-> 스토리지 간 데이터 전송
+          중에도 암호화된다. 스냅샷의 모든 데이터와 I/O 에 대해서도 암호화된다.
+
+* S3
+    - Resource Access Policy
+        # S3 ACL : ACL 을 이용하여 기본 R/W 권한 설정
+            ~ 하위 리소스(폴더 등)에 대한 설정이 아니다!
+        # S3 Bucket Policy : 버킷 안의 객체들에 대한 접근 권한 설정
+        # User Access Policy : IAM 정책을 통해 S3 접근 권한 설정
+
+* RDS
+    - Event Notification
+        # SNS 을 통해 RDS 내 이벤트에 대한 알람을 발생시킬 수 있다.
+
+* CloudWatch
+    - Custom metric
+        # 특정 지표값(지표명, 그룹명, 시간대 포함)을 지정할 수 있으며 사용자는 항상 지정된
+          지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
+    - Detailed Monitoring
+        # 기본 모니터링 서비스는 매 5분마다 서비스에 대한 데이터를 수신받을 수 있지만,
+          세부 모니터링 서비스는 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
+          대신 추가 요금이 발생한다.
+
+* Security Group
+    - Default
+        # EC2 인스턴스가 생성되면 하나의 기본 보안 그룹이 생성된다.
+          ELB 가 적용될 경우 ELB 에서 적용되야 할 기본 보안 그룹이 추가 생성된다.
+
+* IAM
+    - Organizations
+        # 주소 체계 : https://<AWS 계정>.signin.aws.amazon.com/console/
+            ~ IAM 사용자 혹은 그룹에 영향받지 않는다.
+    - Password policy
+        # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.

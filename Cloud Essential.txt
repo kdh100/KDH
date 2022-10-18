@@ -226,16 +226,8 @@
             # Standard
                 ~ 자주 엑세스할 때
                 ~ 최소 3개의 AZ 에 저장됨
-            # Standard-IA(Infrequent Access)
-                ~ 자주 엑세스하지 않을 때
-                ~ 스토리지는 저렴, 사용 비용은 비쌈
-            # One Zone-IA
-                ~ 단일 AZ 에 저장
-                ~ Standard-IA 보다 저렴
-            # Intelligent-Tiering
-                ~ 엑세스 패턴이 불규칙할 때
-                ~ 객체를 모니터링 후 자동으로 각 클래스 계층으로 분류
-                ~ 객체당 소량의 자동화 요금 부과
+            # RRS(Reduced Redundancy Storage)
+                ~ 가끔 엑세스할 때
             # Glacier
                 ~ 데이터 보관용 저비용 스토리지
                 ~ 객체를 몇 분 혹은 몇 시간 이내 검색

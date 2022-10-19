@@ -7,6 +7,10 @@
           기능로, 기본값은 300 초(5분), 최대 3600 초(60분) 설정 가능하다.
           Auto-Scaling 서비스가 켜져있는 경우 해당 해당 인스턴스는 자동 제거된다.
         # EC2 콘솔을 통해 ELB 에 접근하거나, CLI 를 통해서 해당 기능을 설정할 수 있다.
+    - Activity monitoring
+        # CloudWatch Metrics, S3 버킷에 저장된 ELB Logs, API 호출을 통한 CloudTrail 을 통해
+          사용자는 ELB 활동에 대한 모니터링 정보를 수집할 수 있다.
+        # ELB Health-check 는 내부적으로 ELB 에 의해 동작하는 기능일 뿐 모니터링과 관련 없다.
 
 * SNS
     - Sending notification
@@ -24,7 +28,6 @@
           application bootstrapping 을 제공하여 소프트웨어 패키지 설치, 폴더 생성을 지원하고
           그 외 다양한 AWS 서비스(EC2, EBS, RDS 등)를 지원한다.
           유일한 문제는 DevOps 모델을 따르지 않고 사용자가 직접 정의한 템플릿에 의해 동작한다.
-
 
 * Auto Scaling Group
     - Desired capacity

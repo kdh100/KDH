@@ -1,7 +1,4 @@
-1. Developing on Remote Machines using SSH and Visual Studio Code
-	* https://code.visualstudio.com/docs/remote/ssh#_getting-started
-
-2. Extension
+1. Extension
 	* Remote Development Extension
 		- SSH 원격 접속 관리 확장팩
 	* ShellCheck, shellman
@@ -16,3 +13,6 @@
 		- 들여쓰기 블록 색상 표시
 	* Korean Language Pack
 		- 한국어 패키지
+
+2. Developing on Remote Machines using SSH and Visual Studio Code
+	* https://code.visualstudio.com/docs/remote/ssh#_getting-started

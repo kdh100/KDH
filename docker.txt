@@ -238,8 +238,11 @@
         COPY ./public-html/ /usr/local/apache2/htdocs/
         ----------------
         3) docker build -t my-apache2 .
+            # 도퍼 파일이 존재하는 폴더(.)에서 작업하거나 도커 파일이 존재하는 경로를 지정
             # 도커 파일은 정해진 이름(Docker|docker)을 따르거나, -f 옵션으로 특정 도커 파일 지정
                 ~ docker build -t my-apache2 -f Docker2 .
+            # 도커 파일은 tar 형태의 이미지로도 빌드 가능
+                ~ docker build -t my-apache2 - < Docker.tar.gz
         4) docker images
         5) docker run -dit --name my-running-app -p 8080:80 my-apache2
         6) docker ps -a

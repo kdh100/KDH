@@ -28,6 +28,15 @@
           application bootstrapping 을 제공하여 소프트웨어 패키지 설치, 폴더 생성을 지원하고
           그 외 다양한 AWS 서비스(EC2, EBS, RDS 등)를 지원한다.
           유일한 문제는 DevOps 모델을 따르지 않고 사용자가 직접 정의한 템플릿에 의해 동작한다.
+        # AWS Elastic Beanstalk 또한 비슷하게 자동 배포를 지원하지만, 개발 환경 및 어플리케이션
+          실행에 집중한 배포만을 제공한다.
+    - Required components
+        # 구성에 필요한 유일한 요소는 리소스
+
+* VPC
+    - Default settings
+        # 기본 VPC 설정만으로 EC2 인스턴스가 기동되면 오직 Private IP 만 할당된다. 동일 서브넷
+          인스턴스들은 내부 통신이 되겠으나, 인터넷으로의 통신은 Public IP 미할당으로 불가능하다.
 
 * Auto Scaling Group
     - Desired capacity
@@ -39,6 +48,14 @@
     - Aggregate Statistics
         # 동일 그룹 내 존재하는 모든 EC2 인스턴스에 대한 집계된 통계를 확인할 수 있다.
           모든 리전에서 수집되므로, CloudWatch 의 단일 리전 내 통계보다 광범위하다.
+    - Cost
+        # Auto Scaling 실행에는 돈이 들지 않는다!
+    - Schedule
+        # Linux Crontab 처럼 반복 예약 작업을 설정할 수 있다.
+          종료 시간, 반복 정보가 설정에 필요하다.
+    - Delete
+        # 만약 Auto Scaling Group 을 삭제하고 싶다면, Mininum, Desired 를 모두 0 으로 설정한다.
+          콘솔로는 절대 지울 수 없다!
 
 * EBS
     - Encryption
@@ -60,10 +77,18 @@
     - Custom metric
         # 특정 지표값(지표명, 그룹명, 시간대 포함)을 지정할 수 있으며 사용자는 항상 지정된
           지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
+            ~ Sum, Min, Max, Sample Data, Average
     - Detailed Monitoring
         # 기본 모니터링 서비스는 매 5분마다 서비스에 대한 데이터를 수신받을 수 있지만,
           세부 모니터링 서비스는 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
           대신 추가 요금이 발생한다.
+    - Test alarm with CLI
+        # 사용자는 CLI 를 통해서 알람 상태를 임시적으로 변경하여 테스트해볼 수 있다.
+          이 변경사항은 다음 알람이 발생할 때 까지 지속된다.
+    - Billing alarm
+        # 예상 요금이 계산되어 지표로 전송되어 14일 간 저장되며, 이러한 지표를 통해 결제
+          알람을 구성할 수 있다. 모든 서비스에 대한 예상 요금과 전체 예상 요금이 포함된다.
+          사용자는 이런 알람 경보에 대한 임계값을 지정하고 수정할 수 있다.
 
 * Security Group
     - Default
@@ -76,3 +101,16 @@
             ~ IAM 사용자 혹은 그룹에 영향받지 않는다.
     - Password policy
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
+
+* Billing
+    - Programmatic Billing
+        # Monthly Billing report 를 활성화하여 CSV 형식의 리포트를 저장시킬 AWS S3 버킷을
+          지정하고, 프로그래밍 방식 접근 옵션도 활성화하면 해당 리포트를 참고하여 자동 결제를
+          진행시킬 어플리케이션 프로그래밍이 가능하다.
+    - Consolidated Billing
+        # 통합 결제 시스템을 통해 조직 단위에서 하나의 결제 대리인 계정을 만들어 통합 결제를 하면
+          해당 결제 대리인 계정은 조직 내 다른 계정들의 결제에 대한 정보만 확인이 가능하며,
+          그 외 다른 데이터에 대한 정보는 접근할 수 없다.
+    - Free-Tier
+        # 1년 간 무료 사용 가능하며, micro 인스턴스 750 시간 + ELB 750 시간 무료 제공과
+          5GB S3 + 30GB EBS 범용 볼륨 사용이 포함된다.

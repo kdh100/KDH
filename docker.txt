@@ -196,8 +196,51 @@
         - BLOCK I/O
             # --blkio-weight[-device] : 저장소 입출력 쿼터(quota) 설정, 100 - 1000 범위 지정
                 ~ 기본값 500
-            # --device-read|write-bps : 저장소 읽기/쓰기 작업량 제한(kb, mb, gb)
-            # --device-read|write-iops : 저장소 읽기/쓰기 작업량 제한 쿼터 설정(iops * blk_size)
+            # --device-read|write-bps:100mb : 저장소 읽기/쓰기 작업량 제한(kb, mb, gb)
+            # --device-read|write-iops:100 : 저장소 읽기/쓰기 작업량 제한 쿼터 설정(iops * blk_size)
     * 리소스 모니터링
         - stats: 런타임 통계 확인
         - events -f : 실시간 이벤트 정보 출력
+9. Docker 이미지 생성
+    * containner commit : 컨테이너 --> 이미지 생성
+        - docker commit <opt> <container> <repository/image:tag>
+            # -a : 제작자
+            # -m : 설명
+        - 컨테이너에서 작업한 내용들로 용량이 너무 커졌을 때
+            # multi-stage build 방식 적용
+                ~ 최초 빌드 작업 후 나오는 최종 파일만을 다른 컨테이너로 옮겨서 재빌드
+        - 직접 컨테이너에서 명령어 실행을 많이 해야할 때
+            # dockerfile 사용
+    * container export : 컨테이너 --> fs.tar 생성(fs)
+        - docker export <opt> <container> <fs.tar>
+            # > : 기본 umask 설정값의 퍼미션 지정(0644; -rw-r--r--)
+            # -o : docker 에 의한 최소 퍼미션 지정(0600; -rw-------)
+    * image import : fs.tar --> 이미지 생성(fs)
+        - docker import <fs.tar> <site/repository/image:tag>
+            # 생성할 이미지의 이름을 지정하지 않으면 dangling image(none) 로 생성되므로 주의
+                ~ prune 으로 삭제 가능
+    * image save : 이미지 --> fs.tar 생성(layer)
+        - docker save -o <fs.tar> <repository/image:tag>
+    * image load : fs.tar --> 이미지(layer)
+        - docker load -i <fs.tar>
+10. Dockerfile
+    * 기본 구문
+        - FROM : 베이스가 될 docker 이미지
+        - COPY : 호스트 --> 이미지 소스 코드 복사
+        - RUN : 컨테이너 안에서 수행할 명령
+        - ENV : 환경 변수 등 설정
+        - CMD : 컨테이너 안에서 작동시킬 데몬 실행
+    * 작업 순서
+        1) mkdir -p Dockerfile Dockerfile/public-html
+        2) vi Dockerfile
+        ----------------
+        FROM httpd:2.4
+        COPY ./public-html/ /usr/local/apache2/htdocs/
+        ----------------
+        3) docker build -t my-apache2 .
+            # 도커 파일은 정해진 이름(Docker|docker)을 따르거나, -f 옵션으로 특정 도커 파일 지정
+                ~ docker build -t my-apache2 -f Docker2 .
+        4) docker images
+        5) docker run -dit --name my-running-app -p 8080:80 my-apache2
+        6) docker ps -a
+        7) curl http://localhost:8080

@@ -187,9 +187,9 @@
                 ~ -m 500m --memory-swap 1g --> 1g - 500m = swap '500m'
             # --oom-disable : 제한 넘으면 kill 기능 OFF
         - CPU
-            # --cpus=".5" : 코어 개수 설정
-                ~ 0.5개의 코어만큼만 사용
-            # --cpu-share 2048 : CPU 가중치(컨테이너 별 상대적인 가중치) 설정
+            # --cpu 1 : 코어 개수 설정
+                ~ 1개의 코어만큼만 사용(100% 사용)
+            # --cpu-shares 2048 : CPU 가중치(컨테이너 별 상대적인 가중치) 설정
                 ~ 기본값 1024, 2배 더 중요하게 처리
             # --cpuset-cpus 0-3 : 여러개의 CPU 중 담당하는 CPU 지정
                 ~ 0번부터 3번 CPU 할당
@@ -198,4 +198,6 @@
                 ~ 기본값 500
             # --device-read|write-bps : 저장소 읽기/쓰기 작업량 제한(kb, mb, gb)
             # --device-read|write-iops : 저장소 읽기/쓰기 작업량 제한 쿼터 설정(iops * blk_size)
-        
+    * 리소스 모니터링
+        - stats: 런타임 통계 확인
+        - events -f : 실시간 이벤트 정보 출력

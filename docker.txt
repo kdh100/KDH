@@ -279,4 +279,143 @@
         - VOLUME : 영구 볼륨 저장
             # VOLUME ["<volume:/dir>"]
                 ~ volume, bind-mount 둘 다 가능
+    * 간단한 어플리케이션 & Docker 이미지 생성(python + Flask)
+        1) Docker BuildKit 활성화 및 Docker 서비스 재시작
+        - vi /etc/docker/daemon.json
+          ---------------------------
+          {
+              "features":{"buildkit": true}
+          }
+          ---------------------------
+        - systemctl restart docker
+        2) Flask 프레임워크를 사용한 어플리케이션 개발 - app.py
+           --> Flask/Django : 파이선으로 간단한/복잡한 웹개발 지원 프레임워크
+        - cd <project_dir> && pip3 install Flask
+        - pip3 freeze | grep Flask >> requirements.txt --> 필수 요소에 대한 자료 생성
+            # 현재 환경(또는 가상환경)에 설치된 패키지 목록 확인
+        - vi app.py
+          ---------
+          from flask import Flask
+          app = Flask(__name__)
+          @app.route('/')  # curl http://localhost/
+          def hello_world():
+          return 'Hello, Docker!'
+          ---------
+        - python3 -m flask run
+        <TERM2>
+        - firefox http://localhost:5000
+        3) python 용 dockerfile 작성
+        - vi Dockerfile
+          -------------
+          # syntax=docker/dockerfile:1
+          FROM python:3.8-slim-buster
+          WORKDIR /app
+          COPY requirements.txt requirements.txt
+          RUN pip3 install -r requirements.txt
+          COPY . .
+          CMD ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
+          -------------
+        - tree
+        - docker build -t python-docker .
+        - docker images
+        - docker run -d -p 8000:5000 --name rest-server python-docker
+        - docker ps -a
+        - curl localhost:8000
+        4) 개발용 컨테이너 준비
+        - docker volume create {mysql,mysql_config} && docker volume ls
+        - docker network create mysqlnet && docker network ls
+        - docker run -d --rm -v mysql:/var/lib/mysql \
+          -v mysql_config:/etc/mysql -p 3306:3306 \
+          --network mysqlnet --name mysqldb \
+          -e MYSQL_ROOT_PASSWORD=password mysql
+        - docker ps -a
+        - docker exec -it mysqldb mysql -u root -p --> (password), <Ctrl+D>
+        - vi app.py
+          ---------
+          import mysql.connector
+          import json
+          from flask import Flask
+          
+          app = Flask(__name__)
+          
+          # (1) 테스트용 기본 내용
+          # 외부에서 요청: http://server/
+          @app.route('/')
+          def hello_world():
+            return 'Hello, Docker!'
+          
+          # (2) 레코드 가져오기
+          # 외부에서 요청: http://server/widgets
+          @app.route('/widgets')
+          def get_widgets():
+            mydb = mysql.connector.connect(
+              host="mysqldb",
+              user="root",
+              password="password",
+              database="inventory"
+            )
+            cursor = mydb.cursor()
+          
+            cursor.execute("DROP DATABASE IF EXISTS inventory")
+            cursor.execute("CREATE DATABASE inventory")
+            cursor.execute("use inventory")
+            cursor.execute("CREATE TABLE widgets (name VARCHAR(255), description VARCHAR(255))")
+            cursor.execute("INSERT INTO widgets (name, description) VALUES ('lee', 'test1')")
+            cursor.execute("INSERT INTO widgets (name, description) VALUES ('kim', 'test2')")
+            cursor.execute("INSERT INTO widgets (name, description) VALUES ('baik', 'test3')")
+          
+            cursor.execute("SELECT * FROM widgets")
+          
+            #this will extract row headers
+            row_headers=[x[0] for x in cursor.description] 
+          
+            results = cursor.fetchall()
+            json_data=[]
+            for result in results:
+              json_data.append(dict(zip(row_headers,result)))
+          
+            cursor.close()
+          
+            return json.dumps(json_data)
+          
+          # (3) 레코드 삽입
+          # 외부에서 요청: http://server/initdb
+          @app.route('/initdb')
+          def db_init():
+            mydb = mysql.connector.connect(
+              host="mysqldb",
+              user="root",
+              password="password"
+            )
+            cursor = mydb.cursor()
+          
+            cursor.execute("DROP DATABASE IF EXISTS inventory")
+            cursor.execute("CREATE DATABASE inventory")
+            cursor.close()
+          
+            mydb = mysql.connector.connect(
+              host="mysqldb",
+              user="root",
+              password="password",
+              database="inventory"
+            )
+            cursor = mydb.cursor()
+          
+            cursor.execute("DROP TABLE IF EXISTS widgets")
+            cursor.execute("CREATE TABLE widgets (name VARCHAR(255), description VARCHAR(255))")
+            cursor.close()
+          
+            return 'init database'
+          
+          if __name__ == "__main__":
+            app.run(host ='0.0.0.0')
+          ---------
+        - pip3 install mysql-connector-python
+        - pip3 freeze | grep mysql-connector-python >> requirements.txt
+        - docker ps -a --> docker rm -f rest-server
+        - docker build --no-cache -t python-docker-dev .
+        - docker images
+        - docker run --rm -d --network mysqlnet --name rest-server -p 8000:5000 \
+          python-docker-dev
+        - curl -s http://localhost:8000/{initdb,widgets,widget | jq}
         

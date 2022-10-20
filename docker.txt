@@ -224,13 +224,7 @@
     * image load : fs.tar --> 이미지(layer)
         - docker load -i <fs.tar>
 10. Dockerfile
-    * 기본 구문
-        - FROM : 베이스가 될 docker 이미지
-        - COPY : 호스트 --> 이미지 소스 코드 복사
-        - RUN : 컨테이너 안에서 수행할 명령
-        - ENV : 환경 변수 등 설정
-        - CMD : 컨테이너 안에서 작동시킬 데몬 실행
-    * 작업 순서
+    * 빌드 절차
         1) mkdir -p Dockerfile Dockerfile/public-html
         2) vi Dockerfile
         ----------------
@@ -244,6 +238,25 @@
             # 도커 파일은 tar 형태의 이미지로도 빌드 가능
                 ~ docker build -t my-apache2 - < Docker.tar.gz
         4) docker images
+            # docker image history <image> : 빌드된 이미지 내 작업 목록 확인
         5) docker run -dit --name my-running-app -p 8080:80 my-apache2
         6) docker ps -a
         7) curl http://localhost:8080
+    * 기본 구문
+        - FROM : 베이스가 될 docker 이미지
+        - COPY : 호스트 --> 이미지 소스 코드 복사
+        - RUN : 컨테이너 안에서 수행할 명령
+            # shell : RUN yum install -y nginx
+            # exec : RUN ["/bin/bash", "-c", "yum install -y nginx"]
+                ~ -c : string 형태를 실행 코드로 인식(yaml 형식으로 작성되기 때문에 필수)
+        - ENV : 환경 변수 등 설정
+        - CMD : 컨테이너 안에서 작동시킬 데몬 실행
+            # shell : CMD nginx -g 'daemon off;'
+            # exec : CMD ["nginx", "-g", "daemon off;"]
+                ~ 변경 가능한 조건 실행(run 실행 시 CMD 인수를 우선 실행)
+            # ENTRYPOINT : shell 형식, exec 형식 모두 사용 가능
+                ~ 변경 불가능한 무조건 실행
+                ~ ENTRYPOINT 에서 명령어를, CMD 에서 명령어의 옵션과 인수를 지정하여 혼합 사용
+                  --> ENTRYPOINT top
+                      CMD ["-d", "10"]
+            

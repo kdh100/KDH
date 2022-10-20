@@ -1,0 +1,4 @@
+FROM ubuntu
+RUN echo shell format
+RUN ["echo", "exec format"]
+RUN ["/bin/bash", "-c", "echo 'using bash in exec format'"]

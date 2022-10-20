@@ -23,7 +23,7 @@
           반환할 때 메시지 순서를 재정렬할 수 있다.
 
 * CloudFormation
-    - Application Management tool
+    - Application Management
         # 이 제품은 기본적으로 무료지만 생성된 서비스에 대해서만 요금을 받는다.
           application bootstrapping 을 제공하여 소프트웨어 패키지 설치, 폴더 생성을 지원하고
           그 외 다양한 AWS 서비스(EC2, EBS, RDS 등)를 지원한다.
@@ -32,6 +32,13 @@
           실행에 집중한 배포만을 제공한다.
     - Required components
         # 구성에 필요한 유일한 요소는 리소스
+
+* OpsWorks
+    - Configuration management
+        # Puppet 또는 Chef 를 사용하여 온프레미스 혹은 클라우드에서 어플리케이션 구성, 배포를
+          자동화하는 구성 관리 서비스다. Chef 는 관리 서버의 구성 정보를 Chef Recipe 에서
+          관리하고 이를 저장하기 위한 중앙 저장소도 제공해준다.
+          Puppet 은 웹기반 콘솔을 통해 운영 관리가 가능하다.
 
 * VPC
     - Default settings
@@ -57,21 +64,45 @@
         # 만약 Auto Scaling Group 을 삭제하고 싶다면, Mininum, Desired 를 모두 0 으로 설정한다.
           콘솔로는 절대 지울 수 없다!
 
+* Route 53
+    - Alias resource record
+        # CNAME 처럼 등록할 수 있지만 사용자가 확인할 수 없고 단순히 IP 정보만 확인할 수 있다.
+          루트 도메인이나 네이키드 도메인처럼 최상단 도메인 서버를 구성하려고 할 때 유용하다.
+
 * EBS
     - Encryption
         # AES-256 방식으로 암호화되며, 새 볼륨을 만들거나 인스턴스 <-> 스토리지 간 데이터 전송
           중에도 암호화된다. 스냅샷의 모든 데이터와 I/O 에 대해서도 암호화된다.
-
+    - Improve performance
+        # SSD 를 지원하며 EBS 에 최적화된 인스턴스를 사용해서 인스턴스가 EBS 의 IOPs 를 완벽하게
+          프로비저닝한 상태로 사용할 수 있게 할 수 있다.
 * S3
+    - Regional self-replication
+        # 동일 리전 내 S3 끼리는 데이터를 서로 자동으로 복제하여 관리한다
     - Resource Access Policy
         # S3 ACL : ACL 을 이용하여 기본 R/W 권한 설정
             ~ 하위 리소스(폴더 등)에 대한 설정이 아니다!
         # S3 Bucket Policy : 버킷 안의 객체들에 대한 접근 권한 설정
         # User Access Policy : IAM 정책을 통해 S3 접근 권한 설정
+    - Accidental delete
+        # 버전 방식으로 관리되는 S3 데이터는 즉각적인 복구 능력을 가지고 있으며,
+          MFA 방식(OTT 등의 2차 인증을 통한 접근)의 보안 설정이 가능하다.
+    - Characteristics
+        # S3 는 데이터의 총량과 객체수 제한이 없어 사실상 무제한 저장이 가능하다!
+          업로드할 객체가 100MB 이상이라면 멀티파트(분할 병렬식) 업로드 방식을 택할 수도 있다!
 
 * RDS
     - Event Notification
         # SNS 을 통해 RDS 내 이벤트에 대한 알람을 발생시킬 수 있다.
+    - Restore data
+        # RDS 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
+
+* ElastiCache
+    - Memcached
+        # 실시간 메모리 캐싱 서비스로 어플리케이션, DB 성능을 가속화하며 일부 서비스에서는
+          단순 DB 로도 활용 가능하다. Memcached 와 함께 사용할 수 있는데, 이 중 일부 지표
+          로는 Eviction(메모리에서 삭제할 시간 지난 데이터 수), Getmisses(요청에 대해 응답할 수
+          없는 요청 수) 등이 있다.
 
 * CloudWatch
     - Custom metric
@@ -101,6 +132,8 @@
             ~ IAM 사용자 혹은 그룹에 영향받지 않는다.
     - Password policy
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
+    - Security policy for privileged users
+        # 다단계 인증 방식을 사용하고, 권한 계정을 위한 사용자를 생성하여 사용하면 좋다.
 
 * Billing
     - Programmatic Billing

@@ -244,7 +244,6 @@
         7) curl http://localhost:8080
     * 기본 구문
         - FROM : 베이스가 될 docker 이미지
-        - COPY : 호스트 --> 이미지 소스 코드 복사
         - RUN : 컨테이너 안에서 수행할 명령
             # shell : RUN yum install -y nginx
             # exec : RUN ["/bin/bash", "-c", "yum install -y nginx"]
@@ -277,8 +276,9 @@
         - EXPOSE : 리스닝 포트 지정(컨테이너를 실행할 작업자에게 공개 포트 안내 목적)
             # 기본값은 tcp
         - VOLUME : 영구 볼륨 저장
-            # VOLUME ["<volume:/dir>"]
-                ~ volume, bind-mount 둘 다 가능
+            # VOLUME ["<마운트포인트>"]
+                ~ 컨테이너 내 마운트포인트 디렉토리 경로를 지정하고
+                ~ run -v 옵션을 통해서 volume 형식이나 bind-mount 형식으로 지정해줘야함
     * 간단한 어플리케이션 & Docker 이미지 생성(python + Flask)
         1) Docker BuildKit 활성화 및 Docker 서비스 재시작
         - vi /etc/docker/daemon.json
@@ -418,4 +418,29 @@
         - docker run --rm -d --network mysqlnet --name rest-server -p 8000:5000 \
           python-docker-dev
         - curl -s http://localhost:8000/{initdb,widgets,widget | jq}
-        
+11. 프로젝트
+"""
+1) 다음과 같은 조건을 갖는 이미지를 제작한다.
+● 작업 디렉토리: ~/docker/05_minipro1
+● dockerfile 생성한다.
+
+base image: centos
+vsftpd 서버 => Anonymous FTP 구성(다운로드 전용)
+* volume : ftpvol:var/ftp/pub
+* network : ftpnet
+* port : 21:21, 20:20
+vsfptd.conf 설정은 복사해서 사용
+
+Apache httpd + PHP 언어가 동작하도록 하는 이미지를 제작한다.
+
+2) 다음과 같은 조건을 갖는 이미지를 제작한다.
+● dockerfile 생성한다.
+
+Apache httpd + python 언어가 동작하도록 하는 이미지를 제작한다.
+
+3) 다음과 같은 조건을 갖는 이미지를 제작한다.
+● dockerfile 생성한다.
+
+4_ 다음과 같은 조건을 갖는 이미지를 제작한다.
+● dockerfile 생성한다.
+"""

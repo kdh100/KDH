@@ -259,4 +259,6 @@
                 ~ ENTRYPOINT 에서 명령어를, CMD 에서 명령어의 옵션과 인수를 지정하여 혼합 사용
                   --> ENTRYPOINT top
                       CMD ["-d", "10"]
+        - WORKDIR : 작업용 디렉토리 지정(기본값: /)
+            # ENV 와 같이 사용하는 걸 권장
             

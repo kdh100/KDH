@@ -19,7 +19,7 @@
         - OSS(hannu), ALSA(Jaroslav), totem
     * 프린트
         - systemV : lp, lpstat, cancel
-        - lpr, lpc, lpq, lprm
+        - Unix : lpr, lpc, lpq, lprm
     * 파일탐색기
         - nautilus, dolpin
     * 라이브러리

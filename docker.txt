@@ -291,3 +291,94 @@
         - docker-compose != docker compose
             # docker-compose : 도커 패키지에 포함되는 기본 명령어
             # docker compose : 명령어를 다운로드받아 사용하는 것
+    * '.yaml' 파일 문법
+        - 주석 : #
+        - 들여쓰기 : 2칸 또는 4칸(space)
+        - 데이터 : Key:Value 형식
+        - 배열 : '-' 로 표시하고 공백 한 칸 이상 존재해야함
+        - boolean : true/false(yes/no)
+            # 소문자 형식 권장
+        - int : 정수,실수를 따옴표 없이 사용하면 숫자형(int) 데이터
+            # 따옴표 사용시 문자형(str) 데이터
+        - 줄바꿈 : '|' 는 마지막 문자열 뒤 줄바꿈(\n) 포함, '>' 는 중간에 들어간 줄바꿈 제외
+    * 최상위 요소(top-level-elements)
+        - 버전(version:) : docker-compose 파일 버전
+        - 이름(name:) : 프로젝트 이름(디렉토리 이름으로 사용됨)
+            # 미지정 시 자동 생성, 미지정 권장
+        - 서비스(services:) : 동작할 리소스 정의
+        - 네트워크(networks:) : 네트워크 이름(신규 네트워크 이름으로 사용됨)
+            # 미지정 시 자동 생성, 미지정 권장
+        - 볼륨(volumes:) : 볼륨 이름(신규 볼륨 이름으로 사용됨)
+            # 미지정 시 자동 생성, 미지정 권장
+        - 컨피그(configs:) : 컨테이너 서비스 구성 파일 지정
+            # 볼륨처럼 작동함
+        - 비밀(secrets:) : 민감한 정보를 암호화하여 구성 파일 지정
+    * 이미지 빌드 예시(image, build)
+        services:
+          webserver:
+            images: ubuntu|asashinho/dockersample:1.0
+            build: .|/data/Dockerfile-alternate
+              context: /data
+              dockerfile: Dockerfile-alternate
+              args:
+                projectno: 1
+                users: sktuser
+    * 컨테이너 내부 동작 명령어 지정(command, entrypoint)
+        command: /bin/bash
+        entrypoint:(배열 순서대로 실행)
+            - php
+            - -d
+            - memory_limit=-1
+    * 컨테이너 간 연결(links)
+        links:
+          - logserver:log01(서비스명:앨리어스명)
+    * 컨테이너 간 통신(ports, expose)
+        ports:
+          - "3000"(컨테이너의 포트 번호만 지정하면 호스트 머신의 포트는 랜덤 부여)
+          - "8000:8000"
+          - "49100:22"
+          - "127.0.0.1:8001:8001"
+        expose:
+          - "3000"(호스트 내부에서만 접근 가능)
+    * 서비스 의존 관계 정의(depends_on)
+        services:
+          webserver:
+            build: .
+            depends_on:(1순위 db, 2순위 redis, 마지막 webserver 순서로 기동)
+              - db
+              - redis
+          redis:
+            image: redis
+          db:
+            image: postgres
+    * 환경변수 지정(environment, env_file)
+        environment:
+          # 배열(array) 방식
+          - HOGE=fuga
+          - FOO
+          # 해시(hash) 방식
+          HOGE: fuga
+          FOO:
+        env_file: envfile(HOGE=fuga)
+    * 컨테이너 정보 설정(container_name, labels)
+        container_name: web-container(직접 컨테이너 이름 지정하지말고 자동 생성을 권장)
+        labels:(라벨 확인은 docker-compose config 에서 가능)
+          - "com.example.description=Accounting webapp"
+          - "com.example.departement=Finance"
+    * 컨테이너 볼륨 관리(volumes)
+        volumes:
+          - /var/lib/mysql
+          - dbvol:/var/lib/mysql:ro
+          - cache/:/tmp/cache(bind-mount)
+    [참고] VI/VIM 편집기를 통한 YAML 파일 편집 시 유효한 설정값(vi ~/.vimrc)
+    syntax on --> 구문 강조
+    autocmd FileType yaml setlocal ts=2 sw=2 st=2 ai nu et
+    autocmd FileType python setlocal ts=2 sw=2 st=2 ai nu et
+    --> FileType : 특정 파일 형식만 적용
+        setlocal : 현재 편집기에서만 설정 변경
+        ts : TAB 칸 수
+        sw : 자동 들여쓰기 TAB 칸 수
+        st : TAB 공백 수
+        ai : 자동 들여쓰기
+        nu : 라인 번호 표기
+        et : TAB --> space 변환

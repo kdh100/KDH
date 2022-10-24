@@ -410,6 +410,7 @@
         - start|stop|pause|unpause|restart : 시작|중지|일시중지|재개|재시작
         - kill : 강제 중지(default: 9)
             # -s : 시그널 전송
+                ~ HUP(1; 접속 중지)
                 ~ SIGINT(2; 실행 중지)
                 ~ SIGKILL(9; 강제 중지)
                 ~ SIGTERM(15; 정상 중지)

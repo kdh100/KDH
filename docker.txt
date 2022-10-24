@@ -400,9 +400,17 @@
         nu : 라인 번호 표기
         et : TAB --> space 변환
     * Docker-compose CMD
-        - version
-        - up
-            # -d
-            # --build
-            # --no-deps
-            # --scale <숫자>
+        - version : 버전 확인
+        - up : 컨테이너 실행
+            # -d : 백그라운드로 실행
+            # --build : 이미지 빌드 후 컨테이너 실행
+            # --scale <서비스명=숫자> : 숫자 만큼 컨테이너 실행
+        - down : 컨테이너 중지
+            # -v : 자동 생성되었던 볼륨 삭제
+        - ps : 상태 확인
+            # --format : JSON 포맷으로 확인
+                ~ docker-compose ps --format json | jq .
+        - logs: 로그 확인
+        - run : 임의의 명령어 실행
+            # docker-compose run centos /bin/bash = docker exec -it centos /bin/bash
+        

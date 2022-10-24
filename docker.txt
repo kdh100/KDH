@@ -407,10 +407,20 @@
             # --scale <서비스명=숫자> : 숫자 만큼 컨테이너 실행
         - down : 컨테이너 중지
             # -v : 자동 생성되었던 볼륨 삭제
+        - start|stop|pause|unpause|restart : 시작|중지|일시중지|재개|재시작
+        - kill : 강제 중지(default: 9)
+            # -s : 시그널 전송
+                ~ SIGINT(2; 실행 중지)
+                ~ SIGKILL(9; 강제 중지)
+                ~ SIGTERM(15; 정상 중지)
+        - rm : 컨테이너 삭제
+            # -f : 강제 삭제
+        - port : 포트 바인딩
+            # docker-compose port <서비스> <포트>
+        - run : 임의의 명령어 실행
+            # docker-compose run centos /bin/bash = docker exec -it centos /bin/bash
+        - config : 서비스 구성 확인
         - ps : 상태 확인
             # --format : JSON 포맷으로 확인
                 ~ docker-compose ps --format json | jq .
         - logs: 로그 확인
-        - run : 임의의 명령어 실행
-            # docker-compose run centos /bin/bash = docker exec -it centos /bin/bash
-        

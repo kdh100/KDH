@@ -425,3 +425,17 @@
             # --format : JSON 포맷으로 확인
                 ~ docker-compose ps --format json | jq .
         - logs: 로그 확인
+13. Docker 참고사항
+    * 캐시 무효화(혹은 버전 고정)
+        - debian 계열의 OS 로 가동되는 경우 apt-get 을 통한 패키지 관리 시 캐싱 데이터로 인해 오류 발생 가능
+            # apt-get update && apt-get install -y 를 항상 묶어서 사용하는 걸 권장
+                ~ 캐시가 남아있을 경우 업데이트가 진행되지 않아 구버전으로 다운로드될 가능성 있음
+                ~ 혹은, 패키지의 태그를 이용해 고정된 버전을 명시해주면 위 문제점 상쇄 가능
+        - /var/lib/apt/lists 를 지우면 이미지 빌드 시 레이어에 캐싱 데이터가 들어가지 않아 크기 감소 효과
+            # 공식 debian, ubuntu 이미지들은 자동으로 'apt-get clean' 하기 때문에 굳이 호출하지 않아도 됨
+    * 빌드킷(Buildkit)    
+        - 도커 이미지를 효율적으로 빌드하기 위한 모듈
+            # 도커 데스크톱의 모든 사용자들에게 기본값으로 사용중
+            # 리눅스에서 도커를 기동할 경우, 환경변수 또는 기본설정변경을 통해 빌드킷 활성화 진행
+                ~ 환경변수) DOCKER_BUILDKIT=1 docker build...
+                ~ 기본설정) /etc/docker/daemon.json --> {\n\t"features":{"buildkit" : true}\n}

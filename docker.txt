@@ -439,3 +439,47 @@
             # 리눅스에서 도커를 기동할 경우, 환경변수 또는 기본설정변경을 통해 빌드킷 활성화 진행
                 ~ 환경변수) DOCKER_BUILDKIT=1 docker build...
                 ~ 기본설정) /etc/docker/daemon.json --> {\n\t"features":{"buildkit" : true}\n}
+    * 이미지 태그 의미
+        - stretch, buster, jessie : Debian 코드
+            # bullseye, bookworm : Debian 테스트용 코드(불안정할 수 있음)
+        - slim : 실행을 위한 최소 코드 포함
+        - alpine : 컨테이너 내부용 리눅스 운영체제, 이미지를 가능한 작게 만들기 위해 사용하는 코드
+        - windowsservercore : 윈도우 서버 기반 코드
+14. 파이썬 & 플라스크를 이용한 도커 이미지 빌드 과정
+    1) Docker BuildKit 활성화
+        - vi /etc/docker/daemon.json
+          ----------------------------
+          {
+              "features":{"buildkit" : true}
+          }
+          ----------------------------
+    2) 파이썬 준비
+        - yum install -y python38
+            # 패키지 설치
+        - mkdir -p ~/KDH/docker_example/07_myproj && cd ~/KDH/docker_example/07_myproj
+        - [python3 -m] venv .venv
+            # 가상환경 생성(python -m venv <가상환경이름>)
+                ~ python3 -m 은 생략 가능..
+        - source .venv/bin/activate
+            # 가상환경 활성화
+        - pip install Flask
+            # pip : 파이썬 패키지 관리 시스템
+            # Flask : 파이썬 웹 프레임워크(리눅스 <-> apache HTTP 관계)
+        - pip freeze > requirements.txt
+            # freeze : 설치된 패키지 목록 확인
+        - vi app.py
+          ---------
+          from flask import Flask
+          app = Flask(__name__)
+
+          @app.route('/')
+          def hello_world():
+              return 'Hello, Docker!'
+          ---------
+        - flask run
+            # 웹서비스 기동
+    3) Dockerfile 생성
+        - vi Dockerfile
+          -------------
+          1
+          -------------

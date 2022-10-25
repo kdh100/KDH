@@ -10,7 +10,7 @@ services:
     restart: always
     volumes:
       - ./html:/var/www/html/
-      - /etc/timezone:/etc/timezone:ro
+      - ./conf/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - mysql
@@ -18,13 +18,13 @@ services:
   mysql:
     image: mysql:5.5
     environment:
-      MYSQL_ROOT_PASSWORD: 'db_root_password'
-      MYSQL_USER: 'db_id'
-      MYSQL_PASSWORD: 'db_password'
-      MYSQL_DATABASE: 'db_name'
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: soldesk
+      MYSQL_PASSWORD: soldesk1.
+      MYSQL_DATABASE: mydb
     volumes:
       - ./data:/var/lib/mysql
-      - /etc/timezone:/etc/timezone:ro
+      - ./conf/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "3306:3306"

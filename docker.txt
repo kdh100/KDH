@@ -291,6 +291,9 @@
         - docker-compose != docker compose
             # docker-compose : 도커 패키지에 포함되는 기본 명령어
             # docker compose : 명령어를 다운로드받아 사용하는 것
+    * 설치(안정화버전, v2.12.0(2022.10.25))
+        - wget https://github.com/docker/compose/releases/download/v2.12.0/docker-compose-linux-x86_64 \
+          -O /usr/local/bin/docker-compose
     * '.yaml' 파일 문법
         - 주석 : #
         - 들여쓰기 : 2칸 또는 4칸(space)

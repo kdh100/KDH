@@ -402,7 +402,7 @@
     * 컨테이너 서비스 재시작(restart)
         services:
           webserver:
-            restart:always(정책이 제거될 때까지 항상 컨테이너를 다시 시작)
+            restart: always(정책이 제거될 때까지 항상 컨테이너를 다시 시작)
     [참고] VI/VIM 편집기를 통한 YAML 파일 편집 시 유효한 설정값(vi ~/.vimrc)
     syntax on --> 구문 강조
     autocmd FileType yaml setlocal ts=2 sw=2 st=2 ai nu et

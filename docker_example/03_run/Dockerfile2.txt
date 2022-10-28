@@ -1,4 +1,0 @@
-FROM ubuntu
-
-ENTRYPOINT top
-CMD ["-d", "10"]

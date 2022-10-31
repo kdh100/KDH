@@ -11,6 +11,10 @@
         # CloudWatch Metrics, S3 버킷에 저장된 ELB Logs, API 호출을 통한 CloudTrail 을 통해
           사용자는 ELB 활동에 대한 모니터링 정보를 수집할 수 있다.
         # ELB Health-check 는 내부적으로 ELB 에 의해 동작하는 기능일 뿐 모니터링과 관련 없다.
+    - Pre-warming
+        # ELB 는 사전 예열을 할 필요가 없는 서비스이지만, 필요에 따라 사전 예열을 통해 급작스러운
+          트래픽 증가량에 대처할 수 있도록 설정할 수 있다. 이때, 이벤트 시작/종료 일자와 트래픽
+          증가량 등의 정보가 추가적으로 필요하다.
 
 * SNS
     - Sending notification
@@ -45,6 +49,17 @@
         # 기본 VPC 설정만으로 EC2 인스턴스가 기동되면 오직 Private IP 만 할당된다. 동일 서브넷
           인스턴스들은 내부 통신이 되겠으나, 인터넷으로의 통신은 Public IP 미할당으로 불가능하다.
 
+* EC2
+    - Troubleshooting
+        # 인스턴스에 문제가 생겨 정상적인 접속이나 서비스 응답이 없을 경우, 해당 인스턴스를 중지
+          후 다시 스타트 시켜 정상적인 시스템이 재배포될 수 있도록 해본다.
+    - Placement group
+        # EC2 인스턴스끼리 적은 대역폭 사용으로 짧은 응답시간을 가지고 상호작용할 수 있는 기능
+    - Scaling Plan
+        # 이벤트 등으로 확장이 필요할 경우를 대비해 Spot Instance 를 사용할 수 있다.
+          기존 EC2 보다 70~90% 저렴한 가격으로 인스턴스 기능을 사용할 수 있다.
+          하지만 전체 EC2 인스턴스가 부족해지면 스팟 인스턴스가 종료되므로 안정성은 떨어진다.
+
 * Auto Scaling Group
     - Desired capacity
         # 원하는 용량을 설정하면 새로운 값을 바탕으로 자동 확장된다.
@@ -63,11 +78,28 @@
     - Delete
         # 만약 Auto Scaling Group 을 삭제하고 싶다면, Mininum, Desired 를 모두 0 으로 설정한다.
           콘솔로는 절대 지울 수 없다!
+    - Bastion Host
+        # 침입 방지/차단 소프트웨어가 설치된 일종의 게이트 역할을 수행하는 호스트
+        # 특정 Auto Scaling Group 에 여러개의 AZ 를 포함시키고 Min/Max 사이즈를 1로 조정한 뒤
+          해당 그룹에 포함시켜 인스턴스를 구동시킨다.
 
 * Route 53
     - Alias resource record
         # CNAME 처럼 등록할 수 있지만 사용자가 확인할 수 없고 단순히 IP 정보만 확인할 수 있다.
           루트 도메인이나 네이키드 도메인처럼 최상단 도메인 서버를 구성하려고 할 때 유용하다.
+    - Routing
+        # 리전 별 트래픽 통제를 위해 Weighted Routing Policy 를 적용시켜 트래픽 처리량을 효과적
+          으로 분배시킬 수 있다.
+            ~ A 로는 40% 만, B 로는 60% 만 흐르게 설정 가능
+
+* ENI(Elastic Network Interface)
+    - Feature
+        # 인스턴스가 AWS 서비스, 다른 인스턴스, 온프레미스 서버, 인터넷 등 다른 네트워크와 통신할
+          수 있도록 하며, SSH, RDP 등을 이용해 인스턴스에 접근할 수 있게 해주는 가상 인터페이스다.
+    - Failover
+        # 기본 인스턴스 생성 시 ENI 가 있어야 하며, 하나의 서브넷에만 연결된다.
+          ENI 속성에서 '인스턴스 종료시 삭제' 를 비활성화 시키고 새로 생성하여 인스턴스에 기본 ENI
+          대신 연결해놓고, 장애가 발생할 경우 detach 하여 다른 정상 인스턴스에 attach 할 수 있다.
 
 * EBS
     - Encryption
@@ -94,8 +126,14 @@
 * RDS
     - Event Notification
         # SNS 을 통해 RDS 내 이벤트에 대한 알람을 발생시킬 수 있다.
-    - Restore data
+    - Automated Backup/Restore data
         # RDS 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
+          보관 기간은 1일이다.
+
+* Redshift
+    - Automated Backup/Restore data
+        # Redshift 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
+          보관 기간은 1일이다.
 
 * ElastiCache
     - Memcached
@@ -105,6 +143,8 @@
           없는 요청 수) 등이 있다.
 
 * CloudWatch
+    - Default metric
+        # CPI, DISK I/O, Data Transfer 는 기본 지표값
     - Custom metric
         # 특정 지표값(지표명, 그룹명, 시간대 포함)을 지정할 수 있으며 사용자는 항상 지정된
           지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
@@ -126,6 +166,10 @@
         # EC2 인스턴스가 생성되면 하나의 기본 보안 그룹이 생성된다.
           ELB 가 적용될 경우 ELB 에서 적용되야 할 기본 보안 그룹이 추가 생성된다.
 
+* Root-Level Access
+    - Specific services retaining full privileges
+        # EC2, Beanstalk, OpsWorks, MapReduce(Master Node) 이 4 개의 서비스는 루트 권한 필요!
+
 * IAM
     - Organizations
         # 주소 체계 : https://<AWS 계정>.signin.aws.amazon.com/console/
@@ -134,6 +178,8 @@
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
     - Security policy for privileged users
         # 다단계 인증 방식을 사용하고, 권한 계정을 위한 사용자를 생성하여 사용하면 좋다.
+    - Permission
+        # IAM 역할을 통해 사용자가 접근 가능한 리소스를 설정하는 것이 가장 관리 좋은 방법이다.
 
 * Billing
     - Programmatic Billing

@@ -288,9 +288,13 @@
         - 고객은 클라우드 내부(OS, 어플리케이션, 데이터) 보안 담당
     * 사용자 권한 및 액세스
         - IAM(Identity and Access Management)
+            # 무료 글로벌 서비스
             # 최초 계정은 루트 사용자로 로그온
                 ~ 모든 사용자는 MFA(Multi-Factor Authentication) 활성화 권장
                 ~ 이메일, 암호, 일회용 토큰(OTP 코드)까지 있어야 로그인 가능
+                ~ AWS 콘솔 우측 상단 계정 선택 > 보안 자격 증명 > MFA 추가
+                ~ 'Google Authenticator' 어플 설치해서 QR 코드 인증
+                ~ 기존 등록된 MFA 코드 삭제 후 재등록/변경 진행해야함
             # IAM 을 통해 사용자, 그룹, 역할 생성/부여 가능
                 ~ 사용자 기본 권한은 all deny
                 ~ IAM 정책(.json) 을 통해 권한 정의 가능

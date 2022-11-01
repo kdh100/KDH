@@ -85,7 +85,7 @@
 
 * Route 53
     - Alias resource record
-        # CNAME 처럼 등록할 수 있지만 사용자가 확인할 수 없고 단순히 IP 정보만 확인할 수 있다.
+        # CNAME 처럼 등록할 수 있지만 사용자가 확인할 수 없고 단순히 IP  정보만 확인할 수 있다.
           루트 도메인이나 네이키드 도메인처럼 최상단 도메인 서버를 구성하려고 할 때 유용하다.
     - Routing
         # 리전 별 트래픽 통제를 위해 Weighted Routing Policy 를 적용시켜 트래픽 처리량을 효과적

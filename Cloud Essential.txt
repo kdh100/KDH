@@ -194,6 +194,11 @@
         - 서브넷으로 섹션을 격리하여 리소스를 배치하고 사용할 수 있는 서비스
         - 게이트웨이를 통해 VPC 로 트래픽 송수신
             # Virtual Private Gateway 를 통해 사설 서브넷 VPC 통신 관리 가능
+    * IGW(Internet Gateway)/NAT(Network Address Translation)
+        - VPC 내 AZ 안에있는 서브넷의 종류는 2가지
+            # 퍼블릭 : IGW 로 가는 라우팅 테이블과 연결되어있는 서브넷
+            # 프라이빗 : 기본 서브넷 + NAT 로 가는 라우팅 테이블과 연결되어있는 서브넷
+        - 프라이빗은 NAT 를 향해 트래픽 전달 -> NAT 는 IGW 를 향해 트래픽 전달 -> IGW 는 외부 인터넷 통신
     * Direct Connect
         - B2B 전용 회선
         - 별도의 리전 내 전용 회선 팀과 상의하여 물리 회선 제공받아야 함

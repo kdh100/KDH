@@ -1,3 +1,6 @@
+* 실습 참고
+    - http://tessv5-lab.applaycrew.com/
+
 * ELB
     - Sticky session
         # 사용자의 서비스 접속을 위한 세션을 특정 EC2 인스턴스에 바인딩 해주는 기능.
@@ -102,6 +105,8 @@
     - Improve performance
         # SSD 를 지원하며 EBS 에 최적화된 인스턴스를 사용해서 인스턴스가 EBS 의 IOPs 를 완벽하게
           프로비저닝한 상태로 사용할 수 있게 할 수 있다.
+    - Snapshot
+        # 스냅샷 생성이 진행중일 때에도 EBS 볼륨은 계속 사용이 가능하다.
 * S3
     - Regional self-replication
         # 동일 리전 내 S3 끼리는 데이터를 서로 자동으로 복제하여 관리한다
@@ -115,14 +120,15 @@
           MFA 방식(OTT 등의 2차 인증을 통한 접근)의 보안 설정이 가능하다.
     - Characteristics
         # S3 는 데이터의 총량과 객체수 제한이 없어 사실상 무제한 저장이 가능하다!
-          업로드할 객체가 100MB 이상이라면 멀티파트(분할 병렬식) 업로드 방식을 택할 수도 있다!
+          하지만 단일 객체의 크기 제한은 최대 5TB 이므로 주의할 것!
+          업로드할 객체가 100MB 이상이라면 멀티파트(병렬식; Parallel-upload) 업로드 방식을 택할 수도 있다!
 
 * RDS
     - Event Notification
         # SNS 을 통해 RDS 내 이벤트에 대한 알람을 발생시킬 수 있다.
     - Automated Backup/Restore data
         # RDS 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
-          보관 기간은 1일이다.
+          보관 기간은 1일이다. (스냅샷이 아니라 그냥 백업!)
 
 * Redshift
     - Automated Backup/Restore data
@@ -130,11 +136,15 @@
           보관 기간은 1일이다.
 
 * ElastiCache
+    - for redis
+        # 싱글 노드 모드, 메인/복제 노드를 한 쌍(Shard)만 구성하는 단일 샤드 모드,
+          여러개의 샤드로 구성하는 클러스터 모드가 있다.
     - Memcached
         # 실시간 메모리 캐싱 서비스로 어플리케이션, DB 성능을 가속화하며 일부 서비스에서는
           단순 DB 로도 활용 가능하다. Memcached 와 함께 사용할 수 있는데, 이 중 일부 지표
           로는 Eviction(메모리에서 삭제할 시간 지난 데이터 수), Getmisses(요청에 대해 응답할 수
           없는 요청 수) 등이 있다.
+        # Eviction, Getmisses 가 높아지면 클러스터 내 노드 사이즈를 늘리거나 노드 숫자를 늘리자.
 
 * CloudWatch
     - Default metric

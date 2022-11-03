@@ -286,9 +286,11 @@
         - AWS Aurora
             # 기업형 RDS 엔진(MySQL, PostgreSQL 호환)
                 ~ 기존 RDS 엔진보다 3~5배 빠름
+                ~ 라이센스 비용이 없음
             # DB 리소스 안정성과 가용성 유지 및 불필요한 IO 작업을 최소화
                 ~ 비용 최대 1/10 로 절감
             # 3개의 복사본을 3개의 AZ에 복제하고 S3 에 지속적으로 백업
+                ~ 읽기 전용
     * NRDS(Non-Relational Database Service)
         - 비관계형 DB 는 키를 생성하여 그 위에 데이터를 저장하고 쿼리(키-값)
             # 키 위에 저장되는 속성값은 모두 동일한 속성값을 가질 필요가 없어 유연함
@@ -439,9 +441,22 @@
                 ~ Log Event : 어플리케이션 또는 리소스 활동 기록 레코드
                 ~ Log Stream : 모니터링 중인 동일 리소스의 로그 이벤트 모음
                 ~ Log Group : 동일한 보존 및 권한 설정을 공유하는 로그 스트림 모음
+        - CloudWatch EventBridge
+            # CloudWatch 에서 캡처된 이벤트 관리 서비스
+                ~ 이벤트 수집/전달, 보안 및 권한 부여, 오류 처리
+                ~ 완전관리형 서버리스 서비스
+                ~ 이벤트에 대해서면 비용 지불
     * CloudTrail(Log)
         - AWS 대한 모든 요청을 기록하는 API 감사 도구 서비스
             # 15분 이내에 모든 이벤트를 기록
+            # 로그를 지정된 S3 버킷에 저장
+        - 로그 분석
+            # userIdentify : 요청을 수행한 사용자
+            # requestParameters : 요청 내용
+            # eventTime : 요청 수행 시간
+                ~ eventName : API 요청 내용
+                ~ eventRegion : API 요청 수행 위치
+            # responseElements : API 요청 응답 내용
         - Insights
             # AWS 계정 내 비정상적인 API 활동을 자동으로 감지하는 옵션
     * Trusted Advisor
@@ -472,6 +487,14 @@
         - 생산(Refactoring)
             # 마이그레이션 후 새로운 환경에서의 생산 시도
                 ~ 초기 비용 가장 높음
+    * Storage Gateway
+        - 온프레미스 서버 <-> AWS Storage 연결 지원 서비스
+            # SMB, NFS, iSCSI 등 여러 파일 전송 프로토콜 지원
+    * DataSync
+        - 온프레미스 Storage <-> AWS S3, EFS, FSx for Windows 간 연결 지원 서비스
+            # 온프레미스 환경에 DataSync 에이전트가 가상 인스턴스를 통해 배포됨
+    * Transfer Family
+        - SFTP 를 사용하여 S3 에 파일 업로드/다운로드 기능의 서비스
     * Snow 원격 장비
         - AWS Management Console 에서 주문 가능
         - Snowcone

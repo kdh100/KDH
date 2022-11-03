@@ -199,6 +199,11 @@
             # 코드로 자동 관리/실행이 가능
     * SDK(Software Development Kit)
         - 소프트웨어 개발 키트
+    * CDK(Cloud Development Kit)
+        - 일반적인 프로그래밍 언어를 사용하여 어플리케이션 개발 및 프로비저닝 프레임워크
+    * Solution Library
+        - AWS + AWS 파트너사가 구축한 인프라 배포 툴
+            # CloudFormation 템플릿, 스크립트, 참조 아키텍쳐 등 필요한 시작 도구 포함
     * Elastic Beanstalk
         - 자동 인스턴스 프로비저닝을 위한 서비스
         - 사용자가 코드 및 구성 설정을 제공하면 자동 구성
@@ -216,7 +221,15 @@
     * VPC(Virtual Private Cloud)
         - 서브넷으로 섹션을 격리하여 리소스를 배치하고 사용할 수 있는 서비스
         - 게이트웨이를 통해 VPC 로 트래픽 송수신
-            # Virtual Private Gateway 를 통해 사설 서브넷 VPC 통신 관리 가능
+            # AWS 측 Virtual Private Gateway 를 통해 Site-to-Site VPN 가능
+                ~ 시간 당 연결 요금 발생
+                ~ 최초 100GB 는 무료
+    * VPC Endpoint
+        - 인터넷 게이트웨이 없이 AWS 서비스와 통신하게 하는 기능
+            # Gateway, Interface
+    * VPC Peering
+        - Point to Point 형태로 서로 다른 VPC 네트워크를 연결시켜주는 기능
+            # A <-> B <-> C 라고 해서 A <-> C 아님
     * IGW(Internet Gateway)/NAT(Network Address Translation)
         - VPC 내 AZ 안에있는 서브넷의 종류는 2가지
             # 퍼블릭 : IGW 로 가는 라우팅 테이블과 연결되어있는 서브넷

@@ -19,7 +19,7 @@
     * 환경설정(.bashrc, .vimrc)
       <Docker alias>
       alias irm='docker rmi $(docker images -q)'
-      alias crm='docker rm -f $(docker images -aq)'
+      alias crm='docker rm -f $(docker ps -aq)'
       alias vrm='docker volume prune -f'
       alias nrm='docker network prune -f'
       alias dockerc='docker-compose $*'

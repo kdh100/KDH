@@ -211,6 +211,8 @@
                 ~ 기본값 500
             # --device-read|write-bps:100mb : 저장소 읽기/쓰기 작업량 제한(kb, mb, gb)
             # --device-read|write-iops:100 : 저장소 읽기/쓰기 작업량 제한 쿼터 설정(iops * blk_size)
+    * 리소스 업데이트
+        - update <메모리|CPU|BLOCK> <CONTAINER>
     * 리소스 모니터링
         - stats: 런타임 통계 확인
         - events -f : 실시간 이벤트 정보 출력

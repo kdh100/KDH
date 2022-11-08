@@ -3,13 +3,15 @@
 
 * ELB
     - Security Group
-        # 기본 보안 그룹 생성은 총 2개로 소스 보안 그룹 + 'Ingress <-> Back-end 매핑' 보안 그룹 
+        # 기본 보안 그룹 생성은 총 2개로 소스 보안 그룹 + 'Ingress <-> Back-end 매핑' 보안 그룹
+	- Security Policy to cipher support
+		# 'ELBSecurity Policy-2014-01' 정책이 SSL 보안을 지원한다.
     - Sticky session
         # 사용자의 서비스 접속을 위한 세션을 특정 EC2 인스턴스에 바인딩 해주는 기능.
           동일 사용자로부터 들어오는 요청은 바인딩된 동일 인스턴스를 향해 리다이렉션 처리한다.
     - Connection draining
         # 백엔드 인스턴스가 비정상적인 상태에 빠졌을 경우 대기 임계 시간을 갖고 연결을 지속시키는
-          기능로, 기본값은 300 초(5분), 최대 3600 초(60분) 설정 가능하다.
+          기능로, 기본값은 300 초(5분), 최소 1초 ~ 최대 3600 초(60분) 설정 가능하다.
           Auto-Scaling 서비스가 켜져있는 경우 해당 해당 인스턴스는 자동 제거된다.
         # EC2 콘솔을 통해 ELB 에 접근하거나, CLI 를 통해서 해당 기능을 ON|OFF 할 수 있다.
     - Activity monitoring
@@ -23,6 +25,10 @@
     - IPv4/6
         # ELB 는 IPv4/6 를 모두 지원한다. 하지만 백앤드로 향하는 트래픽은 언제나 IPv4 로 변환되어
           포워딩된다.
+	- Log format
+		# {Bucket}/{Prefix}/AWSLogs/{AWS AccountID}/elasticloadbalancing/{Region}/{Year}
+		  /{Month}/{Day}/{AWSAccount ID}_elasticloadbalancing_{Region}_{Load Balancer Name}
+		  _{End Time}_{Load Balancer IP}_{Random String}.log
 
 * SNS
     - Sending notification
@@ -69,6 +75,9 @@
     - Choosing AZs
         # AWS 에서는 EC2 시작 시 AZ 를 선택하지 않는 걸 권장한다. AWS 가 자동으로 최적의 AZ 를
           골라주기 때문이다!
+    - Changing AZs
+		# 일단 한 번 시작된 EC2 인스턴스는 AZ 변경을 할 수 없다. 다른 AZ 에 인스턴스를 구동하고
+		  싶다면, AMI 를 생성하여 구동시키는 방법 뿐이다.
     - Troubleshooting
         # 인스턴스에 문제가 생겨 정상적인 접속이나 서비스 응답이 없을 경우, 해당 인스턴스를 중지
           후 다시 스타트 시켜 정상적인 시스템이 재배포될 수 있도록 해본다.

@@ -55,7 +55,11 @@
         # 유일한 문제는 DevOps 모델을 따르지 않고 사용자가 직접 정의한 템플릿에 의해 동작한다.
         # AWS Elastic Beanstalk 또한 비슷하게 자동 배포를 지원하지만, 개발 환경 및 어플리케이션
           실행에 집중한 배포만을 제공한다.
-        # 정해진 순서에 맞추어 배포가 진행된다!(In-Orderly-Deployments)
+    - Stack
+        # Stack 만들어 정해진 순서에 맞추어 배포가 진행된다!(In-Orderly-Deployments)
+          만약 생성 중 하나랄도 실패하면 모든 생성 리소스가 Rollback 된다.
+        # 정해진 순서에 맞춰 구동시키는(마치 도커의 Dockerfile 순서처럼) 방식을 위해
+          WaitCondition 을 사용해 의존성에 따른 리소스를 우선 배치하게 할 수 있다!
     - Required components
         # 구성에 필요한 유일한 요소는 리소스!
 
@@ -70,6 +74,10 @@
     - Default settings
         # 기본 VPC 설정만으로 EC2 인스턴스가 기동되면 오직 Private IP 만 할당된다. 동일 서브넷
           인스턴스들은 내부 통신이 되겠으나, 인터넷으로의 통신은 Public IP 미할당으로 불가능하다.
+    - VPC Wizard
+        # VPC 마법사를 통해 생성할 경우 Public, Private 서브넷 설정이 포함되었을 경우 자동적으로
+          퍼블릭 서브넷에 NAT 게이트웨이가 생성되고 Private 서브넷과 연결된다.
+          만약 VPC 를 삭제하려고 한다면 NAT 게이트웨이가 구동중인 동안에는 삭제할 수 없다!
 
 * EC2
     - Choosing AZs
@@ -93,6 +101,7 @@
           특정 리전에서 사용할 수 있게 복사해오면 된다.
     - Creating AMI from running instance
         # 구동중인 EC2 인스턴스를 통해 AMI 를 생성하고 생성이 완료되면 실행 권한을 부여할 수 있다.
+          AMI 생성 시 AWS 계정 ID, AWS access/secret access key, X.509 인증 정보가 필요하다.
     - Cost
         # 인스턴스가 리부팅 되는 경우는 요금이 부과되지 않는다.
           그러나 정지 후 재가동 하는 경우 요금이 부과될 수 있다...
@@ -107,9 +116,15 @@
         # Linux Crontab 처럼 반복 예약 작업을 설정할 수 있다. 최대 1달의 예약이 가능하다.
           종료 시간, 반복 정보가 설정에 필요하다.
         # 만약 중복되는 스케쥴이 있는 경우 에러 메시지와 함께 중복되는 스케쥴은 실행이 거부된다.
+    - Failed to launching instances
+        # 만약 반복적으로 인스턴스를 구동하는데 실패한다면 Auto Scaling Group 은 Scaling Precess
+          를 멈춘다.
     - Delete
         # 만약 Auto Scaling Group 을 삭제하고 싶다면, Mininum, Desired 를 모두 0 으로 설정한다.
           콘솔로는 절대 지울 수 없다!
+    - Merge
+        # 2개 이상의 AZ 에 각각의 Auto Scaling Group 을 병합하고 싶을 땐 그저 하나의 Auto Scaling
+          Group 을 모든 AZ 에 적용될 수 있도록 업데이트 하고 나머지 하나를 삭제하는 방법 뿐이다.
     - Bastion Host
         # 침입 방지/차단 소프트웨어가 설치된 일종의 게이트 역할을 수행하는 호스트
         # 특정 Auto Scaling Group 에 여러개의 AZ 를 포함시키고 Min/Max 사이즈를 1로 조정한 뒤
@@ -136,6 +151,8 @@
           중에도 암호화된다. 스냅샷의 모든 데이터와 I/O 에 대해서도 암호화된다.
         # 만약 사용자가 암호화된 볼륨 혹은 데이터를 공유하고 싶다면, 유일한 방법은 해당 데이터를
           비암호화 볼륨으로 복사한 다음 해당 볼륨을 공유하는 방법 밖엔 없다.
+        # 프리 티어 사용자는 암호화 기능을 사용할 수 없을 것이다. 최소 m3 이상의 EC2 인스턴스만
+          지원하기 때문이다.
     - Improve performance
         # SSD 를 지원하며 EBS 에 최적화된 인스턴스를 사용해서 인스턴스가 EBS 의 IOPs 를 완벽하게
           프로비저닝한 상태로 사용할 수 있게 할 수 있다.
@@ -169,6 +186,9 @@
         # DNS 서비스를 통해 장애 발생 시 기존 DB 인스턴스에서 백업 DB(replicas)로 라우팅이 조정된다.
           그저 단순히 DNS 레코드가 Active -> Standby 로 조정되는 기능이다.
           어플리케이션은 동일한 DNS host 를 바라보기 때문에 DB 가 Failover 되어도 퍼포먼스에 영향이 없다.
+    - Default Maintenance Window
+        # AWS 에서는 DB 유지 관리 시간을 제공한다. 기본 시간은 30분, 사용자가 DB 생성시 지정할 수
+          있으며, 지정하지 않을 경우 기본 시간을 갖는다.
 
 * Redshift
     - Automated Backup/Restore data
@@ -192,12 +212,16 @@
     - Custom metric
         # 사용자 정의 지표(지표명, 네임스페이스, 시간대 포함)를 지정할 수 있으며 사용자는 항상 지정된
           지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
-            ~ Sum, Min, Max, Sample Data, Average
+            ~ Sum, Min, Max, Sample Count, Average
+        # CLI, API 를 통해서 사용자 정의 지표를 업로드 시킬 수 있다. 만약 사용자가 파일 형태의
+          지표를 업로드하려는 경우, input 명령어를 통해서 보낼 수 있다.
         # 사용자 정의 지표는 2분 내로 업로드 되지만, 해당 지표를 확인하기 위해선 15분 정도 소요된다.
     - Detailed Monitoring
         # 기본 모니터링 서비스는 매 5분마다 서비스에 대한 데이터를 수신받을 수 있지만,
           세부 모니터링 서비스는 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
           대신 추가 요금이 발생한다.
+    - Graph Switch
+        # Y 축 지표를 바꾸고 싶다면 Switch 를 통해서 바꾸면 된다.
     - Test alarm with CLI
         # 사용자는 CLI 를 통해서 알람 상태를 임시적으로 변경하여 테스트해볼 수 있다.
           이 변경사항은 다음 알람이 발생할 때 까지 지속된다.
@@ -260,6 +284,8 @@
         # 통합 결제 시스템을 통해 조직 단위에서 하나의 결제 대리인 계정을 만들어 통합 결제를 하면
           해당 결제 대리인 계정은 조직 내 다른 계정들의 결제에 대한 정보만 확인이 가능하며,
           그 외 다른 데이터에 대한 정보는 접근할 수 없다.
+        # 통합 결제 시스템에 포함되고 싶은 계정은 마스터 계정으로부터 초대 요청을 받아
+          들어올 수 있다.
         # 통합 결제 시스템을 사용하면 다른 계정에서 결제한 혜택(Reserved Instance; 예약 인스턴스)
           까지 같이 통합된다는 의미로 시스템 내 다른 계정들에 대해서도 동일한 혜택을 적용받게 된다.
     - Free-Tier

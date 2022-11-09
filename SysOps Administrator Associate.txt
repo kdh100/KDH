@@ -180,6 +180,9 @@
           서버 측에서는 AES-256 방식의 암호화 키를, 사용자 측에서는 SSE-C 방식의 암호화를 통해서 가능하며
           각 버전에 대한 객체에 개별적인 암호화 키를 가질 수 있다.
         # 사용자의 SSE-C 키를 S3 가 받아서 사용하기 위해선 S3 버킷 버전 관리를 활성화해야만 한다!
+            ~ x-amz-server-side-encryption-customer-key : 사용자 키를 base64 암호화하여 사용
+            ~ x-amz-server-side-encryption-customer-key-MD5 : 암호화한 키를 MD5 를 통해 무결성 확보
+            ~ x-amz-server-side-encryption-customer-algorithm : 사용자 키에 대한 암호화 방식 확인
     - Accidental delete
         # 버전 방식으로 관리되는 S3 데이터는 즉각적인 복구 능력을 가지고 있으며,
           MFA 방식(OTT 등의 2차 인증을 통한 접근)의 보안 설정이 가능하다.
@@ -191,6 +194,7 @@
 * RDS
     - Event Notification
         # SNS 을 통해 RDS 내 이벤트에 대한 알람을 발생시킬 수 있다.
+          RDS 콘솔 페이지에서 "Enable" 버튼을 눌러 YES|NO 변경할 수 있다.
     - Automated Backup/Restore data
         # RDS 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
           보관 기간은 1일이다. (스냅샷이 아니라 그냥 백업!)
@@ -228,17 +232,19 @@
     - Default metric
         # CPI, DISK I/O, Data Transfer 는 기본 지표값
     - Custom metric
-        # 사용자 정의 지표(지표명, 네임스페이스, 시간대 포함)를 지정할 수 있으며 사용자는 항상 지정된
+        # 사용자 정의 지표(Metrics, Time-Zone, NameSpace)를 지정할 수 있으며 사용자는 항상 지정된
           지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
             ~ Sum, Min, Max, Sample Count, Average
+            ~ NameSpace : 지표가 저장되는 일종의 저장소에서 컨테이너로써 구분짓기 위한 이름으로,
+                          항상 시작은 'AWS/'로 시작한다.
         # CLI, API(PutMetricData) 를 통해서 사용자 정의 지표를 업로드 시킬 수 있다. 만약 사용자가 파일 형태의
           지표를 업로드하려는 경우, input 명령어를 통해서 보낼 수 있다.
           지표를 업로드할 때는 8 kb HTTP GET 요청, 40 kb HTTP POST 요청의 사이즈 제한이 있다.
         # 사용자 정의 지표는 2분 내로 업로드 되지만, 해당 지표를 확인하기 위해선 15분 정도 소요된다.
     - Detailed Monitoring
-        # 기본 모니터링 서비스는 매 5분마다 서비스에 대한 데이터를 수신받을 수 있지만,
-          세부 모니터링 서비스는 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
-          대신 추가 요금이 발생한다.
+        # Basic Monitoring 은 매 5분마다 서비스로부터 데이터를 수신받을 수 있지만,
+          Detailed Monitoring 은 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
+          Detailed Monitoring 은 RDS, ELB, Route 53, OpsWorks 를 제외한 서비스에선 추가 요금이 발생한다.
     - Graph display
         # 사용자 지표 혹은 AWS 서비스를 통해서 생성된 데이터 지표를 그래프 형식으로 볼 수 있다.
           CloudWatch 콘솔에서 URL 혹은 북마크를 제공한다!

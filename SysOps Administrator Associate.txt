@@ -40,6 +40,10 @@
 		  /{Month}/{Day}/{AWSAccount ID}_elasticloadbalancing_{Region}_{Load Balancer Name}
 		  _{End Time}_{Load Balancer IP}_{Random String}.log
 
+* SES
+    - Simple Email Service
+        # 이메일 수신/발송 서비스
+
 * SNS
     - Sending notification
         # 사용자의 구독 요청에 따라 SQS, SMS, Email/Email(JSON), HTTP/HTTPS 로 전송 가능하다.
@@ -341,6 +345,11 @@
 
 * AWS SWF(Simple WorkFlow)
     - 클라우드 어플리케이션들의 작업 조율 및 상태 관리 서비스
+
+* AWS EMR(Elastic MapReduce)
+    - 빅데이터 처리/분석 관리형 클러스터 플랫폼 서비스
+        # 데이터 집약적(Data-intensive) 작접 수행을 위해 원하는 만큼의 용량을 프로비저닝 할 수 있다.
+            ~ data-mining, machine-learning, log analysis, scientific simulation 등
 
 * AWS Config
     - Compliance check

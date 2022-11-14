@@ -165,6 +165,10 @@
         # Linux Crontab 처럼 반복 예약 작업을 설정할 수 있다. 최대 1달의 예약이 가능하다.
           종료 시간, 반복 정보가 설정에 필요하다.
         # 만약 중복되는 스케쥴이 있는 경우 에러 메시지와 함께 중복되는 스케쥴은 실행이 거부된다.
+    - Metrics limitation for CloudWatch
+        # 1개의 Dimension(AutoScalingGroupName)과 8개의 Metrics를 지원하며 그 종류는 다음과 같다.
+            ~ Group{MinSize, MaxSize, DesiredCapacity, InServiceInstances, PendingInstances,
+                    StandbyInstances, TerminatingInstances, TotalInstances}
     - Detailed Monitoring with CloudWatch
         # 기본적으로 Auto Scaling Group 은 CloudWatch Detailed Monitoring 이 Enable 되어있다.
             ~ AutoScaling Launch Config -> InstanceMonitoring.Enabled 플래그 = True

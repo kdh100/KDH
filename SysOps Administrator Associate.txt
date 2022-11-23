@@ -82,6 +82,9 @@
           Template 에는 최대 60개의 Parameter 와 60개의 Output 이 포함될 수 있다.
     - Required components
         # 구성에 필요한 유일한 요소는 리소스!
+    - Reusable, repeatable, safe template
+       # 재사용 가능하며 안전하게 반복 사용이 가능한 단일 템플릿을 구성하기 위해선
+         parameter(매개변수)를 통해서 리소스를 프로비저닝 하면 된다.
 
 * OpsWorks
     - Configuration management
@@ -152,6 +155,8 @@
     - Troubleshooing
         # InsufficientInstanceCapacity : AZ 내 사용자 요청을 처리할수있는 유효한 인스턴스가 없다.
         # DisableApiTermination : 실수로 EC2 중지시키지 않게 설정할 수 있다.
+        # 만약 인스턴스를 실행시키는 데 문제를 확인하고 트러블슈팅하기 위해서 정보가 필요하다면,
+          EC2Resque 를 통해서 시스템 로그를 수집하고 분석하면 된다.
 
 * Auto Scaling Group
     - Cooldown period
@@ -226,6 +231,9 @@
           파일시스템에서 데이터를 복사해와야 한다.
 
 * EBS
+    - Out of space
+        # EBS 볼륨의 용량 부족 문제를 해소하기 위해서 Elastic Volumes 기능을 사용해 기존의
+          볼륨 사이즈를 늘릴 수 있다!
     - Encryption
         # AES-256 방식으로 암호화되며, 새 볼륨을 만들거나 인스턴스 <-> 스토리지 간 데이터 전송
           중에도 암호화된다. 스냅샷의 모든 데이터와 I/O 에 대해서도 암호화된다.
@@ -252,6 +260,8 @@
 * S3
     - Regional self-replication
         # 동일 리전 내 S3 끼리는 데이터를 서로 자동으로 복제하여 관리한다
+    - Transfer data to S3 bucket
+        # 클라이언트 <-> S3 버킷의 데이터 전송을 빠르고 안전하게 하기 위해 최적화해주는 기능이다.
     - Resource Access Policy
         # S3 ACL : ACL Policy 를 이용하여 AWs 계정 또는 그룹, 사용자에 대한 접근 권한 설정
             ~ 버킷 또는 객체에 대한 ACL (폴더는 대상이 아니다!)
@@ -336,11 +346,16 @@
           없는 요청 수) 등이 있다.
         # Eviction, Getmisses 가 높아지면 클러스터 내 노드 사이즈를 늘리거나 노드 숫자를 늘리자.
 
+* CloudTrail
+    - Integrity validation
+        # CloudTrail 에서 생성된 로그 파일에 대해 무결성 검증 기능을 사용하면 변조되거나, 삭제되거나
+          S3 버킷 등으로 전송된 이후에 변경되었는지에 대해 확인할 수 있다.
+
 * CloudWatch
     - Default metric
         # CPI, DISK I/O, Data Transfer 는 기본 지표값이다.
             ~ Linux 환경에서 Monitoring sciprt 를 사용하면 인스턴스의 MEM, Disk Usage 를 확인할 수 있다.
-            ~ 권장 방식은 Monitoring Agent 를 사용하는 것이다.
+            ~ 권장 방식은 Monitoring Agent 를 인스턴스에 설치하여 사용하는 것이다.
     - Custom metric
         # 사용자 정의 지표(Metrics, Time(in UTC), NameSpace)를 지정할 수 있으며 사용자는 항상 지정된
           지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
@@ -354,6 +369,8 @@
         # 사용자 정의 지표는 2분 내로 업로드 되지만, 해당 지표를 확인하기 위해선 15분 정도 소요된다.
         # 서로 다른 소스로부터 같은 NameSpace, Metric 등의 데이터가 들어오면 이 데이터들을 마치
           하나의 데이터처럼 취급한다. 분 단위로 시간이 조금 틀려도 하나로 취합해서 처리한다.
+        # CloudWatch 콘솔에서 해당 지표들을 확인하고 싶으면,
+          CloudWatch Event 에서 사용자 지표를 추가하여 대시보드로 확인하면 된다!
     - Detailed Monitoring
         # Basic Monitoring 은 매 5분마다 서비스로부터 데이터를 수신받을 수 있지만,
           Detailed Monitoring 은 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
@@ -421,6 +438,17 @@
     - Mobile user calls to AWS
         # 모바일을 통한 AWS 동작 요청 등은 IAM 사용자 또는 역할 등으로 제한하지말고 인증 제공자
           (Google, Amazon, Facebook 등)를 통해서 로그인 등으로 인증하는 방식을 추천한다.
+    - SAML 2.0
+        # 외부 인증제공자(idP)를 통해서 AWS 콘솔에 접근하고 API 호출 등을 진행할 수 있다.
+          이 때 필요한 작업으로는 IAM Role 생성 및 인증제공자(idP)의 사용자와 IAM Role 을 매핑
+          해줄 수 있도록 assertion(정의) 해줘야한다.
+
+* KMS(CMK; Customer Master Key)
+    - Rotation period
+        # 새로운 키를 생성하는 방법에는 신규 KMS 키 생성, 주기적으로 KMS 키 생성 이 있다.
+          주기적으로 자동 생성하는 키는 매 1년 혹은 사용자에 의해 특정 주기별로 생성되도록
+          설정할 수 있다.
+        # 키가 새로 생성되면 기존의 키는 관리자가 삭제하기 전까지 남아있는다.
 
 * Disaster Recovery
     - RPO/RTO

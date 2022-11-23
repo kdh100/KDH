@@ -71,6 +71,9 @@
         # 유일한 문제는 DevOps 모델을 따르지 않고 사용자가 직접 정의한 템플릿에 의해 동작한다.
         # AWS Elastic Beanstalk 또한 비슷하게 자동 배포를 지원하지만, 개발 환경 및 어플리케이션
           실행에 집중한 배포만을 제공한다.
+    - Update deployed instances
+        # CloudFormation 템플릿 안에 AutoScalingUpdatePolicy 를 설정하여 스택을 업데이트 하는
+          방식으로 인스턴스를 업데이트시킬 수 있다!
     - Stack
         # Stack 만들어 정해진 순서에 맞추어 배포가 진행된다!(In-Orderly-Deployments)
           만약 생성 중 하나랄도 실패하면 모든 생성 리소스가 Rollback 된다.
@@ -284,6 +287,9 @@
     - Accidental delete
         # 버전 방식으로 관리되는 S3 데이터는 즉각적인 복구 능력을 가지고 있으며,
           MFA 방식(OTT 등의 2차 인증을 통한 접근)의 보안 설정이 가능하다.
+        # 실수로 지운 자료를 복구하고 싶다면,
+          AWS S3 콘솔에서 삭제처리된 객체를 처리취소 하거나,
+          S3 에 있는 lifecycle 규칙에 객체 삭제에 대한 설정 해제를 통해 복구활 수 있다!
     - Upload folder
         # S3 에 폴더를 업로드 하기 위해서는 Enhanced Uploader 옵션을 활성화 시켜야한다.
     - Serving private data through CloudFront
@@ -295,6 +301,10 @@
         # S3 는 데이터의 총량과 객체수 제한이 없어 사실상 무제한 저장이 가능하다!
           하지만 단일 객체의 크기 제한은 최대 5TB 이므로 주의할 것!
           업로드할 객체가 100MB 이상이라면 멀티파트(병렬식; Parallel-upload) 업로드 방식을 택할 수도 있다!
+    - S3 Security monitoring
+        # S3 버킷에 수상한 행동에 대해 확인하고 싶다면 S3 Analytics 기능을 활성화하여 분석하면 된다!
+          추가로 S3 Server Access Logging 을 활성화하여 로그 전용 버킷에 로그를 저장시킨다!
+
 
 * RDS
     - Event Notification
@@ -350,6 +360,10 @@
     - Integrity validation
         # CloudTrail 에서 생성된 로그 파일에 대해 무결성 검증 기능을 사용하면 변조되거나, 삭제되거나
           S3 버킷 등으로 전송된 이후에 변경되었는지에 대해 확인할 수 있다.
+    - Report generation
+        # S3 버킷에 저장된 로그를 Athena 를 통해서 보고서 작성에 필요한 정보를 추출해야한다!
+    - Verify to increased SQS calls
+        # SQS 호출은 API 를 통해 이루어지므로 SQS 호출에 대한 정보를 확인하고 싶다면 CloudTrail 에서 해라!
 
 * CloudWatch
     - Default metric
@@ -444,6 +458,8 @@
         # 외부 인증제공자(idP)를 통해서 AWS 콘솔에 접근하고 API 호출 등을 진행할 수 있다.
           이 때 필요한 작업으로는 IAM Role 생성 및 인증제공자(idP)의 사용자와 IAM Role 을 매핑
           해줄 수 있도록 assertion(정의) 해줘야한다.
+        # LDAP 등 서비스를 받는 사용자 임의 그룹에 대해서 SAML 을 이용하기 위해 IAM 역할을 새로
+          생성하고, LADP 그룹과 연동하여 사용자들의 인증을 진행시킬 수 있다.
 
 * KMS(CMK; Customer Master Key)
     - Rotation period

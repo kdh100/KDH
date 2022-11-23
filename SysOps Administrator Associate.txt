@@ -82,6 +82,9 @@
           Template 에는 최대 60개의 Parameter 와 60개의 Output 이 포함될 수 있다.
     - Required components
         # 구성에 필요한 유일한 요소는 리소스!
+    - Reusable, repeatable, safe template
+       # 재사용 가능하며 안전하게 반복 사용이 가능한 단일 템플릿을 구성하기 위해선
+         parameter(매개변수)를 통해서 리소스를 프로비저닝 하면 된다.
 
 * OpsWorks
     - Configuration management
@@ -99,7 +102,10 @@
     - Default settings
         # 기본 VPC 설정만으로 EC2 인스턴스가 기동되면 오직 Private IP 만 할당된다. 동일 서브넷
           인스턴스들은 내부 통신이 되겠으나, 인터넷으로의 통신은 Public IP 미할당으로 불가능하다.
+        # 기본 VPC 는 모든 In/Out 트래픽에 대해 Allow 한다.
+            ~ 기본 ACL 은 모든 In/Out 트래픽에 대해 Deny 한다.
         # 한 번 세팅이 끝난 VPC 는 사이즈 변경을 할 수 없다.
+        # VPC 는 인스턴스 레벨에서, ACL 은 서브넷 레벨에서 동작한다.
     - VPC Wizard
         # VPC 마법사를 통해 생성할 경우 Public, Private 서브넷 설정이 포함되었을 경우 자동적으로
           퍼블릭 서브넷에 NAT 게이트웨이가 생성되고 Private 서브넷과 연결된다.
@@ -149,8 +155,13 @@
     - Troubleshooing
         # InsufficientInstanceCapacity : AZ 내 사용자 요청을 처리할수있는 유효한 인스턴스가 없다.
         # DisableApiTermination : 실수로 EC2 중지시키지 않게 설정할 수 있다.
+        # 만약 인스턴스를 실행시키는 데 문제를 확인하고 트러블슈팅하기 위해서 정보가 필요하다면,
+          EC2Resque 를 통해서 시스템 로그를 수집하고 분석하면 된다.
 
 * Auto Scaling Group
+    - Cooldown period
+        # Desired Capacity 에 의해 한 번 스케일링이 끝나고 다음 스케일링을 진행하기까지 기다리는 시간
+          으로 이 시간동안은 CloudWatch Alarm 등으로 값이 변동되지 않는다.
     - Aggregate Statistics
         # 동일 그룹 내 존재하는 모든 EC2 인스턴스에 대한 집계된 통계를 확인할 수 있다.
           모든 리전에서 수집되므로, CloudWatch 의 단일 리전 내 통계보다 광범위하다.
@@ -165,6 +176,10 @@
         # Linux Crontab 처럼 반복 예약 작업을 설정할 수 있다. 최대 1달의 예약이 가능하다.
           종료 시간, 반복 정보가 설정에 필요하다.
         # 만약 중복되는 스케쥴이 있는 경우 에러 메시지와 함께 중복되는 스케쥴은 실행이 거부된다.
+    - Metrics limitation for CloudWatch
+        # 1개의 Dimension(AutoScalingGroupName)과 8개의 Metrics를 지원하며 그 종류는 다음과 같다.
+            ~ Group{MinSize, MaxSize, DesiredCapacity, InServiceInstances, PendingInstances,
+                    StandbyInstances, TerminatingInstances, TotalInstances}
     - Detailed Monitoring with CloudWatch
         # 기본적으로 Auto Scaling Group 은 CloudWatch Detailed Monitoring 이 Enable 되어있다.
             ~ AutoScaling Launch Config -> InstanceMonitoring.Enabled 플래그 = True
@@ -210,7 +225,15 @@
           ENI 속성에서 '인스턴스 종료시 삭제' 를 비활성화 시키고 새로 생성하여 인스턴스에 기본 ENI
           대신 연결해놓고, 장애가 발생할 경우 detach 하여 다른 정상 인스턴스에 attach 할 수 있다.
 
+* EFS
+    - Encryption
+        # EFS 파일시스템을 암호화 하고 싶다면 신규 암화화된 EFS 파일시스템을 생성하고 기존의 EFS
+          파일시스템에서 데이터를 복사해와야 한다.
+
 * EBS
+    - Out of space
+        # EBS 볼륨의 용량 부족 문제를 해소하기 위해서 Elastic Volumes 기능을 사용해 기존의
+          볼륨 사이즈를 늘릴 수 있다!
     - Encryption
         # AES-256 방식으로 암호화되며, 새 볼륨을 만들거나 인스턴스 <-> 스토리지 간 데이터 전송
           중에도 암호화된다. 스냅샷의 모든 데이터와 I/O 에 대해서도 암호화된다.
@@ -233,23 +256,31 @@
           어플리케이션의 성능 등이 있다.
     - Snapshot
         # 스냅샷 생성이 진행중일 때에도 EBS 볼륨은 계속 사용이 가능하다.
+
 * S3
     - Regional self-replication
         # 동일 리전 내 S3 끼리는 데이터를 서로 자동으로 복제하여 관리한다
+    - Transfer data to S3 bucket
+        # 클라이언트 <-> S3 버킷의 데이터 전송을 빠르고 안전하게 하기 위해 최적화해주는 기능이다.
     - Resource Access Policy
         # S3 ACL : ACL Policy 를 이용하여 AWs 계정 또는 그룹, 사용자에 대한 접근 권한 설정
             ~ 버킷 또는 객체에 대한 ACL (폴더는 대상이 아니다!)
         # S3 Bucket Policy : 버킷 안의 객체들에 대한 접근 권한 설정
         # User Access Policy : IAM 정책을 통해 S3 접근 권한 설정
-    - Versioning S3 with encryption
+    - Encryption with versioning S3
         # S3 버전을 통해서 각 객체를 따로 관리할 수 있으며, 사용자 혹은 서버 측에서 암호화를 진행할 수 있다.
-          서버 측에서는 AES-256 방식의 암호화 키를, 사용자 측에서는 SSE-C 방식의 암호화를 통해서 가능하며
-          각 버전에 대한 객체에 개별적인 암호화 키를 가질 수 있다.
+          서버 측 암호화는 데이터를 받는 서비스에 의해 암호화하여 데이터가 저장되는 방식이고,
+          사용자 측 암호화는 데이터가 S3 로 전달될 때 해당 로컬에서 암호화하는 방식이다.
+        # S3 Key 를 사용한 AES-256 방식의 SSE-S3 은 비용이 없으며, KMS key 를 사용한 SSE-KMS 은 비용이 있다.
+          사용자 제공 Key 를 사용한 SSE-C 도 있다.
         # 사용자의 SSE-C 키를 S3 가 받아서 사용하기 위해선 S3 버킷 버전 관리를 활성화해야만 한다!
-          그리고 사용자의 키를 S3 버킷은 저장해두질 않으므로 사용자는 매번 키를 변경해야한다...
+          그리고 사용자의 키를 S3 버킷은 저장해두질 않으므로 사용자는 매번 키를 변경해야한다.
+          S3 버전 관리를 활성화하면 각 버전에 대한 객체의 개별적인 암호 키를 가질 수 있다.
             ~ x-amz-server-side-encryption-customer-key : 사용자 키를 base64 암호화하여 사용
             ~ x-amz-server-side-encryption-customer-key-MD5 : 암호화한 키를 MD5 를 통해 무결성 확보
             ~ x-amz-server-side-encryption-customer-algorithm : 사용자 키에 대한 암호화 방식 확인
+    - Remove server-side-encryped-bucket
+        # 암호화된 버킷을 CMD 로 지우려면 aws s3 rb s3://버킷이름 --sse 옵션을 사용한다.
     - Accidental delete
         # 버전 방식으로 관리되는 S3 데이터는 즉각적인 복구 능력을 가지고 있으며,
           MFA 방식(OTT 등의 2차 인증을 통한 접근)의 보안 설정이 가능하다.
@@ -258,7 +289,9 @@
     - Serving private data through CloudFront
         # Pre-Signed S3 bucket URL 을 통해서 인터넷 상의 사용자들에게 Private Data 를 제공할 수 있다.
           이 주소를 통해 CloudFront 로 데이터가 제공된다.
-    - Features
+    - Generate daily cost report
+        # S3 에 저장되는 데이터를 통해 일일 비용 및 사용 보고서를 저장시키고 다운로드 받을 수 있다.
+    - Object size limit
         # S3 는 데이터의 총량과 객체수 제한이 없어 사실상 무제한 저장이 가능하다!
           하지만 단일 객체의 크기 제한은 최대 5TB 이므로 주의할 것!
           업로드할 객체가 100MB 이상이라면 멀티파트(병렬식; Parallel-upload) 업로드 방식을 택할 수도 있다!
@@ -267,6 +300,10 @@
     - Event Notification
         # SNS 을 통해 RDS 내 이벤트에 대한 알람을 발생시킬 수 있다.
           RDS 콘솔 페이지에서 "Enable" 버튼을 눌러 YES|NO 변경할 수 있다.
+    - Encryption
+        # RDS 콘솔 페이지에서 "암호화" 버튼을 눌러 암호화할 수 있다.
+    - Manual Backup on DB instance
+        # DB 인스턴스를 수동 백업하기 위해선 DB 인스턴스의 스냅샷을 찍으면 된다.
     - Automated Backup/Restore data
         # RDS 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
           보관 기간은 1일이다. (스냅샷이 아니라 그냥 백업!)
@@ -277,13 +314,16 @@
           그저 단순히 DNS 레코드가 Active -> Standby 로 조정되는 기능이다.
           어플리케이션은 동일한 DNS host 를 바라보기 때문에 DB 가 Failover 되어도 퍼포먼스에 영향이 없다.
         # 지원하는 DB 제품으로는 MySQL, Oracle, PostgreSQL 이 있다.
-          MS-SQL 은 이러한 고가용성을 위해 Server Mirroring 라는 기술을 사용한다.
+          MS-SQL 은 이러한 고가용성을 보장하기 위해 Server Mirroring 라는 기술을 사용한다.
     - Default Maintenance Window
         # AWS 에서는 DB 유지 관리 시간을 제공한다. 기본 시간은 30분, 사용자가 DB 생성시 지정할 수
           있으며, 지정하지 않을 경우 기본 시간을 갖는다.
     - RDS Console
         # 사용자는 콘솔을 통해 DB 로그를 확인, 다운로드, 살펴볼 수 있다.
             ~ Error, Slow Query, General
+    - CloudWatch Metrics
+        # RDS 는 추가 비용없이 DB 인스턴스들의 지표를 CloudWatch 에 제공한다.
+            ~ compute/MEM/storage capacity utilization, I/O activity, DB 인스턴스 연결
 
 * DynamoDB
     - Access table
@@ -306,9 +346,16 @@
           없는 요청 수) 등이 있다.
         # Eviction, Getmisses 가 높아지면 클러스터 내 노드 사이즈를 늘리거나 노드 숫자를 늘리자.
 
+* CloudTrail
+    - Integrity validation
+        # CloudTrail 에서 생성된 로그 파일에 대해 무결성 검증 기능을 사용하면 변조되거나, 삭제되거나
+          S3 버킷 등으로 전송된 이후에 변경되었는지에 대해 확인할 수 있다.
+
 * CloudWatch
     - Default metric
-        # CPI, DISK I/O, Data Transfer 는 기본 지표값
+        # CPI, DISK I/O, Data Transfer 는 기본 지표값이다.
+            ~ Linux 환경에서 Monitoring sciprt 를 사용하면 인스턴스의 MEM, Disk Usage 를 확인할 수 있다.
+            ~ 권장 방식은 Monitoring Agent 를 인스턴스에 설치하여 사용하는 것이다.
     - Custom metric
         # 사용자 정의 지표(Metrics, Time(in UTC), NameSpace)를 지정할 수 있으며 사용자는 항상 지정된
           지표값을 캡처하고 CLI, API 를 통해 CloudWatch 에 업로드할 수 있다.
@@ -322,11 +369,17 @@
         # 사용자 정의 지표는 2분 내로 업로드 되지만, 해당 지표를 확인하기 위해선 15분 정도 소요된다.
         # 서로 다른 소스로부터 같은 NameSpace, Metric 등의 데이터가 들어오면 이 데이터들을 마치
           하나의 데이터처럼 취급한다. 분 단위로 시간이 조금 틀려도 하나로 취합해서 처리한다.
+        # CloudWatch 콘솔에서 해당 지표들을 확인하고 싶으면,
+          CloudWatch Event 에서 사용자 지표를 추가하여 대시보드로 확인하면 된다!
     - Detailed Monitoring
         # Basic Monitoring 은 매 5분마다 서비스로부터 데이터를 수신받을 수 있지만,
           Detailed Monitoring 은 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
           Detailed Monitoring 은 RDS, ELB, Route 53, OpsWorks 를 제외한 서비스에선 추가 요금이 발생한다.
         # CLI 를 통해 모니터링 데이터를 확인하고 싶다면, 'monitoring.<region>.amazonaws.com' URL 사용!
+    - EventBridge
+        # AWS 서비스에 대한 이벤트를 감지하고 감지된 이벤트에 대해 특정 이벤트를 발생시킬 수 있는
+          서비리스 서비스
+        # EventBus 를 통해 이벤트를 지정하여 특정 리소스에 대한 이벤트 발생 트리거를 지정할 수 있다.
     - Graph display
         # 사용자 지표 혹은 AWS 서비스를 통해서 생성된 데이터 지표를 그래프 형식으로 볼 수 있다.
           CloudWatch 콘솔에서 URL 혹은 북마크를 제공한다!
@@ -372,10 +425,13 @@
           (Monitor-linked account)
     - Password policy
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
+    - Customer managed Policy
+        # 제한적인 IAM 관리자 계정을 위해서는 Customer managed policy 를 생성하여 사용자 혹은 그룹에
+          연결시키면 된다. 사용자 혹은 그룹은 한개 이상의 정책과 연결될 수 있다.
     - Security policy for privileged users
         # 다단계 인증 방식을 사용하고, 권한 계정을 위한 사용자를 생성하여 사용하면 좋다.
     - Permission
-        # IAM 역할을 통해 사용자가 접근 가능한 리소스를 설정하는 것이 가장 관리 좋은 방법이다.
+        # IAM Role 을 통해 사용자가 접근 가능한 리소스를 설정하는 것이 가장 관리 좋은 방법이다.
         # 특정 인스턴스에 제한을 주고 싶다면, 인스턴스 생성 시 부여할 수 있는 '태그'를 통해서
           제한하는 방법이 있다!
           "Condition": {"StringEquals": {"ec2:ResourceTag/InstanceType": "Tag"}}
@@ -384,6 +440,17 @@
     - Mobile user calls to AWS
         # 모바일을 통한 AWS 동작 요청 등은 IAM 사용자 또는 역할 등으로 제한하지말고 인증 제공자
           (Google, Amazon, Facebook 등)를 통해서 로그인 등으로 인증하는 방식을 추천한다.
+    - SAML 2.0
+        # 외부 인증제공자(idP)를 통해서 AWS 콘솔에 접근하고 API 호출 등을 진행할 수 있다.
+          이 때 필요한 작업으로는 IAM Role 생성 및 인증제공자(idP)의 사용자와 IAM Role 을 매핑
+          해줄 수 있도록 assertion(정의) 해줘야한다.
+
+* KMS(CMK; Customer Master Key)
+    - Rotation period
+        # 새로운 키를 생성하는 방법에는 신규 KMS 키 생성, 주기적으로 KMS 키 생성 이 있다.
+          주기적으로 자동 생성하는 키는 매 1년 혹은 사용자에 의해 특정 주기별로 생성되도록
+          설정할 수 있다.
+        # 키가 새로 생성되면 기존의 키는 관리자가 삭제하기 전까지 남아있는다.
 
 * Disaster Recovery
     - RPO/RTO

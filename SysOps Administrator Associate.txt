@@ -368,6 +368,8 @@
     - Organizations
         # 주소 체계 : https://<AWS 계정>.signin.aws.amazon.com/console/
             ~ IAM 사용자 혹은 그룹에 영향받지 않는다.
+        # 대시보드를 통해서 계정 상태를 파악하고 싶다면 모니터링 기능이 있는 계정을 사용해야한다.
+          (Monitor-linked account)
     - Password policy
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
     - Security policy for privileged users

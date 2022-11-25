@@ -245,6 +245,8 @@
     * VPC Peering
         - Point to Point 형태로 서로 다른 VPC 네트워크를 연결시켜주는 기능
             # A <-> B <-> C 라고 해서 A <-> C 아님
+        - 서로 다른 IP CIDR 대역끼리 연결이 가능하고, 리전 별 연결도 가능
+            # ping 은 동일 대역이 아닐 경우 불가능
     * IGW(Internet Gateway)/NAT(Network Address Translation)
         - VPC 내 AZ 안에있는 서브넷의 종류는 2가지
             # 퍼블릭 : IGW 로 가는 라우팅 테이블과 연결되어있는 서브넷

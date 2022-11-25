@@ -19,6 +19,10 @@
           기능로, 기본값은 300 초(5분), 최소 1초 ~ 최대 3600 초(60분) 설정 가능하다.
           Auto-Scaling 서비스가 켜져있는 경우 해당 해당 인스턴스는 자동 제거된다.
         # EC2 콘솔을 통해 ELB 에 접근하거나, CLI 를 통해서 해당 기능을 ON|OFF 할 수 있다.
+    - Alarm to unhealthy instances
+        # health-check 를 통해서 인스턴스의 건강 상태를 점검할 수 있다.
+          만약 건강하지 못한 인스턴스를 감지했을 경우 알람을 발생시키고 싶다면,
+          AWS/ApplicationELB UnhealthyHostCount >= 1 (1 이상) 으로 조건을 설정하면 된다!
     - Activity monitoring
         # CloudWatch Metrics, S3 버킷에 저장된 ELB Logs, API 호출을 통한 CloudTrail 을 통해
           사용자는 ELB 활동에 대한 모니터링 정보를 수집할 수 있다.
@@ -53,7 +57,7 @@
         # SQS 는 선입선출(FIFO)을 보장하지 못한다(어떻게든 전달만 하면 되니까). 하지만 시스템 상
           메시지의 순서가 중요할 경우 대기열에 있는 메시지에 Sequencing information 을 배치해서 
           반환할 때 메시지 순서를 재정렬할 수 있다.
-    - Retain Messages
+    - Retein Messages
         # 기본값으로 대기열에 추가된 메시지는 4일동안 유지되며, 사용자 지정 기간동안 메시지를
           유지시킬 수 있다.
     - Deletion Queue
@@ -77,8 +81,12 @@
     - Stack
         # Stack 만들어 정해진 순서에 맞추어 배포가 진행된다!(In-Orderly-Deployments)
           만약 생성 중 하나랄도 실패하면 모든 생성 리소스가 Rollback 된다.
-        # 정해진 순서에 맞춰 구동시키는(마치 도커의 Dockerfile 순서처럼) 방식을 위해
-          WaitCondition 을 사용해 의존성에 따른 리소스를 우선 배치하게 할 수 있다!
+        # 실패한 Stack 에 대해서는 삭제하고 다시 새로 Stack 을 생성하여 진행해야 한다!
+        # WaitCondition 구문을 사용하여 앞에서 진행한 프로세스가 다음으로 넘어가기 전에 필요한
+          충분한 시간을 벌어들일 수 있다.
+    - Template
+        # 사전 정의한 서비스나 옵션 등의 내용을 템플릿으로 저장하여 Stack 이 참고할 수 있게 한다.
+          우선 실행되어야 하는 의존성 구동 여부는 Init 으로 가능하다. 
     - Limitation
         # Stack 은 계정당 20개가 제한한다. Template 는 제한이 없다.
           Template, Parameter, Output, Resource description 의 글자수는 4096 으로 제한한다.
@@ -100,6 +108,12 @@
           DB 인스턴스 접속에 필요한 변수들(host, user, password 등)을 .json 형식으로 작성한다.
             ~ [:deploy][:app_name][:database]
           사용자 지정 Repice 를 통해 어플리케이션 인스턴스와 DB 인스턴스간의 연결을 설정해준다.
+
+* System Manager
+    - Patch Manager
+        # System Manager 의 Patch Manager 를 통해 일괄적인 리소스 패치가 가능하다.
+          사용자들의 사용감 저하를 감소시키기 위해 패치 그룹에 속해있는 인스턴스들의 10 퍼센트에
+          해당되는 인스턴스들만 패치를 진행시키는 방법을 적용시킬 수 있다.
 
 * VPC
     - Default settings
@@ -195,6 +209,9 @@
         # 만약 수동으로 인스턴스를 리부팅시키거나 기타 이유로 Auto Scaling Group Health Check 가
           failed 나서 의도치 않게 인스턴스가 삭제되려고 한다면, 해당 인스턴스의 health 상태를
           healthy 로 변경하는 명령어를 통해서 방지할 수 있다.
+    - Analyze the unhealthy instance before termination
+        # AS 설정에서 인스턴스 종료 직전에 일시정지 기능(hook the pause)을 사용하면 health check
+          를 통해 확인되어 인스턴스가 종료되기 직전 분석해볼 수 있다!
     - Suspended Processes
         # Terminate 프로세스를 중지시킬 경우 AZRebalancing 프로세스는 설정된 Maximum size 보다
           10 퍼센트 더 큰 사이즈로 인스턴스를 실행시킨다. 이는 Terminate 프로세스가 재시작될 때까지
@@ -215,12 +232,17 @@
 
 * Route 53
     - Alias resource record
-        # CNAME 처럼 등록할 수 있지만 사용자가 확인할 수 없고 단순히 IP  정보만 확인할 수 있다.
+        # CNAME 처럼 등록할 수 있지만 사용자가 확인할 수 없고 단순히 IP 정보만 확인할 수 있다.
           루트 도메인이나 네이키드 도메인처럼 최상단 도메인 서버를 구성하려고 할 때 유용하다.
+        # CloudFront 를 통해 메인 도메인의 어플리케이션을 접근하려고 할 때에도 유용하다!
+        # 동일 조직 내 다른 계정의 서비스에 대한 접근 및 포워딩에 대해서도 유용하게 사용할 수 있다!
     - Routing
         # 리전 별 트래픽 통제를 위해 Weighted Routing Policy 를 적용시켜 트래픽 처리량을 효과적
           으로 분배시킬 수 있다.
             ~ A 로는 40% 만, B 로는 60% 만 흐르게 설정 가능
+        # 특정 국가나 리전에 대해 접근을 불가하게 설정하고 싶은 경우, Route 53 geolocation Routing
+          기능으로 특정 국, 리전으로만 통신이 가능하게 라우팅 조정할 수 있다.
+          추가적으로 CloudFront 의 geo-restriction 과 혼용해서 사용할 수 있다!
 
 * ENI
     - Failover
@@ -244,6 +266,8 @@
           비암호화 볼륨으로 복사한 다음 해당 볼륨을 공유하는 방법 밖엔 없다.
         # 프리 티어 사용자는 암호화 기능을 사용할 수 없을 것이다. 최소 m3 이상의 EC2 인스턴스만
           지원하기 때문이다.
+        # KMS CMK(Customer Master Key)를 사용하여 암호화할 경우, Lambda 함수를 사용하여
+          aws kms describe-keycommand 를 사용하면 스케쥴링을 진행하면서 동시에 암호화할 수 있다!
     - Improve performance
         # SSD 를 지원하며 EBS 에 최적화된 인스턴스를 사용해서 인스턴스가 EBS 의 IOPs 를 완벽하게
           프로비저닝한 상태로 사용할 수 있게 할 수 있다.
@@ -468,12 +492,21 @@
         # LDAP 등 서비스를 받는 사용자 임의 그룹에 대해서 SAML 을 이용하기 위해 IAM 역할을 새로
           생성하고, LADP 그룹과 연동하여 사용자들의 인증을 진행시킬 수 있다.
 
+* SSO(Single-Sign On)
+    - feature
+        # 1 회의 인증으로 서비스 및 어플리케이션에 접근할 수 있는 인증 솔루션을 뜻한다.
+          AWS SSO 를 사용할 경우 권한 세트를 생성하고, 사용자 혹은 그룹에 대해 연결시켜 사용한다!
+
 * KMS(CMK; Customer Master Key)
     - Rotation period
         # 새로운 키를 생성하는 방법에는 신규 KMS 키 생성, 주기적으로 KMS 키 생성 이 있다.
           주기적으로 자동 생성하는 키는 매 1년 혹은 사용자에 의해 특정 주기별로 생성되도록
           설정할 수 있다.
         # 키가 새로 생성되면 기존의 키는 관리자가 삭제하기 전까지 남아있는다.
+    - Shared key from accounts
+        # 조직 내 다른 계정들과의 KMS key 를 공유하여 동일한 스토리지 암호화 및 암호화된 데이터에
+          접근할 수 있도록 허용할 수 있다. key 정책에서 연관된 계정들의 KMS key 를 이용한 암호화
+          및 암호화된 데이터 접근을 허용해주면 된다.
 
 * Disaster Recovery
     - RPO/RTO

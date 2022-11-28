@@ -1,0 +1,1063 @@
+1. Kubernetes(K8S) 개요
+    * 컴퓨터 클러스터에 어플리케이션 컨테이너의 배치(스케줄링) 및 실행을 오케스트레이션하는 운영 수준 플랫폼
+    * 공식 사이트
+        - Kubernetes : https://kubernetes.io/
+        - CNCF(Cloud Native Computing Foundation) : https://www.cncf.io/
+    * 특징
+        - 스냅샷을 이용한 롤백/롤아웃
+        - 서비스 검색 및 로드밸런싱
+        - 일괄 실행 관리
+        - 자가 치유(Health-Check 를 통한 상태 확인/복구)
+        - 수평적 스케일링
+    * Kubernetes 클러스터 구성
+        - {Control Plane(Master) { Node(Worker) {Pod {Container}}}}
+        - Control Plane(Master)
+            # kube-apiserver
+                ~ API 를 통한 인스턴스 배포/실행, 트래픽 조정
+                ~ frontend
+            # etcd
+                ~ 키:값 저장소(KVS; Key-Value Store)
+                ~ backend
+            # kube-scheduler
+                ~ 파드 감지, 노드 배정, 노드 실행
+            # kube-controller-manager
+                ~ 프로세스(노드, 레플리케이션, 엔드포인트(서비스<->파드 연결), 계정/토큰) 관리
+                ~ health-check
+            # cloud-controller-manager
+                ~ 클라우드 전용 API 프로세스(노드, 라우팅, 서비스) 관리
+        - Node(Worker)
+            # kubelet
+                ~ 데몬처럼 파드에서 컨테이너 동작 관리
+            # kube-proxy
+                ~ 네트워크 규칙 유지
+            # container-runtime(container-engine)
+                ~ 컨테이너 실행 담당 소프트웨어
+        - Add-on
+            # DNS
+                ~ 컨테이너 내부 파드끼리의 통신을 위해 필요
+            # WEB-UI(대시보드)
+                ~ 클러스터 및 동작하는 어플리케이션 관리, Troubleshooting 지원
+            # container resource monitoring
+                ~ 리소스 기록/열람 UI 제공
+            # cluster-level logging
+                ~ 로그 저장, 검색/열람 인터페이스 제공
+            # CNI(Container Network Interface)
+                ~ SDN
+    * 어플리케이션 구성
+        - 파드(Pod)
+            # 하나 혹은 여러개의 컨테이너를 모아 관리(작성/시작/정지/삭제)
+                ~ 웹 서버와 DB 서버 같이 역할이 다른 컨테이너를 하나의 파드에 저장하면 안됨
+        - 레플리카셋(ReplicaSet)
+            # 미리 지정된 파드를 작성하여 실행하는 템플릿
+                ~ 10개 지정하면 9개 가동 시 1개 추가 가동, 11개 가동 시 1개 중지 등
+        - 전개(Deployment)
+            # 레플리카셋 생성
+                ~ 레플리카셋 이력 관리용
+    * 네트워크 관리
+        - 서비스(service)
+            # 외부 --> 클러스터 내부 파드에 엑세스하는 서비스 정의
+                ~ 로드밸런서 : IP(Cluster IP(사설), External IP(공인)) + 포트 번호에 대한 L4 레벨 부하 분산
+                ~ 인그레스(Ingress) : 서비스와 연결되어 통신 내용을 프록시
+        - 라벨(Label)
+            # 리소스를 적절히 관리하기 힘들기 때문에 식별하기 쉬운 Label 을 내부에서 랜덤 부여/관리
+                ~ key:value 형식의 임의 문자열
+    * 네임스페이스(NameSpace)
+        - 클러스터 내 논리적 클러스터처럼 리소스를 그룹으로 격리하는 기능
+            # kubectl api-resources 를 통해서 "namespaced: true" 값의 객체들은 그룹 격리 가능
+                ~ 쿼터(Quota)를 통해 클러스터 내 리소스를 분할
+        - 기본 네임스페이스
+            # default : 네임스페이스가 없는 객체들을 위한 기본 네임스페이스
+            # kube-system : 시스템에서 생성한 객체를 위한 네임스페이스
+            # kube-public : 공개적으로 읽을 수 있는 리소스를 위한 네임스페이스
+            # kube-node-lease : 노드 리스(kubelet 이 마스터의 장애를 탐지)를 위한 네임스페이스
+2. GCP(Google Cloud Platform)를 이용한 GKE(Google GKE) 사용
+    * GCP 구성
+        <GCP 프로젝트 ID 확인/설정>
+        - https://cloud.google.com -> 프로젝트 이름/ID 확인 -> 프롬프트 열기
+            # PROJECT_ID=$(gcloud config list project --format "value(core.project)")
+            # echo $PROJECT_ID
+            # gcloud config set project $PROJECT_ID
+            # sudo -l
+                ~ session timeout 방지로 while true 반복문 걸어주면 좋음
+        <GCP registry 설정; Cloud Source Repositories API>
+        - GCP 콘솔 -> API 및 서비스 - 라이브러리 -> Cloud Source Repositories API 사용
+        - GCP 프롬프트
+            # git clone https://github.com/asashiho/dockertext2
+            # git config --global \
+            # credential.'https://source.developers.google.com'.helper gcloud.sh
+            # git config --list
+            # gcloud source repos create dockertext2
+                ~ dockertext2 : 구글 레지스트리에 생성될 저장소 이름
+            # git remote add google \
+              https://source.developers.google.com/p/$PROJECT_ID/r/dockertext2
+            # git push google master
+                ~ 생성된 저장소(google, master 브랜치)에 디렉토리에 있는 파일들을 푸시
+    * GCP 를 이용한 Docker 이미지 빌드
+        <GCP API 설정>
+        - GCP 콘솔 -> API 및 서비스 - 라이브러리
+            # GKE, container registry, cloud build API 사용
+                ~ 좌측 메뉴에 핀셋 설정으로 즐겨찾기 등록하면 편함
+        <이미지 빌드>
+        - GCP 프롬프트
+            # cd ~/dockertext2/chap09
+            # cat config/cloudbuild.yaml
+            # vi config/configmap.yaml
+                ~ 'project.id: ' 부분에 본인의 프로젝트 ID 작성
+            # gcloud builds submit --config config/cloudbuild.yaml
+                ~ 간혹 신규 서비스 사용으로 인해 접근 거부로 인한 오류로 정상적으로 등록 안될 수 있음
+                ~ 잠시 기다렸다가 여러번 재실행 하면 정상 동작함(인증 과정에 시간이 오래 소요될 수 있음)
+    * GCP 를 이용한 Kubernetes 클러스터 구축
+        <클러스터 생성>
+        - GCP 콘솔 -> GKE -> 클러스터 -> 만들기 -> Standard -> 구성
+            # 이름: imageview, 영역: asia-northeast1-a, default-pool: {크기: 3}
+                ~ 선택 후 만들기(시간 좀 걸림)
+        <클러스터 관리 인증 정보 생성>
+        - GCP 프롬프트
+            # gcloud container cluster get-credentials imageview --zone=asia-northeast1-a
+            # cat ~/.kube/config
+            # kubectl get nodes [-o yaml]
+            # echo 'source <(kubectl completion bash)' >>~/.bash_profile
+            # source ~/.bash_profile
+                ~ kubernetes 관리 명령어 자동완성 기능 활성화
+    * kubectl CMD
+        - configmap : 어플리케이션에서 공통으로 사용하는 정보(plaintext)
+            # kubectl create configmap <file> <source>
+                ~ GCP -> GKE -> 보안 비밀 및 Configmap 에서 확인 가능
+            # kubectl get configmaps [-o yaml]
+            # kubectl delete configmaps <map-name>
+        - secrets : API 키나 DB 연결을 위한 ID/PW 등의 기밀 데이터(base64 인코딩)
+            # kubectl create -f ./secret.yaml
+                ~ GCP -> GKE -> 보안 비밀 및 Configmap 에서 확인 가능
+            # kubectl get secret <secret-name> [-o yaml]
+            # kubectl delete secret <secret-name>
+    *어플리케이션 배포
+        <파드 가동/중지>
+        - GCP 프롬프트
+            # kubectl api-resources | grep deployment
+            # vi config/deployment-blue|green.yaml --> 일부 내용 아래처럼 수정
+                ~ apiVersion: apps/v1
+                ~ spec:
+                    selector:
+                      matchLabels:
+                        type: webserver
+                  replicas: 3
+                ~ spec:
+                    containers:
+                      image: gcr.io/vataltrick-123456/imageview:blue|green
+            # kubectl create -f config/deployment-blue|green.yaml
+            # (TERM2) watch kubectl get pods [-o wide]
+            # kubectl delete pod webserver-blue-xxxxxxx-xxxxx
+                ~ 강제로 파드 중지시켜보면 해당 ID 값의 파드는 사라지고 신규 파드가 바로 생성됨
+                ~ 만들어진 템플릿(레플리카셋)에 따라 항상 동일한 파드 유지
+        <서비스 가동>
+        - GCP 프롬프트
+            # cat config/service.yaml
+            # kubectl create -f config/service.yaml
+            # (TERM3) watch kubectl get services [-o wide]
+                ~ 웹 콘솔에서 공인 IP 확인/테스트 전에는 pending 상태가 상당히 오래 유지됨
+        - GCP 콘솔 -> GKE -> 서비스 및 수신 -> 세부정보 -> 공인 IP 확인 -> 접속 테스트
+        <어플리케이션 버전업; Blue-Green Deployment>
+        - 가동중인 서버, 어플리케이션을 갱신할 때 사용하는 방법 중 하나
+            # 가동중인 기존 서버 <-- 새로운 서버를 추가 가동시켜 엑세스 시켜놓고 기존 서버 업데이트
+                ~ 문제 발생 시 바로 이전 서버로 롤백 가능
+        - GCP 콘솔 -> GKE -> 서비스 및 수신 -> 세부 정보 -> 수정 -> 저장
+            # selector 의 color 부분을 변경(blue --> green)
+        - GCP 프롬프트
+            # kubectl edit services webserver
+                ~ selector 의 color 부분을 변경(blue --> green)
+        <스케쥴링; Linux crontab, at>
+        - GCP 프롬프트
+            # cat config/cronjob.yaml
+            # kubectl create -f config/cronjob.yaml
+            # kubectl get jobs [--watch]
+            # kubectl delete -f config/cronjob.yaml
+3. 클라우드 환경에서 운용
+    * 시스템 운용 기초
+        - 가용성 관리
+            # Cold|Hot-Standby
+            # Health-Check
+            # Load-Balancing
+        - 시스템 감시
+            # 머신 활동 감시
+            # 리소스 감시
+            # 잡 감시
+            # 장애 대응 및 퍼포먼스 튜닝
+    * GKE 를 사용한 Docker 환경 운용
+    [상태 확인]
+        <클러스터 상태 확인>
+        - GCP 콘솔 -> GKE -> 세부정보 확인
+        - GCP 프롬프트
+            # gcloud container clusters list
+            # kubectl cluster-info [dump]
+                ~ dump 사용 시 자세한 정보 확인 가능
+        <노드 확인>
+        - GCP 콘솔 -> GKE -> 세부정보 -> 노드 탭
+        - GCP 프롬프트
+            # kubectl get nodes [-o wide]
+        <파드 확인>
+        - GCP 콘솔 -> GKE -> 작업 부하
+        - GCP 프롬프트
+            # kubectl get pods [-o wide]
+            # kubectl describe pods <파드 ID>
+        <서비스 확인>
+        - GCP 콘솔 -> GKE -> 서비스 및 수신
+        - GCP 프롬프트
+            # kubectl get services [-o wide]
+    [관리]
+        <파드 관리>
+        - GCP 프롬프트
+            # kubectl get pods
+            # kubectl scale --replicas=2 -f config/deployment-green.yaml
+                ~ 레플리카셋의 파드를 2개로 설정
+            # kubectl get pods
+        <노드 관리>
+        - GCP 프롬프트
+            # gcloud container clusters list
+            # gcloud continaer clusters resize imageview --num-nodes 5 --zone asia-northeast1-a
+            # gcloud container clusters list
+            # kubectl scale --replicas=5 -f config/deployment-green.yaml
+            # kubectl get pods
+                ~ 늘어난 노드에 맞춰 파드를 늘려본 수 다시 노드를 감소시키면
+            # gcloud continaer clusters resize imageview --num-nodes 3 --zone asia-northeast1-a
+            # kubectl get nodes
+            # kubectl get pods
+                ~ 다른 노드에 파드가 자동으로 위치 조정됨
+    [리소스 작성/삭제/변경]
+        <리소스 작성>
+        - GCP 프롬프트
+            # kubectl create -f <file> <source>
+            # kubectl apply -f <file>
+                ~ 기존 생성된 파일의 내용을 변경할 때
+            # kubectl edit -f <file>
+                ~ 현재 적용중인 리소스 파일이 저장된 위치(etcd)에서 직접 수정/적용할 때
+            # kubectl delete -f <file>
+    [클러스터 업그레이드/다운그레이드]
+        - GCP 프롬프트
+            # gcloud container clusters list
+            # gcloud container get-setver-config --zone=asia-northeast1-a
+            # gcloud container clusters upgrade imageview --cluster-version=<버전>
+                ~ 마스터,노드 보다 더 높은 버전으로 업그레이드 하는 것은 불가능
+    [클러스터 삭제; GCP 콘솔에서 진행]
+        <서비스 삭제>
+        - GKE -> 서비스 수신 -> webserver 선택 -> 삭제
+        <노드 삭제>
+        - GKE -> 작업부하 -> 모두 선택 -> 삭제
+        <클러스터 삭제>
+        - GKE -> imageview 선택 -> 삭제
+        <GCP 서비스 종료>
+        - API 및 서비스 -> 사용 설정된 API.. -> 서비스 선택 -> 사용 중지
+            # Cloud Source Repositories API
+            # Container Registry API
+                ~ 위 2개의 서비스 사용 중지 시 GKE 자동 사용 중지 
+        <프로젝트 삭제>
+        - IAM 및 관리자 -> 리소스 관리 -> 프로젝트 선택 -> 삭제
+4. 온프레미스 환경에서 운용
+    [MiniKube 설치]
+        <리눅스 가상환경 설치>
+        - VM : VMWare
+        - OS : CentOS
+        - CPU : 2
+        - MEM : 4 G
+        - HDD : 40 GB
+        - Hostname : 
+            # controlplane : master.example.com
+            # node(1,2,3) : node1|2|3.example.com
+            # backup : minikube.example.com
+                ~ hostnamectl set-hostname <hostname>
+                ~ 변경 후 로그아웃 > 로그인
+        - IP : 
+            # controlplane : 192.168.10.10/24
+            # node(1,2,3) : 192.168.10.{20|30|40}/24
+            # backup : 192.168.10.50/24
+                ~ nm-connection-editor 작업 후 nmcli connection up eth0
+        - /etc/hosts
+            # controlplane, nodes, backup 에 대한 내용 설정
+        - SELinux
+            # sestatus > disable or permissive
+        - Firewall
+            # systemctl disable --now firewalld
+        - NTP
+            # controplane(NTP Server)
+                ~ vi /etc/chrony.conf > #allow 192.168.0.0/16 --> allow 192.168.10.0/24
+                ~ systemctl restart chronyd
+            # nodes, backup(NTP Client)
+                ~ vi /etc/chrony.conf > server, pool --> #server, #pool
+                                      > echo 'server 192.168.10.10 iburst' >> /etc/chrony.conf
+                ~ systemctl restart chronyd
+                ~ chronyc sources -v
+        <MiniKube 설치>
+        - 참고 URL : https://minikube.sigs.k8s.io/docs/tutorials/
+        - backup 서버에서 구축
+        - Docker 설치
+            # cd
+            # yum remove -y runc && \
+              curl -fsSL https://get.docker.com -o get-docker.sh && \
+              sh get-docker.sh && \
+              systemctl enable --now docker
+        - Minikube 설치
+            # cd
+            # curl -LO \
+              https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+            # sudo install minikube-linux-amd64 /usr/local/bin/minikube
+        - Minikube 실행
+            # minikube start --force --memory=2048mb
+                ~ --force : 루트 사용자로 실행
+                ~ --memory : 메모리 설정
+            # curl -LO "https://dl.k8s.io/release/\
+              $(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            # sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            # kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
+        <Minikube 실행>
+        - 대시보드 실행
+            # minikube dashboard
+                ~ 하단의 URL 을 복사하여 다른 터미널 창에서 firefox 백그라운드로 확인
+        - 어플리케이션 배포
+            # kubectl create deployment hello-minikube --image=k8s.gcr.io/echoserver:1.4
+            # kubectl get deployments
+            <서비스 개시1>
+            # kubectl expose deployment hello-minikube --type=NodePort --port=8080
+            # kubectl get services
+            # minikube service hello-minikube
+                ~ 기본 웹브라우저(default browser: firefox)에서 내용 확인
+            <서비스 개시2>
+            # kubectl port-forward service/hello-minikube 7080:8080
+            # firefox http://localhost:7080 &
+            <로드 밸런서 배포>
+            # kubectl create deployment balanced --image=k8s.gcr.io/echoserver:1.4
+            # kubectl get deployments
+            # kubectl expose deployment balanced --type=LoadBalancer --port=8080
+            # kubectl get services
+            # minikube tunnel
+                ~ 로드밸런싱을 위한 유효 라우팅 IP 생성
+            # kubectl get services
+            # firefox http://<external IP>:8080 &
+                ~ 유효 라우팅 IP 를 통해서 접근 시 백앤드 컨테이너에 접근 가능
+        - 클러스터 관리
+            # minikube pause|unpause
+            # minikube status
+            # minikube addons list
+                ~ 추가 설치 가능한 플러그인 카탈로그
+            # minikube delete --all
+                ~ 도커를 통해 생성된 쿠버네티스 컨테이너 및 하위 정보들을 삭제
+            # minikube stop
+                ~ minikube start --force 로 다시 시작 가능
+                ~ docker ps -a 로 컨테이너(minikube) 확인 가능
+    [k8s 직접 설치]
+    * 준비사항
+        - Linux 계열 OS, 2GB 이상 MEM, 2 Core 이상 CPU, 네트워크 연결, 고유 Hostname, MAC, SWAP 비활성화
+            # uname -a
+                ~ Centos 7,8,9
+                ~ Ubuntu 16.04, 18.04, 20.04, 22.04
+            # free -h
+            # lscpu -e
+            # ping 8.8.8.8
+            # hostnamectl
+            # swapoff -a (/etc/fstab)
+        - Kubespray 설치
+            # 앤서블(Ansible) 기반의 쿠버네티스 클러스터 배포 툴
+            # 고가용성 구조
+                ~ 별도의 로드밸런서가 필요 없이 자체적인 고가용성 구조가 구축되어있음
+                ~ 각각의 노드가 서버 내부에 존재하는 nginx proxy 를 바라보고 있음
+                ~ 노드 내부의 nginx proxy 는 마스터(controlplane)의 kube-apiserver 를 바라보고 있음
+                ~ 마스터의 장애 감지는 Health Check 를 통해서 nginx 가 알아서 처리함
+            # 필수사항
+                ~ Ansible v2.9, Python v3.8 이상
+                ~ Ansible-playbook 을 위한 Jinja v2.11 이상
+                ~ Ansible-playbook 을 위한 인벤토리 서버들의 SSH 키 공유
+                ~ 적절한 firewall 규칙 우선 정의 필요(kubespray 에 의해 관리되지 않음)
+                ~ 루트 사용자가 아닌 일반 사용자로 실행될 경우 --become 필요
+    * YAML 파일 편집을 위한 설정
+        - vi ~/.bashrc
+            # alias vi='/usr/bin/vim'
+        - source ~/.bashrc
+        - vi ~/.vimrc
+            # syntax on
+              autocmd FileType yaml setlocal ai nu ts=2 sw=2 et
+              autocmd FileType python setlocal ai nu ts=2 sw=2 et
+    * 인벤토리 서버들의 SSH 키 공유
+        - ssh-keygen
+        - ssh-copy-id master|node1|node2|node3
+    * 파이썬 준비
+        - yum install -y python38 && rm -f /usr/bin/python3 && ln -s /usr/bin/python3.8 /usr/bin/python3
+        - python3 --version
+    * PIP3, Jinja 준비
+        - yum install -y python3-pip wget git vim sshpass & sleep 1 && \
+          python3 -m pip install --upgrade pip && sleep 2 && pip install -U Jinja2
+    * Kubespray 준비
+        - cd
+        - git clone https://github.com/kubernetes-sigs/kubespray
+        - cd kubespray/
+        - python3 -m pip install -r requirements.txt
+        - cp -rfp inventory/sample inventory/mycluster
+        - declare -a IPS=(192.168.10.10 192.168.10.20 192.168.10.30 192.168.10.40)
+        - CONFIG_FILE=inventory/mycluster/hosts.yaml \
+          python3 contrib/inventory_builder/inventory.py ${IPS[0]}
+            # all 부분의 hosts 를 노드에 맞게 수정
+            # children 부분의 kube_control_plane 의 hosts 를 master 로 수정
+              kube_node 의 hosts 를 각각의 node 로 수정
+              etcd 부분의 hosts 를 matser 로 수정
+        - 설치 완료 후 로그아웃/로그인
+        - kubectl version --output=yaml
+        - kubectl cluster-info
+        - kubectl get nodes -o wide
+    * 확인 후 각 노드들의 스냅샷 저장
+5. K8S 운영(파드)
+    * CMD 자동 완성 기능 활성화
+        - echo "source <(kubectl completion bash)" >> ~/.bashrc
+          echo "source <(kubeamd completion bash)" >> ~/.bashrc
+        - source ~/.bashrc
+    * kubectl CMD
+    <기본>
+        - kubectl --help
+        - kubectl api-resources
+    <노드 정보 확인>
+        - kubectl get nodes -o wide
+        - kubectl describe nodes <이름>
+    <파드 실행>
+        - kubectl run web --image=nginx --port=80
+            # image 를 pulling 하고 서비스 포트를 80으로 지정하여 직접 실행
+        - kubectl run web --image=nginx --port=80 --dry-run=client > web-pod.yml
+            # 파드를 실행시키지 않고 실행시키기 위한 설정값을 yaml 파일로 생성
+        - kubectl create -f web-pod.yml
+            # yaml 파일을 통해 파드 실행
+    * kubectx, kubens
+    <설치>
+        - git clone https://github.com/ahmetb/kubectx /opt/kubectx
+        - ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+        - ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+        - git clone https://github.com/agmetb/kubectx.git ~/.kubectx
+        - COMPDIR=$(pkg-config --variable=completionsdir bash-completion)
+        - ln -sf ~/.kubectx/completion/kubens.bash $COMPDIR/kubens
+        - ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
+        - cat << EOF >> ~/.bashrc
+          export PATH=~/.kubectx:$PATH
+          EOF
+    <사용>
+        - kubectx : 클러스터를 빠르게 변경해주는 bash script
+            # kubectx <이름>
+                ~ 변경
+            # kubectx -
+                ~ 이전 상태
+        - kubens : 네임스페이스를 빠르게 변경해주는 bash script
+            # kubens <이름>
+            # kubens -
+    * namespace
+    <네임스페이스 생성/삭제>
+        - 하나의 클러스터 내에 존재하는 리소스들을 논리적으로 분류하기 위한 공간
+        - kubectl create namespace <이름>
+            # kubectl create namespace test --dry-run -o yaml > test.yml
+              kubectl create -f test.yml
+                ~ 파일을 통해 네임스페이스 생성 가능
+        - kubectl get namespaces
+        - kubectl delete namespace <이름>
+    * context
+    <기본 네임스페이스 변경을 위한 context 생성 및 수정>
+        - 클러스터를 구성하는 요소(계정,클러스터이름,네임스페이스 등)를 집합시킨 클러스터 세부 내용
+            # 컨텍스트에서 정의한 네임스페이스가 default namespace 로 지정됨
+        - kubectl config view
+            # 현재 클러스터에서 정의된 컨텍스트 확인
+        - kubectl config set-context <user>@<namespace> \
+          --cluster=cluster.local --user=kubernetes-admin --namespace=<이름>
+            # kubectl config current-context 의 네임스페이스 정보를 변경하기 위해 내용 정의
+        - kubectl config use-context <user>@<namespace>
+            # 신규로 정의된 context(네임스페이스)로 변경
+                ~ 기본값은 kubectl config use-context kubernetes-admin@cluster.local
+                ~ 테스트 후 반드시 원복
+    <context 삭제>
+        - kubectl config delete-context <user>@<namespace>
+        - kubectl config view
+    * API version
+        <버전 확인>
+        - kubectl api-resources
+            # alias findapi='kubectl api-resources | head -1 ; kubectl api-resources | grep $1'
+        - kubectl explain <리소스이름>.<필드이름>.<필드이름>...
+    * Pod
+    <파드 생성>
+        - kubectl run <이름> --image=<이미지> --port=<포트번호>
+        - kubectl creafe -f <yaml 파일>
+    <파드 확인>
+        - kubectl get pods 
+        - kubectl get pods -o wide|json|yaml
+        - kubectl describe pods <파드이름>
+    <파드에 콘솔 접근>
+        - kubectl exec <파드이름> -it -c <컨테이너이름> -- <CMD; /bin/bash, /bin/sh 등>
+     <파드 설정파일을 직접 수정하기>
+        - kubectl edit -f <파드를 실행시킨 yaml 파일>
+            # 현재 디렉토리의 yaml 파일을 바탕으로 생성된 파드 정보가 저장된 etcd 내 config 파일을 수정
+                ~ 수정하면 바로 적용됨
+    <파드의 Self-Healing 을 위한 Liveness Probe 사용>
+        - 파드가 계속 실행할 수 있음을 보장해줌(Health-Check 기능)
+        - yaml 파일 내에서 spec:containers: 하위 레벨에 livenessProbe: 선언
+            # httpGet 을 사용해서 반환코드가 200 이 아니면 오류(unhealthy)로 판단하고 컨테이너 재시작
+                ~ livenessProbe:
+                    httpGet:
+                      path: /
+                      port: 80
+            # tcpSocket 을 사용해서 TCP 연결을 시도하고 연결되지 않으면 오류로 판단하고 컨테이너 재시작
+                ~ livenessProbe:
+                    tcpSocket:
+                      port: 22
+            # exec 명령어를 사용해서 명령어 종료값이 0 이 아니면 오류로 판단하고 컨테이너 재시작
+                ~ livenessProbe:
+                    exec:
+                      command:
+                      - ls
+                      - /data/file
+        - livenessProbe 변수
+            # periodSeconds : health check 반복 실행 시간
+            # initialDelaySeconds : 파드 실행 후 probe 실행까지 delay 시킬 시간
+            # timeoutSeconds : health check 후 응답 대기 시간
+            # successThreshold : health check 에 대한 성공 판단 임계값
+            # failureThreshold : health check 에 대한 오류 판단 임계값
+    <파드 내 의존성에 따른 컨테이너 우선 실행 순위를 위한 init container 사용>
+        - main(어플리케이션) container 실행 전 사전 작업이 필요할 경우 사용
+            # init container 우선 실행 --> 나머지 container 실행
+        - yaml 파일 내에서 spec: 하단에 containers: 와 동일 레벨에 initContainers: 선언
+            # 하위 레벨의 필드값들은 containers: 와 같음
+    <파드와 함께 자동으로 생성되는 infra container 이해>
+        - 각 파드가 생성될 때 1개의 pause container 가 같이 만들어지고 파드가 삭제되면 같이 삭제됨
+            # IP, hostname 등에 대한 관리 및 생성 담당하는 컨테이너
+    <Static Pod 생성>
+        - 노드 내 kubelet 데몬이 바라보는 디렉토리의 파일을 자동으로 읽어들여 파드 생성/삭제 가능
+            # 마스터 노드의 apiserver, scheduler 등을 거치지 않고 노드 내에서 직접 파드 생성
+                ~ cat /var/lib/kubelet/config.yaml
+                ~ staticPodPath: /etc/kubernetes/manifests --> Static Pod 디렉토리
+                ~ 만약 파일 수정했을 경우 kubelet 데몬 재시작(systemctl restart kubelet)
+    <파드에 리소스 할당>
+        - requests 는 파드 실행을 위한 최소 리소스 요청
+        - limits 는 파드 실행을 위한 최대 리소스 제한
+            # CPU
+                ~ 1 core == 1000m
+                ~ 코어 개수나 용량으로 지정하는 방법 둘 다 가능
+            # MEM
+                ~ G/Gi, M/Mi, K/Ki 등
+                ~ 1G = 1000 M, 1 Gi = 1024 Mi
+            # 리미트 초과 시 파드는 종료(OOM Killer)되며 다시 스케쥴링 됨
+                ~ 전체 리소스에 가깝게 설정하면 Pending 상태로 실행 불가
+        - spec:containers: 하위 레벨에 resources: 선언
+            # requests 를 주지 않으면 기본값으로 limits 와 동일 값 설정
+                ~ resources:
+                    requests:
+                      cpu: 1000m
+                      memory: 1024Mi
+                    limits:
+                      cpu: 1500m
+                      memory: 1526Mi
+    <파드에 환경 변수 설정>
+        - spec:containers: 하위 레벨에 env: 선언
+            # 컨테이너 내에서 실행될 때 필요한 변수 지정하기 위해 사용
+                ~ env:
+                  - name: MYVAR
+                    value: "This is a test value."
+    <파드 구성 패턴 종류>
+        - 사이드카(Sidecar)
+            # 어플리케이션이 실행되는 컨테이너를 보조해주는 별도의 보조 컨테이너로써 동작
+                ~ 어플리케이션 컨테이너가 로그를 발생시키면, 사이드카는 해당 로그를 DB 에 저장시켜줌
+        - 어댑터(Adapter)
+            # 외부 -> 어플리케이션 의 통신을 프로토콜처럼 표준화 동작
+                ~ 외부 NMS(monitoring)의 어플리케이션에 대한 데이터 요청을 정규화된 표준화 및 확인
+        - 앰배서더(Ambassador)
+            # 외부 <- 어플리케이션 의 통신을 프록시 방식 동작
+                ~ 각 용도에 맞는 DB(Dev, Prod, TB 등)에 컨테이너가 연결하기 위해 중간에서 프록시 작용
+6. K8S 운영(컨트롤러)
+    * ReplicationController
+        - 레플리케이션 설정 방법(ReplicaSet, Deployments)에 따라 실행된 레플리카의 파드 수 보장
+            # 너무 많으면 최근에 생성된 파드 제거, 너무 적으면 파드 생성(안정적인 파드 유지)
+                ~ apiVersion: v1
+                  kind: ReplicationController
+                  metadata:
+                    name: <RC 이름>
+                  spec:
+                    replicas: <배포 개수>  --> 지정하지 않으면 default: 1
+                    selector:  --> 동일 라벨을 가진 단독 파드도 해당 컨트롤러에 의해 조정됨
+                      key:value  --> 생설될 파드의 metadata:labels: 하위 레벨에서 정의된 태그 정보 선택
+                    template:
+                      <컨테이너 템플릿>
+                      metadata:
+                        name: nginx-pod
+                        labels:
+                          app: web
+                      spec:
+                        containers:
+                        - name: nginx-container
+                          image: nginx:1.14
+                          ...
+    <RC 생성/확인/삭제/스케일링>
+        - kubectl create rc <RC 이름> \
+          --image=<이미지이름> --replicas=<배포 개수> --selector=<라벨 정보>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,rc -o wide
+        - kubectl delete rc <RC 이름>
+        - kubectl scale rc <RC 이름> --replicas=<배포 개수>
+            # yml 파일을 edit 하여 수정한 내용은 실행중인 파드가 스케일링 될 때 업데이트됨
+    * ReplicaSet
+        - ReplicaSet(Pod/Container)
+        - RC 를 대체하기 위해 나온 상위 버전 컨트롤러
+            # 더 다양한 selector: 필드 제공
+                ~ spec:
+                    selector:
+                      matchLabels:
+                        key:value  --> RC 와 동일
+                      matchExpressions:
+                      - {key: <이름>, operator: <연산자>, values: [<이름>]}
+            # 연산자 종류
+                ~ In : key:value 매칭되는 파드와 연결
+                ~ NotIn : key 만 매칭하고 value 는 매칭되지 않는 파드와 연결
+                ~ Exists : key 가 매칭되는 파드와 연결(values 는 필요없음)
+                ~ DoesNotExist : Key 가 매칭되지 않는 파드와 연결(values 는 필요없음)
+            # 온라인 상태의 레플리카-파드 업데이트를 지원(Rolling Update)
+                ~ RC 는 지원하지 않음
+    <RS 생성/확인/삭제>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,rs -o wide
+        - kubectl delete rs <RS 이름>
+            # --cascade=false 옵션을 쓰면 RS 안에 파드들도 삭제되는걸 방지
+    * Deployment
+        - Deployment(ReplicaSet(Pod/Container))
+        - 파드와 RS 에 대한 선언적 업데이트를 제공
+            # 파드 인스턴스를 점진적으로 새로운 것으로 업데이트(롤링업데이트)하여 서비스 무중단 보장
+                ~ 이전 버전으로의 롤백 가능
+            # 롤링업데이트에 대한 전략 설정 가능
+                ~ metadata:
+                    annotations:
+                      kubernetes.io/change-cause: version 1.14  --> '--record' 기능 동작
+                  spec:
+                    progressDeadlineSeconds: 600  --> 업데이트가 10분 안에 안되면 취소
+                    revisionHistoryLimit: 10  --> 롤링업데이트 기록 최대 버전 개수
+                    strategy:
+                      rollingUpdate:
+                        maxSurge: 25%  --> 한번에 진행되는 파드 개수(총 3개 중 25% = 0.75; 1개의 파드)
+                        maxUnavailable: 25%  --> 한번에 종료시킬 파드 개수(maxSurge 와 동일하게 설정)
+                      type: RollingUpdate
+    <deployment 생성/확인/삭제>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,rs,deploy -o wide
+        - kubectl delete deployment <deployment 이름>
+            # --cascade=false 옵션을 쓰면 deployment 안에 레플리카셋, 파드들도 삭제되는걸 방지
+    <rollingupdate 진행/일시중지/재시작/확인>
+        - kubectl set image <deployment 이름> <컨테이너이름>=<이미지:버전> --record
+        - kubectl rollout pause <deployment 이름>
+        - kubectl rollout resume <deployment 이름>
+        - kubectl rollout status <deployment 이름>
+        - kubectl rollout history <deployment 이름>
+    <rollback>
+        - kubectl rollout undo <deployment 이름>
+            # --to-revision=<번호> : 특정 리비전으로 롤백, 옵션이 없으면 이전 단계로 롤백
+    * DaemonSet
+        - 전체 노드에서 파드가 각각 1개씩 실행되도록 보장
+            # 클러스터에 노드가 추가되면 파드도 추가, 노드가 제거되면 추가된 파드는 쓰레기(garbage)로 수집
+            # 데몬셋을 삭제하면 생성된 파드들이 한번에 정리됨
+    <DS 생성/확인/삭제>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,ds -o wide
+        - kubectl delete ds <DS 이름>
+    <노드 확인/삭제>
+        - kubectl get nodes
+        - kubectl delete node <노드 이름>
+    <노드 추가를 위한 새로운 토큰 확인/생성>
+        - kubeadm token list
+        - kubeadm token create --ttl 8h
+            # --ttl : 토큰 만료시간 설정
+    <노드 추가를 위한 기존 클러스터에 노드 join 시키기>
+        - 필요한 정보 : token ID, discovery-token-ca-cert-hash
+            # openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt \  --> 인증서를 퍼블릭키로 받아와서
+              | openssl rsa -pubin -outform der 2>/dev/null \  --> DER 포맷으로 RSA 형식으로 변환하고
+              | openssl dgst -sha256 -hex | sed 's/^.* //'  --> SHA256, HEX 한 hash 값을 확인
+        (추가할 노드에 ssh 접속)
+        - kubeadm reset
+        - kubeadm join <마스터 노드 IP>:6443 --token <token ID> \
+          --discovery-token-ca-cert-hash \
+          sha256:<hash 값>
+        (마스터 노드로 돌아와서)
+        - kubectl get nodes
+    <rollingupdate/rollback>
+        - kubectl edit ds <DS 이름>
+        - kubectl rollout undo ds <DS 이름>
+    * StatefulSet
+        - 레플리카셋이나 디플로이먼트처럼 stateless 한 스케일링, 롤업데이트/롤백 + stateful 보장 컨트롤러
+            # 파드의 상태(파드 이름, 파드 볼륨(Storage))를 유지 보장
+            # 동일한 컨테이너 스펙을 보장해줌
+            # STS yaml 형식
+                ~ kind: StatefulSet
+                  metadata:
+                    name: <STS 이름>
+                  spec:
+                    replices: <개수>
+                    serviceName: <서비스 이름>
+                    podManagementPolicy: Parallel  --> 스케일링 시 순서(OrderedReady) 상관없이 진행
+    <STS 생성/확인/삭제>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,statefulset -o wide
+        - kubectl delete ds <STS 이름>
+    <STS 스케일링>
+        - kubectl scale statefulset <STS 이름> --replicas=<개수>
+    <STS rollingupdate/rollback>
+        - kubectl edit <STS 이름>
+        - kubectl rollout undo <STS 이름>
+    * Job
+        - 작업을 위해 파드를 생성하고 작업이 완료되면 파드가 삭제됨
+            # job yaml 형식
+                ~ kind: Job
+                  metadata:
+                    name: <JOB 이름>
+                  spec:
+                    completions: <JOB 개수>
+                    parallelism: <동시에 구동될 파드 개수>
+                    activeDeadlineSeconds: <JOB 완료 제한 시간>
+                    template:
+                      spec:
+                        containers:
+                        - name:
+                          image:
+                          command:
+                            - bash
+                          args:
+                            - -c
+                            - echo 'hello world'; sleep 10; echo 'bye'
+                        restartPolicy: Never
+    <JOB 생성/확인/삭제>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,job -o wide
+        - kubectl delete -f <yaml 파일>
+    * CronJob
+        - 사용자가 원하는 시간에 job 실행 예약 지원
+            # Job 컨트롤러를 실행할 파드를 주기적으로 반복 실행
+                ~ linux crontab 과 동일
+                ~ 분 시 일 월 day
+            # spec: 하위 레벨에 schedule: 선언, template 대신 jobTemplate: 선언(JOB 템플릿), 
+                ~ spec:
+                    schedule: "* * * * *"
+                    startingDeadlineSeconds: 300  --> 정해진 시간 이후 실행될때까지 기다리는 유예시간
+                    concurrencyPolicy: Forbid  --> 작업이 완료되지 않았으면 완료될 때까지 기다림
+                    jobTemplate:
+                      spec:
+                        template:
+                          metadata:
+                          spec:
+    <CRONJOB 생성/확인/삭제>
+        - kubectl create -f <yaml 파일>
+        - kubectl get pods,cronjob -o wide
+        - kubectl delete -f <yaml 파일>
+7. K8S 운영(서비스; 네트워크 구성)
+    * 동일한 서비스를 제공하는 파드 그룹의 단일 진입포인트(Virtual IP)를 제공(서비스 = 네트워크)
+        - 서비스는 여러 개의 파드에 접근할 수 있는 IP 하나를 제공
+        - 기본 기능은 로드 밸런서 역할 수행
+        - 서비스 Type
+            # ClusterIP(default) : 파드 그룹의 단일 진입포인트 생성
+            # NodePort : ClusterIP 생성 후 모든 Worker 노드에 접속 가능한 포드 예약
+                ~ 포트 번호는 30000~32767 번 중 하나
+            # LoadBalancer
+            # ExternalName : 클러스터 내부에서 외부로 나갈 시 사용할 도메인을 CNAME 에 등록
+                ~ ExternalName 이 실제 외부 도메인으로 치환됨
+    <내부 통신 목적>
+        - ClusterIP(default)(내부 통신)
+            # 서비스를 클러스터-내부 IP 에 노출되어 내부 통신 가능
+                ~ selector 라벨이 동일한 파드들의 그룹으로 묶임
+                ~ ClusterIP 생성 시 파드 그룹의 단일 진입포인트(Virtual IP) 생성됨
+                ~ 진입포인트에 할당될 IP 대역은 CNI 에 따라서 설정값이 다르니 참고
+                ~ Kubespray 기준 10.233.0.0/18
+            # ClusterIP yaml 형식
+                ~ kind: Service
+                  metadata:
+                    name: <ClusterIP 이름>
+                  spec:
+                    type: ClusterIP
+                    clsuterIP: <호스트 IP>  --> 미지정 시 랜덤하게 가용 IP 범위에서 선택
+                    selector:
+                    ports:
+                    - protocol: TCP
+                      port: 80  --> 서비스 포트
+                      targetPort: 80  --> 파드 포트
+        - kube-proxy(내부 로드밸런싱 목적)
+            # iptables(default)
+                ~ service api 요청 시 iptables rule 생성
+                ~ 클라이언트 요청 시 iptables rule 을 통해서 연결
+            # ipVS
+                ~ L4 로드밸런싱 기술 이용
+                    ~ 커널 버전에 따른 사용 여부 확인 필요
+        - Headless(내부 통신; CNAME 방식의 DNS 통신)
+            # clusterIP 가 없는 서비스로 단일 진입포인트가 필요 없을 때 사용
+            # 서비스와 연결된 파드의 엔드포인트로 DNS 레코드가 생성됨
+                ~ DNS 주소 : <pod-ip-주소>.<namespace>.pod.cluster.local
+            # headless yaml 형식
+                ~ kind: Service
+                  metadata:
+                    name: <서비스 이름>
+                  spec:
+                    type: ClusterIP
+                    clusterIP : None
+                    selector:
+                      key:value
+                    ports:
+                    - protocol: TCP
+                      port: 80
+                      targetPort: 80
+    <외부 통신 목적>
+        - NodePort(외부 통신)
+            # 모든 노드를 대상으로 외부에서 파드로 접속 가능한 단일 진입 포트를 예약
+            # ClusterIP 생성 --> NodePort 예약됨
+                ~ 포트 범위 : 30000 ~ 32767
+            # NodePort yaml 형식
+                ~ spec:
+                    type: NodePort
+                    clusterIP: <호스트 IP>
+                    ports:
+                    - port: <포트 번호>
+                      protocol: TCP
+                      targetPort: <포트 번호>
+                      nodePort: 30200  --> 생략 시 랜덤하게 가용 포트 범위에서 부여됨
+        - LoadBalancer(외부 통신; L4 로드밸런싱 목적)
+            # ClusterIP 생성 --> NodePort 예약 --> LoadBalancer 가 해당 NodePort 로 외부 접근 허용
+            # yaml 형식은 NodePort 와 동일
+                ~ spec:
+                    type: LoadBalancer
+                    ports:
+                    - protocol: TCP
+                      port: 80
+                      targetport: 80
+                      nodePort: 30200  --> 생략 시 NodePort 처럼 랜덤하게 부여됨
+        - Ingress(외부 통신; L7 로드밸런싱 목적)
+            # https://kubernetes.io/ko/docs/concepts/services-networking/ingress-controllers/
+            # 하나의 IP or 도메인으로 다수의 서비스를 제공
+                ~ http/https 를 통해 클러스터 내부의 서비스를 외부로 노출
+                ~ 컨트롤러를 통해 룰에 따라 트래픽을 로드밸런싱(컨트롤러의 포트로 접근해야함)
+            # NodePort 형식으로 외부에 포트 제공 및 컨트롤러에 의해 내부 노드 IP 중 하나를 컨트롤러에 매핑
+                ~ kubectl get svc -n ingress-nginx
+                ~ kubectl edit svc ingress-nginx-controller -n ingress-nginx
+            # service 에 대한 외부용 URL 제공
+            # SSL/TLS 인증서 처리 지원(https 통신 지원)
+                ~ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key \
+                  -out tls.crt -subj "/CN=https-example.foo.com"
+                ~ kubectl create secret tls https-example.foo.com --key tls.key --cert tls.crt
+                ~ kubectl describe secret https-example.foo.com
+                ~ 클라이언트 요청 시 ingress 컨트롤러의 443 포트에 매핑된 포트로 접근 요청
+                ~ curl -I -k https://https-example.foo.com:<컨트롤러 443 매핑 포트>
+            # SSL 지원 ingress yaml 형식
+                ~ spec:
+                    ingressClassName: nginx
+                    rules:
+                    - host:
+                      - https-example.foo.com  --> FQDN 선언으로 요청자는 /etc/hosts 에 등록되어있어야함
+                      secretName: https-example.foo.com  --> 앞에서 생성한 secret 이름
+                      http:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: service1
+                            port:
+                              number: 80
+            # Virtual Hosting 을 지정
+            # 트래픽 로드밸런싱
+                ~ Ingress rules : example.com/ --> svc MAIN, example.com/login --> svc LOGIN 분산
+            # ingress yaml 형식
+                ~ apiVersion: networking.k8s.io/v1
+                  kind: Ingress
+                  metadata:
+                    name: <ingress 이름>
+                    namespace: <네임스페이스 이름>  --> 매핑시킬 서비스(컨테이너 파드)와 동일 NS 이어야 함
+                  spec:
+                    ingressClassName: <ingress 클래스 이름>  --> kubectl get ingressclass 확인!
+                    rules:
+                  # - host: foo.bar.com  --> FQDN 선언, 뒤에 http 하위 paths 에서 하위 디렉토리 지정
+                    - http:
+                        paths:
+                        - path: /  --> 매핑시킬 서비스의 URL 주소이름
+                          pathType: Prefix
+                          backend:
+                            service:
+                              name: <매핑시킬 서비스 이름>  --> path 값으로 접근 시 해당 서비스 접근
+                              port:
+                                number: 80  --> 매핑할 서비스의 포트 넘버 확인 필요
+        - ExternalName(외부 통신; CNAME 방식의 DNS 통신)
+            # 클러스터 내부에서 외부에서 보여질 도메인을 설정
+                ~ curl <externalname-svc>.<default>.svc.cluster.local
+                ~ curl <서비스 이름>.<네임스페이스>.svc.cluster.local
+            # ExternalName yaml 형식
+                ~ kind: Service
+                  metadata:
+                    name: <externalname 이름>
+                  spec:
+                    type: ExternalName
+                    externalName: <도메인 주소>
+            # 서비스 시작 후 파드 내부에서 curl externalname-svc.default.svc.cluster.local 요청
+8. K8S 운영(라벨)
+    * Label
+        - 클러스터의 모든 리소스에 할당하여 분류 및 selector 를 통한 선택 가능
+        - 파드 라벨은 yaml 파일에서 metadata:labels: 하위 레벨에 "Key: Value" 형식으로 선언
+        - 노드 라벨은 yaml 파일에서 metadata:spec:nodeSelector: 하위 레벨에 "Key: Value" 형식으로 선언
+        - 특정 라벨 정보에 부합하는 노드에 파드 생성 가능
+            # spec:
+                nodeSelector:  --> 라벨 정보가 다르면 파드 생성 안됨(Pending)
+                  gpu: "true"  --> boolean 함수는 큰따옴표로 묶어줘야 함
+                  disk: ssd
+                  mem: high
+    <라벨 확인>
+        - kubectl get pods --show-label
+        - kubectl get pods -l key=value
+            # 특정 라벨 정보 확인 시
+    <노드 라벨 확인>
+        - kubectl get nodes --show-labels
+        - kubectl get nodes -L key,key
+            # key 값을 입력하면 해당 key 에 매칭되는 정보가 디스플레이 row 로 출력됨
+    <라벨 설정>
+        - kubectl label pod <파드 이름> key=value
+        - kubectl label pod <파드 이름> key=value --overwrite
+            # 현재 파드에 이미 key 가 있는 경우 value 를 덮어쓰고 싶을 때
+        - kubectl edit <파드 이름> -o yaml
+            # 권장하는 수정 방식
+    <라벨 삭제>
+        - kubectl label pod <파드 이름> key-
+            # key 뒤에 '-'를 넣어주면 해당 라벨 삭제
+        - kubectl delete all -l key=value
+            # 라벨 정보에 부합하는 파드 삭제
+    * 다양한 파드 업그레이드(배포) 방법
+        - Blue/Green Deployment(일괄 업데이트)
+            # 블루(OLD ver.)에서 그린(NEW ver.) 파드를 신규 생성하여 서비스 전환
+        - Rolling Update(개별 업데이트)
+            # 정해진 룰에 맞춰 기존 파드(OLD ver.)를 정지시키고 신규 파드(NEW ver.)를 실행시키기
+        - Canary Deployment(점진적 업데이트)
+            # 기존 파드(OLD ver.)와 일부 파드의 버전 업그레이드를 진행시켜 테스트 진행(양 버전이 공존)
+    <라벨을 이용한 카나리 배포>
+        - 기존 버전과 동일한 디플로이먼트에서 라벨 정보 중 버전 정보를 임의의 버전으로 다르게 생성
+            # 기존 라벨(app: web, ver: stable), 카나리 라벨(app: web, ver: canary)
+                ~ 서비스(네트워크)가 기존 파드와 카나리 파드를 모두 바라볼 수 있게 해줘야 함
+            # 카나리 디플로이먼트는 레플리카 개수를 1개부터 시작
+        - 기존 파드와의 서비스 혼용으로 테스트 해보고 점진적으로 카나리 레플리카 개수를 점차 늘려나감
+            # 문제 없다고 생각되면 카나리가 기존 파드를 전부 대체하고 기존 디플로이먼트 레플리카 0 처리
+                ~ kubectl scale deploy <기존 디플로이먼트 이름> --replicas=0
+    * Annotation
+        - 클러스터 시스템에서 필요한 정보를 표시할 때 사용
+            # rolling update
+                ~ metadata:
+                    annotations:
+                      kubernetes.io/chage-cause: version 1.15  --> deploy, rs 에서 --record 효과
+            # 코드 작성자 정보
+                ~ metadata:
+                    annotations:
+                      builder: "KDH(vataltrick@gmail.com)"
+                      buildDate: "2022-11-21"
+                      imageRegistry: https://hub.docker.com
+9. K8S 운영(컨피그맵과 시크릿)
+    * ConfigMap : 컨테이너의 구성 정보를 한 곳에 모아서 관리
+        - key:value 형태로 ConfigMap 에 저장되어 etcd 에서 관리
+    <컨피그맵 생성>
+        - kubectl create configmap <이름> [--from-file /dir/file] [--from-literal key=value]
+            # 파일을 key 로 설정하면 파일 안의 데이터가 value 가 됨
+    <컨피그맵의 일부를 파드의 컨테이너에 적용>
+        - 파드를 생성하는 yaml 파일에서 spec:env: 하위에서 key 에 대한 value 를 configmap 에서 가져옴
+            # spec:
+                env:
+                - name: <파드에서 정의될 환경변수의 key 이름>
+                  valueFrom:
+                    configMapKeyRef:
+                      name: <컨피그맵 이름>
+                      key: <컨피그맵 내 key 이름>
+    <컨피그맵의 전체를 파드의 컨테이너에 적용>
+        - 파드를 생성하는 yaml 파일에서 spec:containers: 하위에서 envFrom: 선언
+            # spec:
+                containers:
+                  envFrom:
+                  - configMapRef:
+                      name: <컨피그맵 이름>
+    * Secret: 컨테이너가 사용하는 중요한 정보를 base64 인코딩해서 한 곳에 모아서 관리
+        - key:value(base64 encoded) 형태로 Secret 에 저장되어 etcd 에서 관리
+        - secret 의 최대 크기는 1MB
+    <시크릿 생성>
+        - kubectl create secret {docker-registry|generic|tls} <이름> [옵션]
+    <시크릿 내용을 파드의 컨테이너에 적용>
+        - 컨피그맵처럼 일부 또는 전체 적용을 yaml 파일에서 spec: 하위 레벨에 선언
+            # spec:
+                containers:
+                  env:
+                  - name: <key 이름>
+                    valueFrom:
+                      secretKeyRef:
+                        name: <시크릿 이름>
+                        key: <시크릿 내 key 이름>
+            # spec:
+                containers:
+                  envFrom:
+                  - secretRef:
+                      name: <시크릿 이름>
+10. K8S 운영(스토리지)
+    * Volume : 컨테이너의 파드에 바인딩되는 볼륨을 마운트하고 마치 로컬 파일시스템처럼 스토리지 접근
+        - 컨테이너의 이미지가 요구하는 볼륨 등이 파드 내에 없으면 실행 시 에러 발생 가능
+        - 파드(컨테이너)와 스토리지(볼륨)을 분리시켜서 운영하고 서로 연동시키는 걸 권장
+    <파드에서 스토리지 선언 yaml 형식>
+        - kind: Pod
+          spec:
+            volumes:  --> 파드에서 볼륨(스토리지) 선언
+            - name: <이름>
+              hostPath:
+                type: Directory
+                path: /hostdir or file
+            containers:
+              volumeMounts:  --> 파드 내 컨테이너에서 볼륨 마운트할 경로 지정
+              - name: <이름>
+                mountPath: /usr/share/nginx/html
+    * hostPath : 노드의 파일시스템의 디렉토리나 파일을 컨테이너에 마운트
+        - type 지시어 종류
+            # DirectoryorCreate : 디렉토리, 없으면 생성(kubelet 소유, 0755)
+            # Directory : 디렉토리, 없으면 에러
+            # FileorCreate : 파일, 없으면 생성(kubelet 소유, 0755)
+            # File : 파일, 없으면 에러
+    * emptyDir : 컨테이너 <-> 빈 볼륨(공유 디렉토리 개념) <-> 컨테이너
+        - volumes:
+          - name: <이름>
+            emptyDir: {}
+    * Shared Volume : 여러개의 파드들이 동일 데이터를 참조하기 위한 볼륨
+        - AWS EBS, Azure Storage, NFS volume 등...
+        - NFS : NFS 서버가 공유하는 디렉토리를 파드에 엑세스
+            # volumes:
+              - name: <이름>
+                nfs:
+                  server: <nfs 주소>
+                  path: <nfs 가 공유하고있는 디렉토리>
+    <NFS 자원 공유>
+        - 추가 HDD 디스크에 대한 디스크 작업
+            # lsblk -fp
+            # fdisk /dev/sdx,..  --> LVM 으로 파티션 ID 생성
+        - PV,VG,LV 생성
+            # pvcreate /dev/sdx1
+            # pvs
+            # vgcreate <VG이름> /dev/sdx1
+            # vgs
+            # lvcreate <VG이름> -n <LV이름> {-l 50%FREE | -L 5G}
+            # lvs
+        - 파일시스템 설정
+            # mkfs.ext4 /dev/<VG이름>/<LV이름>
+            # lsblk -fp
+        - /etc/fstab 등록
+            # blkid  --> UUID 확인하여 해당 값으로 마운트 설정 진행
+            # UUID=<LV UUID 정보>  <마운트포인트>  ext4  defaults  0 0
+        - 마운트
+            # mount -a
+    * PV(Persistent Volume) : 저장소 풀에 대한 볼륨
+        - NFS 의 공유 리소스를 클러스터 내 전역 리소스 형태의 볼륨으로 만들어줌
+            # kind: PersistentVolume
+              spec:
+                capacity:
+                  storage: <풀에서 관리할 저장소의 총 사이즈>
+                volumeMode: Filesystem
+                accessModes:
+                - ReadWriteMany  --> Once 는 단일 노드만, Many 는 다수 노드에서 접근 가능
+                storageClassName: manual
+                persistentVolumeReclaimPolicy: Delete  --> PVC 가 삭제될 경우 같이 삭제(기본값)
+                nfs:
+                  server: <NFS 서버 IP 혹은 서비스이름>
+                  path: <공유 디렉토리>
+            # ReclaimPolicy(반환정책) 종류
+                ~ Retain: PVC 가 삭제되어도 PV 보존
+                ~ Delete: PVC 가 삭제되면 PV 삭제
+    * PVC(PVClaim)
+        - PVC 를 통해서 사전 생성된 PV 의 리소스를 필요한 파드에 프로비저닝시킴
+            # kind:PersistentVolumeClaim
+              spec:
+                resources:
+                  requests:
+                    storage: <PV 사이즈>  --> 실제 PV 사이즈와 달라고 PV 사이즈로 자동조정됨
+                accessModes:
+                - ReadWriteOnce
+                - ReadWriteMany
+                storageClassName: manual

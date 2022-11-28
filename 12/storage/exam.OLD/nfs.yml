@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nfs-deployment
+  labels:
+    app: nfs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs
+  template:
+    metadata:
+      name: nfs-pod
+      labels:
+        app: nfs
+    spec:
+      nodeSelector:
+        role: nfs
+      containers:
+      - name: nfs-container
+        image: k8s.gcr.io/volume-nfs:0.8
+        ports:
+        - name: nfs
+          containerPort: 2049
+        - name: mountd
+          containerPort: 20048
+        - name: rpcbind
+          containerPort: 111
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nfs-server
+spec:
+  type: ClusterIP
+  clusterIP : 10.233.0.100
+  selector:
+    app: nfs
+  ports:
+  - name: nfs
+    port: 2049
+    targetPort: 2049
+  - name: mountd
+    port: 20048
+    targetPort: 20048
+  - name: rpcbind
+    port: 111
+    targetPort: 111

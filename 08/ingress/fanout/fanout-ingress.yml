@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-fanout-example
+  namespace: fanoutns
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: foo.bar.com
+    http:
+      paths:
+      - path: /foo
+        pathType: Prefix
+        backend:
+          service:
+            name: foo-service
+            port:
+              number: 4200
+      - path: /bar
+        pathType: Prefix
+        backend:
+          service:
+            name: bar-service
+            port:
+              number: 8080

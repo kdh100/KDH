@@ -1,0 +1,12 @@
+---
+- name: "Configuration for file."
+  hosts: kube
+  gather_facts: false
+  tasks:
+  - name: "Initiate configuration for $HOME/.vimrc"
+    copy:
+      src: files/vimrc.txt
+      dest: /root/.vimrc
+      owner: root
+      group: root
+      mode: '0644'

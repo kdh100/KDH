@@ -1,0 +1,12 @@
+# kubectl run web1 --image=nginx:1.14 --port=80
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx:1.14
+    ports:
+    - containerPort: 80
+      protocol: TCP

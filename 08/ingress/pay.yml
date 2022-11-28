@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pay-deploy
+  namespace: testns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pay
+  template:
+    metadata:
+      name: pay-pod
+      namespace: testns
+      labels:
+        app: pay
+    spec:
+      containers:
+      - name: pay-container
+        image: whatwant/node-web:1.0
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pay-service
+  namespace: testns
+spec:
+  selector:
+    app: pay
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080

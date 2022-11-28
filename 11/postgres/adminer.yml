@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer-deployment
+  labels:
+    app: adminer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adminer
+  template:
+    metadata:
+      name: adminer-pod
+      labels:
+        app: adminer
+    spec:
+      hostAliases:
+      - ip: "10.233.0.100"
+        hostnames:
+        - "postgres"
+      containers:
+      - name: adminer
+        image: adminer
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ADMINER_DEFAULT_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: adminer-configmap
+              key: adminer_default_server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminer-service
+  labels:
+    app: adminer-express
+spec:
+  selector:
+    app: adminer
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30000

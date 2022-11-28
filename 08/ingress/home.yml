@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-deploy
+  namespace: testns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: home
+  template:
+    metadata:
+      name: home-pod
+      namespace: testns
+      labels:
+        name: home
+    spec:
+      containers:
+      - name: home-container
+        image: httpd
+        ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-service
+  namespace: testns
+spec:
+  selector:
+    name: home
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80

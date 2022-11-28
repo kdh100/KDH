@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webui
+  template:
+    metadata:
+      name: deploy-pod-nginx
+      labels:
+        app: webui
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.14
+        ports:
+        - containerPort: 80
+          protocol: TCP

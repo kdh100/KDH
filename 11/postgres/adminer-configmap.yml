@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adminer-configmap
+data:
+  adminer_default_server: postgres

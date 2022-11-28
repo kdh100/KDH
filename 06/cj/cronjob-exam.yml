@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-exam
+spec:
+  schedule: "* * * * *"
+  startingDeadlineSeconds: 600
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: cronjob-job-exam
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - echo 'hello'; sleep 10; echo 'bye'
+          restartPolicy: Never

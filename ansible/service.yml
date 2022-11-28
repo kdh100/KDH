@@ -1,0 +1,14 @@
+---
+- name: "Disable the service."
+  hosts: kube
+  gather_facts: no
+  tasks:
+  - name: "httpd(80), named(53), vsftpd(21)"
+    service:
+      name: "{{ item }}"
+      state: stopped
+      enabled: no
+    with_items:
+    - httpd
+    - named
+    - vsftpd

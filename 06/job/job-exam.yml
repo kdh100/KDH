@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-centos
+spec:
+  completions: 3
+  parallelism: 3
+  activeDeadlineSeconds: 15
+  template:
+    metadata:
+      name: job-pod-centos
+    spec:
+      containers:
+      - name: centos-container
+        image: centos:7
+        command:
+          - "bash"
+        args:
+          - "-c"
+          - "echo 'Start the Pod'; sleep 10; echo 'Stop the Pod'"
+      restartPolicy: Never

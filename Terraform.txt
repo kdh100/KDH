@@ -73,7 +73,7 @@
               --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
             # sudo yum install -y terraform
 2. HCL(HashiCorp Configuration Language)
-    * 테라폼에서 사용하는 구성 언어로 JSON 구문으로 작성된 인프라 구성 파일 필요
+    * 주요 형식
     =====================================================================================
     // 한줄 주석 방법1
     # 한줄 주석 방법2
@@ -107,6 +107,70 @@
       myprojectname = format("%s is myproject name", var.project)
       //인라인(inline) 조건문도 지원합니다.
       credentials = var.credentials == "" ? file(var.credentials_file) : var.credentials
+    }
+    =====================================================================================
+    * 변수
+        - 입력 변수 : 어떤 함수에 인자(element) 값
+        - 출력 변수 : 어떤 함수의 출력(output) 값
+        - 지역 변수 : 특정 area 의 임시적인 값
+    * 변수 사용
+        - 테라폼 파일(.tf) 내에서 사용할 경우  --> parameter = var.<변수이름>
+        - 문자열 내에서 사용할 경우  --> ${변수이름}
+    * 변수 형식
+    =====================================================================================
+    variable "number_example" {
+      description = "An example of a number variable in Terraform"
+      type        = number
+      default     = 42
+    }
+
+    variable "list_example" {
+      description = "An example of a list in Terraform"
+      type        = list
+      default     = ["a", "b", "c"]
+    }
+
+    variable "list_number_example" {
+      description = "An example of a number list in Terraform"
+      type        = list(number)
+      default     = [1, 2, 3]
+    }
+
+    variable "map_example" {
+      description = "An example of a map in Terraform"
+      type        = map(string)
+      default     = {
+        key1 = "value1"
+        key2 = "value2"
+        key3 = "value3"
+      }
+    }
+
+    variable "object_example" {
+      description = "An example of a structural type in Terraform"
+      type        = object ({
+        name      = string
+        age       = number
+        tags      = list(string)
+        enabled   = bool
+      })
+      default     = {
+        name      = "kim"
+        age       = 32
+        tags      = ["a", "b", "c"]
+        enabled   = true
+      }
+    }
+
+    variable "server_port" {
+      description = "The Port the server will use for HTTP requests"
+      type        = number
+      default     = 8080
+    }
+
+    output "public ip" {
+      description = "The public IP address of the web server in AWS"
+      value       = aws_instance.example.public_ip
     }
     =====================================================================================
 3. AWS 구성
@@ -150,7 +214,8 @@
             # profile:default 선택
                 ~ 정상 접속 시 EXPLORER 창에 AWS 리소스 확인 가능
 5. 테라폼 예제
-    * EC2 인스턴스를 시작하기
+    * 단일 웹 서버 배포하기
+    <테라폼 파일 생성>
         - vi main.tf
         =============
         provider "aws" {
@@ -158,15 +223,49 @@
         }
 
         resource "aws_instance" "example" {
-          ami           = "ami-0fb653ca2d3203ac1"  --> AWS AMI catalog 에서 검색 가능
-          instance_type = "t2.micro"  --> 프리 티어 인스턴스 타입 선택
+          ami                    = "ami-0fb653ca2d3203ac1"  --> AWS AMI 카탈로그에서 검색
+          instance_type          = "t2.micro"
+          vpc_security_group_ids = [aws_security_group.instance.id]
+
+          user_data = <<-EOF
+                      #!/bin/bash
+                      echo "Hello, World" > index.html
+                      nohup busybox httpd -f -p 8080 &
+                      EOF
+
+          user_data_replace_on_change = true
+
           tags = {
             Name = "terraform-example"
           }
         }
+
+        resource "aws_security_group" "instance" {
+        
+          name = var.security_group_name  --> 출력 변수를 통해 인자 전달받음
+
+          ingress {
+            from_port   = 8080
+            to_port     = 8080
+            protocol    = "tcp"
+            cidr_blocks = ["0.0.0.0/0"]
+          }
+        }
+
+        variable "security_group_name" {
+          description = "The name of the security group"
+          type        = string
+          default     = "terraform-example-instance"
+        }
+
+        output "public_ip" {  --> terraform apply 시 해당 내용에 대한 결과값을 출력
+          description = "The public IP address of the instance"
+          value       = aws_instance.example.public_ip  --> terraform state show aws_instance.example
+        }
         =============
+    <테라폼 파일을 통한 리소스 시작>
         - terraform init
         - terraform plan
         - terraform apply
+    <테라폼 파일을 통한 리소스 삭제>
         - terraform destroy
-    * 

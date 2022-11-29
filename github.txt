@@ -1,0 +1,35 @@
+1. Github 사용법
+    * CI 순서
+        - pull --> 로컬 저장소에서 소스 코드 변경 --> commit --> push
+    * Git 원격 접근을 위한 인증 방법 2가지
+        1) 일반 로그인 정보(ID/PW)를 통한 원격 접근 인증
+        2) Access token 을 통한 보안 접근 인증
+            # 토큰값은 생성 당시에만 보여지기 때문에 주의
+    * CMD
+        - init : 현재 디렉토리를 로컬 저장소처럼 사용하기 위해 초기화 작업 진행
+            # git init
+                ~ ".git" 이라는 폴더가 생성되며 해당 폴더에 설정값 저장됨
+                ~ 초기화 작업 이후 git config --global user.email "이메일주소"|user.name "영문이름" 설정
+        - commit : 파일 변경 내용을 로컬 저장소에 저장
+            # git commit -m "A commit message nessecery required."
+        - push : 파일 변경 내용을 원격 저장소에 저장
+            # git push origin <로컬 저장소 이름>
+        - pull : 원격 브랜치의 내용을 현재 브랜치로 가져오기
+            # git checkout <브랜치 이름> ; git pull origin <동일한 이름의 원격 브랜치>
+        - merge : 다른 브랜치의 내용을 현재 브랜치에 병합시키기
+            # git checkout <브랜치 이름> ; git merge <다른 브랜치 이름>
+        - reset : 로컬 저장소 커밋 내용을 취소
+            # git reset
+        - status : 로컬 저장소 현재 상태 확인
+            # git status
+        - branch : 소스 코드 버전 관리 목적의 분기점
+            # git branch -b <브랜치 이름>
+                ~ 생성 후 해당 브랜치로 이동
+        - checkout : 브랜치 이동
+            # git checkout <브린치 이름>
+        - remote : 원격 저장소(https://github.com/ID/repos_name) 관련
+            # git remote -v
+            # git remote add|rm <이름> <https://github.com/ID>
+        - clone : 원격 저장소를 현재 디렉토리로 복사해오기
+            # git clone https://github.com/ID/repos_name
+        - 

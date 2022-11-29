@@ -6,7 +6,7 @@
                 ~ AWS, K8S, Github 등...
             # 물리적 시스템, VM, N/W 스위치, 컨테이너 같은 리소스를 프로비저닝, 업데이트, 파괴
         - 구성(Configuration)
-            # HCL(HashiCorp Configuration Language)을 사용하여 테라폼 용으로 작성된 코드
+            # 테라폼 용으로 작성된 코드
         - 공급자(Providers)
             # 리소스를 관리하는 데 사용하는 플러그인
         - 모듈(Modules)
@@ -109,3 +109,28 @@
       credentials = var.credentials == "" ? file(var.credentials_file) : var.credentials
     }
     =====================================================================================
+3. AWS 구성
+    * 계정 정보
+        - Root : vataltrick@naver.com
+        - URL : https://soldeskkdh.signin.aws.amazon.com/console
+        - IAM : terraform.user01
+        - PW : Soldesk1.
+        - Access Key : AKIAQ7APKNNQQUV3TCNR
+        - Region : us-east-2(ohio) --> Cloudshell 지원 리전(ap-northeast-1(도쿄) 리전도 지원)
+4. 테라폼 및 필수 패키지 설치
+    * 패키지 설치
+        - sudo yum install -y yum-utils
+        - sudo yum-config-manager \
+          --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+        - sudo yum install -y terraform
+        - terraform -version
+    * 테라폼 CMD 자동완성 설정
+        - terraform -install-autocomplete  --> ~/.bashrc 에 자동완성 설정 추가됨
+        - source ~/.bashrc
+    * AWS CLI 설치
+        - 적당한 디렉토리 이동
+        - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
+          -o "awscliv2.zip"
+        - unzip awscli2.zip
+        - sudo ./aws/install
+        - aws --version

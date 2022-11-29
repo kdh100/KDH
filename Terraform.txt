@@ -115,7 +115,8 @@
         - URL : https://soldeskkdh.signin.aws.amazon.com/console
         - IAM : terraform.user01
         - PW : Soldesk1.
-        - Access Key : AKIAQ7APKNNQQUV3TCNR
+        - Access Key : AKIAQ7APKNNQ44JGSCFZ
+        - Secret Access Key : 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
         - Region : us-east-2(ohio) --> Cloudshell 지원 리전(ap-northeast-1(도쿄) 리전도 지원)
 4. 테라폼 및 필수 패키지 설치
     * 패키지 설치
@@ -134,3 +135,38 @@
         - unzip awscli2.zip
         - sudo ./aws/install
         - aws --version
+    * Host OS(Linux) 의 Terraform 에서 AWS CLI 접근
+        - aws configure
+            # access key, secret access key 입력 후 us-ease-2, json 입력
+                ~ ~/.bashrc 에서 export 로 access key, secret access key 값을 변수로 지정해도 가능
+                ~ 명령어로 설정하는걸 권장
+        - aws configure list
+            # 만약 설정값이 리스트업 안된다면, ~/.bashrc 에 변수값 설정해줘야 정상 표기됨
+    * VScode 에서 terraform - awscli 연동
+        - VScode extension 설치
+            # AWS toolkit, terraform, terraform autocomplete
+        - AWS toolkit 설정
+            # Connect to AWS..
+            # profile:default 선택
+                ~ 정상 접속 시 EXPLORER 창에 AWS 리소스 확인 가능
+5. 테라폼 예제
+    * EC2 인스턴스를 시작하기
+        - vi main.tf
+        =============
+        provider "aws" {
+          region = "us-east-2"
+        }
+
+        resource "aws_instance" "example" {
+          ami           = "ami-0fb653ca2d3203ac1"  --> AWS AMI catalog 에서 검색 가능
+          instance_type = "t2.micro"  --> 프리 티어 인스턴스 타입 선택
+          tags = {
+            Name = "terraform-example"
+          }
+        }
+        =============
+        - terraform init
+        - terraform plan
+        - terraform apply
+        - terraform destroy
+    * 

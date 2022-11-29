@@ -67,6 +67,18 @@
     - SQS 주소체계
         # http://sqs.<AZ>.amazonaws.com/<12bit ID>/<QueueName>
 
+* AWS Lambda
+    - Increasing traffic scaling
+        # 람다 함수를 통한 서버리스 인프라를 구축한 상태일 때 트래픽 처리량을 더 늘리고 싶다면
+          추가 ENI 를 람다 함수에 연결시키면 된다!
+
+* AWS Config
+    - Managed rule
+        # 사용자가 지정 가능한 사전 정의 규칙에 따라 AWS 리소스들이 공통 모범 사례에 맞는지 평가
+          하는 관리 도구다. AMI 의 인가 여부 등을 빠르게 점검해볼 수 있다!
+        # 사전 정의 규칙의 범위와 일치하는 리소스의 구성이 변경되면 평가를 트리거 시키거나,
+          선택한 빈도에 따라 주기적인 평가를 트리거 시킬수도 있다.
+
 * CloudFormation
     - Application Management
         # 이 제품은 기본적으로 무료지만 생성된 서비스에 대해서만 요금을 받는다.
@@ -84,6 +96,9 @@
         # 실패한 Stack 에 대해서는 삭제하고 다시 새로 Stack 을 생성하여 진행해야 한다!
         # WaitCondition 구문을 사용하여 앞에서 진행한 프로세스가 다음으로 넘어가기 전에 필요한
           충분한 시간을 벌어들일 수 있다.
+    - Failing stack update
+        # 스택 업데이트에 실패하면서 롤백조차 실패했다면,
+          우선 롤백을 실패시킨 에러부터 해결한 뒤 콘솔에서 롤백 액션을 재개한다고 선택하면 된다!
     - Template
         # 사전 정의한 서비스나 옵션 등의 내용을 템플릿으로 저장하여 Stack 이 참고할 수 있게 한다.
           우선 실행되어야 하는 의존성 구동 여부는 Init 으로 가능하다. 
@@ -114,6 +129,9 @@
         # System Manager 의 Patch Manager 를 통해 일괄적인 리소스 패치가 가능하다.
           사용자들의 사용감 저하를 감소시키기 위해 패치 그룹에 속해있는 인스턴스들의 10 퍼센트에
           해당되는 인스턴스들만 패치를 진행시키는 방법을 적용시킬 수 있다.
+    - Session Manager
+        # System manager 의 Session Manager 를 통해 인스턴스에 원격 접속 세션을 연결할 수 있다.
+          SSH 접속 연결이므로 port 22 번은 열려있어야한다!(security-group or ACL)
 
 * VPC
     - Default settings
@@ -130,6 +148,9 @@
     - Overlaps IP communication
         # VPC 는 외부 인터넷과 통신 시 소스가 VPC 내의 네트워크 대역 그리고 서브넷들의 대역과 겹치는
           트래픽을 드랍시킨다.
+    - Endpoint between S3 to EC2 instance
+        # S3 에 엔드포인트를 생성하고 EC2 인스턴스에서 접근하기 위해서는 S3 access log 를 disable
+          시켜야 접근할 수 있다!
 
 * EC2
     - Choosing AZs
@@ -174,6 +195,8 @@
         # DisableApiTermination : 실수로 EC2 중지시키지 않게 설정할 수 있다.
         # 만약 인스턴스를 실행시키는 데 문제를 확인하고 트러블슈팅하기 위해서 정보가 필요하다면,
           EC2Resque 를 통해서 시스템 로그를 수집하고 분석하면 된다.
+        # 기본적으로 인스턴스가 먹통이 되고 시스템 점검 시 상태가 failed 라면,
+          인스턴스를 중지시키고 다시 시작시켜 새로운 호스트로 가동되는지 테스트 해보면 된다!
 
 * Auto Scaling Group
     - Cooldown period
@@ -205,6 +228,14 @@
               1) Launch Configuration with detailed monitoring flag=true 신규 생성
               2) Auto Scaling Group 을 새로 생성한 Configuration 으로 업데이트하기
               3) EC2 인스턴스의 Detailed Monitoring 활성화
+    - Scale based on the number of incoming requests
+        # EC2 인스턴스들의 활성화 요청에 대한 평균치 계산값을 Custom Metric 으로 하고,
+          이를 기반으로 한 simple scaling policy 를 사용하면 들어오는 요청 수에 따라 확장되도록
+          할 수 있다!
+    - Gradually shift traffic from old version to new version
+        # blue/green 배포 방식이나 canary 배포 방식처럼 점진적으로 구버전에서 신버전으로 트래픽 이동
+          이 필요할 경우, target tracking scaling policy 를 생성하여 어디에서 어디로 트래픽 이동이
+          되야하는지 지정해주면 된다.
     - Marked health check
         # 만약 수동으로 인스턴스를 리부팅시키거나 기타 이유로 Auto Scaling Group Health Check 가
           failed 나서 의도치 않게 인스턴스가 삭제되려고 한다면, 해당 인스턴스의 health 상태를
@@ -250,6 +281,11 @@
           ENI 속성에서 '인스턴스 종료시 삭제' 를 비활성화 시키고 새로 생성하여 인스턴스에 기본 ENI
           대신 연결해놓고, 장애가 발생할 경우 detach 하여 다른 정상 인스턴스에 attach 할 수 있다.
 
+* Storage Gateway
+    - Failing activation
+        # 스토리지 게이트웨이를 정상적으로 실행시키지 못한다면,
+          업로드 버퍼가 설정되어있지 않거나, 정확한 시간이 설정되어있지 않을때 실행되지 않을 수 있다!
+
 * EFS
     - Encryption
         # EFS 파일시스템을 암호화 하고 싶다면 신규 암화화된 EFS 파일시스템을 생성하고 기존의 EFS
@@ -287,8 +323,9 @@
 * S3
     - Regional self-replication
         # 동일 리전 내 S3 끼리는 데이터를 서로 자동으로 복제하여 관리한다
-    - Transfer data to S3 bucket
+    - Transfer acceleration
         # 클라이언트 <-> S3 버킷의 데이터 전송을 빠르고 안전하게 하기 위해 최적화해주는 기능이다.
+        # 캐싱 관리 기능으로 로컬에서 데이터 사용에 대한 퍼포먼스를 높힌다!
     - Resource Access Policy
         # S3 ACL : ACL Policy 를 이용하여 AWs 계정 또는 그룹, 사용자에 대한 접근 권한 설정
             ~ 버킷 또는 객체에 대한 ACL (폴더는 대상이 아니다!)
@@ -314,6 +351,10 @@
         # 실수로 지운 자료를 복구하고 싶다면,
           AWS S3 콘솔에서 삭제처리된 객체를 처리취소 하거나,
           S3 에 있는 lifecycle 규칙에 객체 삭제에 대한 설정 해제를 통해 복구활 수 있다!
+    - Notification for available to access glacier storaged file retrieve
+        # S3 glacier 에 저장된 파일에 접근하기 위해서는 일정 시간이 필요하다.
+          S3 이벤트 알림 기능을 통해 's3:ObjectCreated:Postevent' 에 대하여 SNS 알림을 보내게 설정
+          하고 구독해놓으면 파일 접근이 가능해질 때 알람을 받을 수 있다! 
     - Upload folder
         # S3 에 폴더를 업로드 하기 위해서는 Enhanced Uploader 옵션을 활성화 시켜야한다.
     - Serving private data through CloudFront
@@ -328,7 +369,6 @@
     - S3 Security monitoring
         # S3 버킷에 수상한 행동에 대해 확인하고 싶다면 S3 Analytics 기능을 활성화하여 분석하면 된다!
           추가로 S3 Server Access Logging 을 활성화하여 로그 전용 버킷에 로그를 저장시킨다!
-
 
 * RDS
     - Event Notification
@@ -475,6 +515,8 @@
           연결시키면 된다. 사용자 혹은 그룹은 한개 이상의 정책과 연결될 수 있다.
     - Security policy for privileged users
         # 다단계 인증 방식을 사용하고, 권한 계정을 위한 사용자를 생성하여 사용하면 좋다.
+    - Service control policies(SCPs) 를 통해 Organizations 내 특정 리소스에 접근하거나 행동을 하지
+      못하도록 제한할 수 있다.
     - Permission
         # IAM Role 을 통해 사용자가 접근 가능한 리소스를 설정하는 것이 가장 관리 좋은 방법이다.
         # 특정 인스턴스에 제한을 주고 싶다면, 인스턴스 생성 시 부여할 수 있는 '태그'를 통해서
@@ -495,7 +537,7 @@
 * SSO(Single-Sign On)
     - feature
         # 1 회의 인증으로 서비스 및 어플리케이션에 접근할 수 있는 인증 솔루션을 뜻한다.
-          AWS SSO 를 사용할 경우 권한 세트를 생성하고, 사용자 혹은 그룹에 대해 연결시켜 사용한다!
+          AWS SSO 를 사용할 경우 권한 세트를 생성하고, IAM 사용자 혹은 그룹에 대해 연결시켜 사용한다!
 
 * KMS(CMK; Customer Master Key)
     - Rotation period
@@ -507,6 +549,11 @@
         # 조직 내 다른 계정들과의 KMS key 를 공유하여 동일한 스토리지 암호화 및 암호화된 데이터에
           접근할 수 있도록 허용할 수 있다. key 정책에서 연관된 계정들의 KMS key 를 이용한 암호화
           및 암호화된 데이터 접근을 허용해주면 된다.
+
+* CloudHSM(Hardware Security Module)
+    - Symmetric|Asymmetric key management system
+        # 대칭|비대칭 암호화 작업 및 키 생성/저장/관리를 위한 보안 스토리지를 제공하는 컴퓨팅 장치로
+          기존 온프레미스 환경의 암호화 키도 마이그레이션 가능하다!
 
 * Disaster Recovery
     - RPO/RTO

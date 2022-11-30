@@ -343,6 +343,7 @@
             # AWS 환경에서 관계형 RDS 를 사용할 수 있는 서비스
             # HDD 고가용성 프로비저닝, DB 설정/패치/백업 자동 관리 서비스 제공
             # Lambda 서비스를 사용하여 Serverless 어플리케이션 + DB 쿼리 자동화 가능
+            # 1일의 보존 기간을 갖는 자동 백업 기능
         - AWS Aurora
             # 기업형 RDS 엔진(MySQL, PostgreSQL 호환)
                 ~ 기존 RDS 엔진보다 3~5배 빠름
@@ -367,6 +368,7 @@
         - 이러한 필요성은 현재 DB 모델에서는 처리하기 어려울 수 있음
         - 빅 데이터 분석에 필요한 데이터 웨어하우징 서비스
             # 단일 API 호출 작업으로 빅데이터 BI(Business Intelligent) 실현
+        - 1일의 보존 기간을 갖는 자동 백업 기능
     * DMS(DB Migration Service)
         - 원본 DB <-> 대상 DB 간 데이터 이동 서비스
             # 동종 DB 이거나 이종 DB 상관없이 지원 가능

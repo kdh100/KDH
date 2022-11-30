@@ -387,3 +387,31 @@
           tags = var.resource_tags
         }
         =============
+    * ASG launch configuartion 생성 및 수명주기 설정
+        - vi main.tf
+            # ASG 의 시작 구성은 변경될 수 없으나 테라폼에서 변경 시 apply 가 안되는 에러 발생
+            # create_before_destroy 옵션의 수명주기 설정을 사용하여 에러 상쇄 가능
+                ~ 테라폼에서의 변경점 적용 순서 : 이전 리소스 삭제 -> 변경 리소스 신규 생성
+                ~ 옵션 적용 : 변경 리소스 우선 생성 -> 이전 리소스 참조를 신규 리소스로 변경 후 삭제
+        =============
+        resource "aws_autoscaling_group" "example" {
+          launch_configuration = aws_launch_configuration.example.name
+          vpc_zone_identifier  = data.aws_subnets.default.ids
+
+          target_group_arns = [aws_lb_target_group.asg.arn]
+          health_check_type = "ELB"
+
+          min_size = 2
+          max_size = 10
+
+          tag {
+            key                 = "Name"
+            value               = "terraform-asg-example"
+            propagate_at_launch = true
+          }
+
+          lifecycle {
+            create_before_destroy = true
+          }
+        }
+        =============

@@ -608,3 +608,6 @@
         # Billing Management 콘솔에서 Cost Allocation 보고서 작성을 선택할 수 있다.(체크박스)
           그러면 AWS Lambda 함수를 통해서 리소스들의 메타데이터를 읽어들이고, DynamoDB 테이블에
           리소스에 지정된 특정 태그를 저장시킨다.
+    - breakdown of costs per project using Cost Explorer
+        # Cost Explorer 를 사용하여 프로젝트 별 비용 분석을 하기 위해선,
+          AWS Budget 과 cost allocation tags 를 모두 활성화 시켜 확인해야한다!

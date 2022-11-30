@@ -179,8 +179,8 @@
         - URL : https://soldeskkdh.signin.aws.amazon.com/console
         - IAM : terraform.user01
         - PW : Soldesk1.
-        - Access Key : AKIAQ7APKNNQ44JGSCFZ
-        - Secret Access Key : 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
+        - Access|Secret Access Key : AWS IAM 사용자 별 엑세스 키 생성 시 확인 가능
+            # 이 키값을 여기에 저장하면 AWS health dashboard 에서 경고 뜨면서 계정 권한 잠김
         - Region : us-east-2(ohio) --> Cloudshell 지원 리전(ap-northeast-1(도쿄) 리전도 지원)
 4. 테라폼 및 필수 패키지 설치
     * 패키지 설치

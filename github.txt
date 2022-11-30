@@ -33,6 +33,13 @@
         - clone : 원격 저장소를 현재 디렉토리로 복사해오기
             # git clone https://github.com/ID/repos_name
 2. 상황별 사용 가이드
+    * 깃 초기화 및 제어제외 파일 설정
+        - cd <작업디렉토리>
+        - git init
+        - touch .gitignore
+            # 제외할 파일 형태를 설정하면 하위 디렉토리의 모든 파일들에게 적용됨
+                ~ 가급적 최상위 디렉토리에서 선언
+        - git remote add origin https://github.com/kdh100/KDH.git
     * 로컬 브랜치 생성 및 원격 브랜치와 연동
         - git checkout -b <브랜치>
             # 로컬 브랜치 생성 및 이동

@@ -20,11 +20,12 @@ data "aws_ami" "ubuntu" {
 
 # 1. AWS Launch Configuration
 # * Web Server
-# * Security Group
+# * [v] Security Group
 resource "aws_launch_configuration" "example" {
   name          = "example_instance"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
+  security_groups = [aws_security_group.default.id]
 
   user_data = <<-EOF
     #!/bin/bash
@@ -38,7 +39,7 @@ resource "aws_launch_configuration" "example" {
 }
 
 # 2. Autoscaling Group
-resource "aws_autoscaling_group" "bar" {
+resource "aws_autoscaling_group" "example" {
   name                      = "example_asg"
   max_size                  = 10
   min_size                  = 2
@@ -50,11 +51,30 @@ resource "aws_autoscaling_group" "bar" {
 
 data "aws_subnets" "default" {
   filter {
-    name   = "vpc.id"
+    name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
 }
 
 data "aws_vpc" "default" {
   default = true
+}
+
+# 3. Security Group
+resource "aws_security_group" "default" {
+  description = "Default Security Group"
+  vpc_id      = data.aws_vpc.default.id
+  name        = "default_security_group"
+
+  ingress {
+    description = "Inbound 80/tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow 80/tcp"
+  }
 }

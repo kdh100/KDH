@@ -71,6 +71,8 @@
     - Increasing traffic scaling
         # 람다 함수를 통한 서버리스 인프라를 구축한 상태일 때 트래픽 처리량을 더 늘리고 싶다면
           추가 ENI 를 람다 함수에 연결시키면 된다!
+    - Capacity to run simultaneous job
+        # 동시에 여러 작업을 수행할 수 있도록 동시성(concurrency) 설정을 해줄 수 있다!
 
 * AWS Config
     - Managed rule
@@ -101,7 +103,11 @@
           우선 롤백을 실패시킨 에러부터 해결한 뒤 콘솔에서 롤백 액션을 재개한다고 선택하면 된다!
     - Template
         # 사전 정의한 서비스나 옵션 등의 내용을 템플릿으로 저장하여 Stack 이 참고할 수 있게 한다.
-          우선 실행되어야 하는 의존성 구동 여부는 Init 으로 가능하다. 
+          우선 실행되어야 하는 의존성 구동 여부는 Init 으로 가능하다.
+    - ChangeSets
+        # 변경 세트라는 일종의 개별 스택을 통해 기존에 서비스중인 스택의 리소스 등을 변경하는 등
+          업데이트시킬 수 있다. 변경 세트는 실행되기 전 스택의 어떤 변경 사항들이 존재하는지 미리
+          보여주기 때문에 변경점을 쉽게 파악할 수 있다!
     - Limitation
         # Stack 은 계정당 20개가 제한한다. Template 는 제한이 없다.
           Template, Parameter, Output, Resource description 의 글자수는 4096 으로 제한한다.
@@ -147,6 +153,10 @@
           를 엔드포인트로 지정할 수 있도록 설정해줘야 한다.
         # VPC 내부의 private subnet 이 외부로 나가기 위해서 필요한 건 NAT 를 통해 IGW 로 나가는
           방법이고, 이게 반드시 외부 네트워크의 연결성을 보장해준다고 할수는 없다.
+    - VPN connect without connect to public network
+        # VPC 내부 트래픽이 공인망을 거치지않고 다른 사이트의 접근을 위해서는 VPN 연결을 통해 가능하다.
+          이를 위해서 내부 서브넷들은 NAT 를 통해 IP 를 변환시켜 VPN 연결을 진행하면 되고,
+          공인망의 트래픽은 VPC 내부로 접근할 수 없는 상태가 된다.
     - VPC Wizard
         # VPC 마법사를 통해 생성할 경우 Public, Private 서브넷 설정이 포함되었을 경우 자동적으로
           퍼블릭 서브넷에 NAT 게이트웨이가 생성되고 Private 서브넷과 연결된다.
@@ -192,6 +202,9 @@
     - Checking Log in EC2 Console
         # 윈도우 기반 EC2 콘솔창에서는 최근 3건의 시스템 에러 로그를 확인 가능하고,
           리눅스 기반 EC2 콘솔창에서는 콘솔 출력 결과물만 보인다.
+    - Access control to EC2 instances
+        # EC2 인스턴스에 IAM 정책을 적용시켜 특정 사용자 혹은 그룹이 접근 요청하는걸 제어할 수 있고,
+          아니면 EC2 인스턴스 시 설정한 태그 정보에 따라 접근 제어하는 IAM 정책을 생성할 수도 있다!
     - Cost
         # 인스턴스가 리부팅 되는 경우는 요금이 부과되지 않는다.
           그러나 정지 후 재가동 하는 경우 요금이 부과될 수 있다...
@@ -359,10 +372,13 @@
         # 실수로 지운 자료를 복구하고 싶다면,
           AWS S3 콘솔에서 삭제처리된 객체를 처리취소 하거나,
           S3 에 있는 lifecycle 규칙에 객체 삭제에 대한 설정 해제를 통해 복구활 수 있다!
-    - Notification for available to access glacier storaged file retrieve
+    - Glacier storaged file retrieving to access
         # S3 glacier 에 저장된 파일에 접근하기 위해서는 일정 시간이 필요하다.
           S3 이벤트 알림 기능을 통해 's3:ObjectCreated:Postevent' 에 대하여 SNS 알림을 보내게 설정
           하고 구독해놓으면 파일 접근이 가능해질 때 알람을 받을 수 있다! 
+    - Glacier configuration
+        # 장기간 데이터 저장 목적의 Glacier 저장소에 데이터를 보관하려면,
+          vault lock policy 옵션으로 설정할 수 있다.
     - Upload folder
         # S3 에 폴더를 업로드 하기 위해서는 Enhanced Uploader 옵션을 활성화 시켜야한다.
     - Serving private data through CloudFront
@@ -457,6 +473,8 @@
           하나의 데이터처럼 취급한다. 분 단위로 시간이 조금 틀려도 하나로 취합해서 처리한다.
         # CloudWatch 콘솔에서 해당 지표들을 확인하고 싶으면,
           CloudWatch Event 에서 사용자 지표를 추가하여 대시보드로 확인하면 된다!
+    - HTTP request query monitoring on ALB
+        # CloudWatch 에서 로드밸런서에 대한 기본 지표를 통해 HTTP 요청 쿼리값의 내용을 확인해 볼 수 있다.
     - Detailed Monitoring
         # Basic Monitoring 은 매 5분마다 서비스로부터 데이터를 수신받을 수 있지만,
           Detailed Monitoring 은 매 1분마다 서비스에 대한 데이터를 수신받을 수 있다.
@@ -516,6 +534,7 @@
             ~ IAM 사용자 혹은 그룹에 영향받지 않는다.
         # 대시보드를 통해서 계정 상태를 파악하고 싶다면 모니터링 기능이 있는 계정을 사용해야한다.
           (Monitor-linked account)
+        # 그룹 내 특정 부서의 리소스를 허용/제한 시키려면 service control 정책을 사용하면 된다!
     - Password policy
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
     - Customer managed Policy
@@ -530,6 +549,12 @@
         # 특정 인스턴스에 제한을 주고 싶다면, 인스턴스 생성 시 부여할 수 있는 '태그'를 통해서
           제한하는 방법이 있다!
           "Condition": {"StringEquals": {"ec2:ResourceTag/InstanceType": "Tag"}}
+    - Active directory user in on-premises access to AWS
+        # 온프레미스 환경의 윈도우 AD 를 통해서 AWS 로의 접근을 제어를 하고 싶다면,
+          윈도우 AD 설정에서 AWS Direct Connect 를 사용하거나,
+        # 온프레미스 환경의 윈도우 AD 를 사용해서 AWS 로 접근하고 싶다면,
+          AWS Directory Service 를 사용해서 AD connector 를 생성, 적절한 정책을 가진 IAM 사용자를
+          생성하여 접근할 수 있게 하면 된다.
     - Limitation
         # 사용자 당 그룹제한 10개, 계정 당 사용자제한 5000개, 그룹제한 100개, 역할제한 250개
     - Mobile user calls to AWS
@@ -613,3 +638,6 @@
     - breakdown of costs per project using Cost Explorer
         # Cost Explorer 를 사용하여 프로젝트 별 비용 분석을 하기 위해선,
           AWS Budget 과 cost allocation tags 를 모두 활성화 시켜 확인해야한다!
+    - Determining reason to increase spend costs on AWS account
+        # AWS Trusted Advisor 를 통해 리소스 사용에 대한 추적과 AWS Budget 을 통해 비용 경보를
+          활성화시켜 계정 내에서 발생하는 비용에 대한 분석을 할 수 있다!

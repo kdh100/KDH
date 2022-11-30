@@ -32,4 +32,20 @@
             # git remote add|rm <이름> <https://github.com/ID>
         - clone : 원격 저장소를 현재 디렉토리로 복사해오기
             # git clone https://github.com/ID/repos_name
-        - 
+2. 상황별 사용 가이드
+    * 로컬 브랜치 생성 및 원격 브랜치와 연동
+        - git checkout -b <브랜치>
+            # 로컬 브랜치 생성 및 이동
+        - git push origin <동일브랜치>
+            # 원격에 동일 브랜치 생성
+        - git branch --set-upstream-to origin/<동일브랜치>
+            # 로컬 <-> 원격(upstream) 연동
+                ~ 상위레벨(upstream)로 지정하겠다는 의미
+    * 로컬 브랜치 삭제 및 원격 브랜치도 같이 삭제
+        - git checkout <삭제할브랜치>
+            # 로컬 브랜치 이동
+        - git branch -D <삭제할브랜치>
+            # 로컬 브랜치 삭제
+                ~ -D : 강제 삭제
+        - git push --delete origin <삭제할브랜치>
+            # 원격 브랜치 삭제

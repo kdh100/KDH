@@ -157,6 +157,8 @@
     - Endpoint between S3 to EC2 instance
         # S3 에 엔드포인트를 생성하고 EC2 인스턴스에서 접근하기 위해서는 S3 access log 를 disable
           시켜야 접근할 수 있다!
+        # VPC 엔드포인트를 사용하여 EC2 인스턴스에서의 제한적인 접근을 위한 정책으로는,
+          S3 버킷 정책을 통해 VPC 엔드포인트의 IP address 를 소스로 한 제한 정책을 만들면 된다.
 
 * EC2
     - Choosing AZs

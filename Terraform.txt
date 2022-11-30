@@ -54,8 +54,8 @@
                 }
               }
     * 테라폼 주요 CMD
-        - init(초기화), plan(점검), apply(자원생성)
-        - import(자원 -> 파일), state(파일관리), destroy(자원삭제)
+        - init(초기화), plan(작업목록), apply(자원생성), validate(문법점검)
+        - refresh(새로고침), import(자원 -> 파일), state(파일관리), destroy(자원삭제)
     * 테라폼 설치
         - 윈도우(choco 설치 후 terraform 설치)
             # powershell(관리자모드) 실행

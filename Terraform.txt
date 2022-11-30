@@ -117,63 +117,77 @@
         - 테라폼 파일(.tf) 내에서 사용할 경우  --> parameter = var.<변수이름>
             # 변수 파일을 생성하고 그 파일을 참조할 경우 main.tf 와 variable.tf 은 동일 디렉토리에 있어야함
         - 문자열 내에서 사용할 경우  --> ${변수이름}
+        - 변수에서 default 값을 지정하지 않으면 terraform apply 시 대화형 프롬프트로 변수 인자값을 요구함
+            # 동일 디렉토리 내 .tfvars 파일 안에서 입력 변수에 해당하는 값들을 미리 정의 가능
     * 변수 형식
-    =====================================================================================
-    variable "number_example" {
-      description = "An example of a number variable in Terraform"
-      type        = number
-      default     = 42
-    }
-
-    variable "list_example" {
-      description = "An example of a list in Terraform"
-      type        = list
-      default     = ["a", "b", "c"]
-    }
-
-    variable "list_number_example" {
-      description = "An example of a number list in Terraform"
-      type        = list(number)
-      default     = [1, 2, 3]
-    }
-
-    variable "map_example" {
-      description = "An example of a map in Terraform"
-      type        = map(string)
-      default     = {
-        key1 = "value1"
-        key2 = "value2"
-        key3 = "value3"
-      }
-    }
-
-    variable "object_example" {
-      description = "An example of a structural type in Terraform"
-      type        = object ({
-        name      = string
-        age       = number
-        tags      = list(string)
-        enabled   = bool
-      })
-      default     = {
-        name      = "kim"
-        age       = 32
-        tags      = ["a", "b", "c"]
-        enabled   = true
-      }
-    }
-
-    variable "server_port" {
-      description = "The Port the server will use for HTTP requests"
-      type        = number
-      default     = 8080
-    }
-
-    output "public ip" {
-      description = "The public IP address of the web server in AWS"
-      value       = aws_instance.example.public_ip
-    }
-    =====================================================================================
+        - vi variables.tf
+        =====================================================================================
+        variable "number_example" {
+          description = "An example of a number variable in Terraform"
+          type        = number
+          default     = 42
+        }
+    
+        variable "list_example" {
+          description = "An example of a list in Terraform"
+          type        = list
+          default     = ["a", "b", "c"]
+        }
+    
+        variable "list_number_example" {
+          description = "An example of a number list in Terraform"
+          type        = list(number)
+          default     = [1, 2, 3]
+        }
+    
+        variable "map_example" {
+          description = "An example of a map in Terraform"
+          type        = map(string)
+          default     = {
+            key1 = "value1"
+            key2 = "value2"
+            key3 = "value3"
+          }
+        }
+    
+        variable "object_example" {
+          description = "An example of a structural type in Terraform"
+          type        = object ({
+            name      = string
+            age       = number
+            tags      = list(string)
+            enabled   = bool
+          })
+          default     = {
+            name      = "kim"
+            age       = 32
+            tags      = ["a", "b", "c"]
+            enabled   = true
+          }
+        }
+    
+        variable "server_port" {
+          description = "The Port the server will use for HTTP requests"
+          type        = number
+          default     = 8080
+        }
+    
+        output "public ip" {
+          description = "The public IP address of the web server in AWS"
+          value       = aws_instance.example.public_ip
+        }
+        - vi terraform.tfvars
+        =====================================================================================
+        resource_tags = {
+          project     = "new-project",
+          environment = "test",
+          owner       = "me@example.com"
+        }
+    
+        ec2_instance_type = "t2.micro"
+    
+        instance_count = 3
+        =====================================================================================
 3. AWS 구성
     * 계정 정보
         - Root : vataltrick@naver.com
@@ -215,8 +229,7 @@
             # profile:default 선택
                 ~ 정상 접속 시 EXPLORER 창에 AWS 리소스 확인 가능
 5. 테라폼 예제
-    * 단일 웹 서버 배포하기
-    <테라폼 파일 생성>
+    * 단일 웹 서버 배포
         - vi main.tf
         =============
         provider "aws" {
@@ -264,9 +277,113 @@
           value       = aws_instance.example.public_ip  --> terraform state show aws_instance.example
         }
         =============
-    <테라폼 파일을 통한 리소스 시작>
-        - terraform init
-        - terraform plan
-        - terraform apply
-    <테라폼 파일을 통한 리소스 삭제>
-        - terraform destroy
+    * private,public subnet + nat/vgw + ec2/elb SG 포함된 ec2 인스턴스 구축
+        - vi main.tf
+        =============
+        terraform {
+          required_providers {
+            aws = {
+              source = "hashicorp/aws"
+            }
+          }
+        }
+
+        provider "aws" {
+          region  = var.aws_region
+        }
+
+        data "aws_availability_zones" "available" {
+          state = "available"
+        }
+
+        module "vpc" {
+          source  = "terraform-aws-modules/vpc/aws"
+          version = "2.64.0"
+
+          cidr = var.vpc_cidr_block
+
+          azs             = data.aws_availability_zones.available.names
+          private_subnets = slice(var.private_subnet_cidr_blocks, 0, var.private_subnet_count)
+          public_subnets  = slice(var.public_subnet_cidr_blocks, 0, var.public_subnet_count)
+
+          enable_nat_gateway = true
+          enable_vpn_gateway = var.enable_vpn_gateway
+
+          tags = var.resource_tags
+        }
+
+        module "app_security_group" {
+          source  = "terraform-aws-modules/security-group/aws//modules/web"
+          version = "3.17.0"
+
+          name        = "web-sg-project-alpha-dev"
+          description = "Security group for web-servers with HTTP ports open within VPC"
+          vpc_id      = module.vpc.vpc_id
+
+          ingress_cidr_blocks = module.vpc.public_subnets_cidr_blocks
+
+          tags = var.resource_tags
+        }
+
+        module "lb_security_group" {
+          source  = "terraform-aws-modules/security-group/aws//modules/web"
+          version = "3.17.0"
+
+          name        = "lb-sg-project-alpha-dev"
+          description = "Security group for load balancer with HTTP ports open within VPC"
+          vpc_id      = module.vpc.vpc_id
+
+          ingress_cidr_blocks = ["0.0.0.0/0"]
+
+          tags = var.resource_tags
+        }
+
+        resource "random_string" "lb_id" {
+          length  = 3
+          special = false
+        }
+
+        module "elb_http" {
+          source  = "terraform-aws-modules/elb/aws"
+          version = "2.4.0"
+
+          # Ensure load balancer name is unique
+          name = "lb-${random_string.lb_id.result}-project-alpha-dev"
+
+          internal = false
+
+          security_groups = [module.lb_security_group.this_security_group_id]
+          subnets         = module.vpc.public_subnets
+
+          number_of_instances = length(module.ec2_instances.instance_ids)
+          instances           = module.ec2_instances.instance_ids
+
+          listener = [{
+            instance_port     = "80"
+            instance_protocol = "HTTP"
+            lb_port           = "80"
+            lb_protocol       = "HTTP"
+          }]
+
+          health_check = {
+            target              = "HTTP:80/index.html"
+            interval            = 10
+            healthy_threshold   = 3
+            unhealthy_threshold = 10
+            timeout             = 5
+          }
+
+          tags = var.resource_tags
+        }
+
+        module "ec2_instances" {
+          source = "./modules/aws-instance"
+
+          instance_count     = var.instance_count
+          instance_type      = var.ec2_instance_type
+          subnet_ids         = module.vpc.private_subnets[*]
+          security_group_ids = [module.app_security_group.this_security_group_id]
+
+          tags = var.resource_tags
+        }
+        =============

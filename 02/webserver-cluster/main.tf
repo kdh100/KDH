@@ -20,7 +20,7 @@ data "aws_ami" "ubuntu" {
 
 # 1. AWS Launch Configuration
 # * Web Server
-# * [v] Security Group
+# * Security Group
 resource "aws_launch_configuration" "example" {
   name          = "example_instance"
   image_id      = data.aws_ami.ubuntu.id
@@ -30,7 +30,7 @@ resource "aws_launch_configuration" "example" {
   user_data = <<-EOF
     #!/bin/bash
     echo "My Web Server" > index.html
-    nohup busybox httpd -f -p 8080 &
+    nohup busybox httpd -f -p 80 &
   EOF
 
   lifecycle {
@@ -40,7 +40,7 @@ resource "aws_launch_configuration" "example" {
 
 # 2. Autoscaling Group
 resource "aws_autoscaling_group" "example" {
-  name                      = "example_asg"
+  name                      = var.asg_name
   max_size                  = 10
   min_size                  = 2
   health_check_type         = "ELB"
@@ -64,17 +64,113 @@ data "aws_vpc" "default" {
 resource "aws_security_group" "default" {
   description = "Default Security Group"
   vpc_id      = data.aws_vpc.default.id
-  name        = "default_security_group"
+  name        = var.sg_name
 
   ingress {
     description = "Inbound 80/tcp"
-    from_port   = 80
-    to_port     = 80
+    from_port   = var.http_port
+    to_port     = var.http_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name = "allow 80/tcp"
+  }
+}
+
+# 4. ELB
+# * 4-1) lb
+# * 4-2) listener
+# * 4-3) listener rule
+# * 4-4) target group
+resource "aws_lb" "example" {
+  name               = var.lb_name
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = data.aws_subnets.default.ids
+
+  tags = {
+    Name = "test1"
+  }
+}
+
+resource "aws_security_group" "alb" {
+  name        = var.lb_sg_name
+  description = "Allow HTTP inbound traffic"
+
+  ingress {
+    description      = "HTTP from VPC"
+    from_port        = var.http_port
+    to_port          = var.http_port
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "test1"
+  }
+}
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.example.arn
+  port              = var.http_port
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "404 not found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "example" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.example.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+}
+
+resource "aws_lb_target_group" "example" {
+  name        = var.lb_tg_name
+  port        = var.http_port
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.default.id
+
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 15
+    timeout             = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
   }
 }

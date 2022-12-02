@@ -113,7 +113,7 @@
           Template, Parameter, Output, Resource description 의 글자수는 4096 으로 제한한다.
           Template 에는 최대 60개의 Parameter 와 60개의 Output 이 포함될 수 있다.
     - Required components
-        # 구성에 필요한 유일한 요소는 리소스!
+        # 구성에 필요한 유일한 요소는 리소스(resource)!
     - Reusable, repeatable, safe template
        # 재사용 가능하며 안전하게 반복 사용이 가능한 단일 템플릿을 구성하기 위해선
          parameter(매개변수)를 통해서 리소스를 프로비저닝 하면 된다.
@@ -335,14 +335,14 @@
           IO 를 발생시켜 IOPS 를 발생시켜준다.
     - PIOPS from EBS volume
         # 예상(Provisioned)할 수 있는 최적의 성능(IOPS)은 다음과 같다.
-          볼륨 크기(100G) * 30 = 최대 IOPS(3000 IOPS)
+          볼륨 크기(100, 기본단위 1G = 1) * 30 = 최대 IOPS(3000 IOPS)
         # 그 밖에 성능에 영향을 줄 수 있는 요소들은 네트워크(10G 이상), EC2 인스턴스가 EBS 최적 제품인지,
           어플리케이션의 성능 등이 있다.
     - Snapshot
         # 스냅샷 생성이 진행중일 때에도 EBS 볼륨은 계속 사용이 가능하다.
 
 * S3
-    - Regional self-replication
+    - A Regional self-replication
         # 동일 리전 내 S3 끼리는 데이터를 서로 자동으로 복제하여 관리한다
     - Transfer acceleration
         # 클라이언트 <-> S3 버킷의 데이터 전송을 빠르고 안전하게 하기 위해 최적화해주는 기능이다.

@@ -335,7 +335,7 @@
             # Instant Retrival : 가끔 엑세스할 때 + 빠른 복원 가능
             # Flexible : 가끔 엑세스할 때 + 검색 옵션(빠른(1~5분), 보통(3~5시간), 대량(5~12시간))
             # Deep Archive : 가끔 엑세스할 때 + 가장 저렴 + 검색 느림(12시간 내)
-    * RDS(Relational Database Service)
+    * RDS(Relational Database Service; SQL)
         - 관계형 DB 는 데이터 - 데이터 간의 연관된 방식(행, 열로 구분)을 저장하고 쿼리
             # 정해진 테이블에는 동일한 속성(Attribute)값만 들어가있어야 하는 고정적인 방식
             # 정적 스키마를 사용하므로 모든 테이블의 데이터를 유연하게 수정하지 못함
@@ -352,7 +352,7 @@
                 ~ 비용 최대 1/10 로 절감
             # 3개의 복사본을 3개의 AZ에 복제하고 S3 에 지속적으로 백업
                 ~ 읽기 전용
-    * NRDS(Non-Relational Database Service)
+    * NRDS(Non-Relational Database Service; NoSQL)
         - 비관계형 DB 는 키를 생성하여 그 위에 데이터를 저장하고 쿼리(키-값)
             # 키 위에 저장되는 속성값은 모두 동일한 속성값을 가질 필요가 없어 유연함
         - AWS DynamoDB

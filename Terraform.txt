@@ -519,9 +519,91 @@
           }
         }
         =====================
-6. 테라폼 상태 관리
-    * 테라폼 파일(.tf)을 통해 배포하면 작업 디렉토리에 terraform.tfstate 라는 파일이 생성됨
-        - 생성된 인프라에 대한 정보 저장
+6. 테라폼 상태 관리(.tfstate, .lock.hcl)
+    * 테라폼 파일(.tf)을 통해 배포하면 작업 디렉토리에 .tfstate, .lock.hcl 이라는 파일들이 생성됨
+        - 생성된 인프라에 대한 정보 저장 및 해당 설정에 대한 잠금 설정 파일
         - 프라이빗 API 로 테라폼 내부에서만 사용
             # 조작하려면 terraform import, terraform state CMD 로 사용
-        
+    * 해당 상태 저장 파일을 통해 테라폼 리소스에 대한 구성 및 변경이 가능
+        - 공용 엑세스가 가능한 스토리지에 저장시켜 원격으로 공유 가능
+            # 원격으로 공용 엑세스할 경우 충돌 등의 동시성 문제 발생 가능
+                ~ 이를 해결하기 위해 .lock 잠금 파일이 존재(일종의 토큰 링 구조에서의 토큰 개념)
+        - AWS S3 버킷에 tfstate 파일을 저장시키고, AWS DynamoDB 에 lock 파일을 저장
+    * 테라폼에서 제공하는 백엔드 설정으로 이러한 상태 파일들의 저장 및 상태 정보를 구성 가능
+        - 테라폼(.tf) 파일에서 선언 방식 예제
+            ===============================
+            provider "aws" {
+              region = "us-east-2"
+            }
+
+            backend "s3" {
+              bucket         = "s3 bucket 이름"  --> 사전에 버킷은 생성해야함
+              key            = ".tfstate 파일 위치"
+              region         = "us-east-2"
+              dynamodb_table = "dynamodb table 이름"  --> 사전에 테이블은 생성해야함
+              encrypt        = true  --> 상태 파일이 s3 bucket 에 저장될 때 암호화할지 여부
+            }
+            ===============================
+        - 스토리지 생성 예제
+            ===============
+            # 버킷 생성 리소스 정의
+            resource "aws_s3_bucket" "terraform_state" {
+              bucket = "bucket-1974-0710"
+
+              force_destroy = true
+
+              versioning {
+                enabled = true
+              }
+
+              server_side_encryption_configuration {
+                rule {
+                  apply_server_side_encryption_by_default {
+                    sse_algorithm = "AES256"
+                  }
+                }
+              }
+
+              tags = {
+                Name = "My bucket"
+              }
+            }
+
+            # 테이블 생성 리소스 정의
+            resource "aws_dynamodb_table" "terraform-locks" {
+              name           = "terraform-locks"
+              billing_mode   = "PAY_PER_REQUEST"
+              hash_key       = "LockID"
+
+              attribute {
+                name = "LockID"
+                type = "S"  --> 값은 S(string), N(number), B(binary) 중 택일
+              }
+            }
+            ===============
+7. 테라폼 모듈(module)
+    * 모듈(module) : 함께 사용되는 여러 리소스의 컨테이너
+        - main.tf, variables.tf, outputs.tf 등이 포함된 구성 파일 모음의 단일 디렉토리
+    * 모듈 종류
+        - 루트(Root)
+            # 모듈 내 최상위 디렉토리로 반드시 존재해야 함
+        - 하위(Child)
+            # 모듈 내 다른 모듈들을 호출하여 사용하는 경우를 지칭
+        - 게시(Published)
+            # 테라폼 레지스트리(https://terraform.io)에 업로드된 모듈
+    * 모듈 생성
+        - 변수 파일(variables.tf)
+            # default 의 value 를 지정하지 않고 해당 묘듈을 사용할 사용자가 직접 지정하게 할 것
+        - 출력 파일(outputs.tf)
+            # 출력 결과는 되도록 많이 생성할 것
+8. 테라폼 반복문
+    * 특정 유형을 반복하거나 if문을 사용하거나 무중단 배포를 할 수 있도록 다양한 반복문 제공
+        - count 메타 변수
+            # resource 를 count 만큼 반복
+        - for_each 와 for 표현식
+            # for_each : resource 내에서 리소스 및 inline 블록을 반복
+            # for : list 와 map 반복
+        - create_before_destroy 같은 lifecycle 블록
+            # 
+        - 3항 연산자
+        - 다양한 함수들

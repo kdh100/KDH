@@ -23,8 +23,6 @@
         # health-check 를 통해서 인스턴스의 건강 상태를 점검할 수 있다.
           만약 건강하지 못한 인스턴스를 감지했을 경우 알람을 발생시키고 싶다면,
           AWS/ApplicationELB UnhealthyHostCount >= 1 (1 이상) 으로 조건을 설정하면 된다!
-    - EBS Volume create limitation
-        # AWS 계정 당 EBS 볼륨 생성 갯수 제한은 5000 개다!
     - Activity monitoring
         # CloudWatch Metrics, S3 버킷에 저장된 ELB Logs, API 호출을 통한 CloudTrail 을 통해
           사용자는 ELB 활동에 대한 모니터링 정보를 수집할 수 있다.
@@ -77,6 +75,8 @@
         # 동시에 여러 작업을 수행할 수 있도록 동시성(concurrency) 설정을 해줄 수 있다!
 
 * AWS Config
+    - Compliance check
+        # AWS 리소스들의 설정 등이 적합한 규정을 준수하고 있는지 점검할 수 있는 서비스
     - Managed rule
         # 사용자가 지정 가능한 사전 정의 규칙에 따라 AWS 리소스들이 공통 모범 사례에 맞는지 평가
           하는 관리 도구다. AMI 의 인가 여부 등을 빠르게 점검해볼 수 있다!
@@ -96,7 +96,7 @@
           방식으로 인스턴스를 업데이트시킬 수 있다!
     - Stack
         # Stack 만들어 정해진 순서에 맞추어 배포가 진행된다!(In-Orderly-Deployments)
-          만약 생성 중 하나랄도 실패하면 모든 생성 리소스가 Rollback 된다.
+          만약 생성 중 하나라도 실패하면 모든 생성 리소스가 Rollback 된다.
         # 실패한 Stack 에 대해서는 삭제하고 다시 새로 Stack 을 생성하여 진행해야 한다!
         # WaitCondition 구문을 사용하여 앞에서 진행한 프로세스가 다음으로 넘어가기 전에 필요한
           충분한 시간을 벌어들일 수 있다.
@@ -155,7 +155,7 @@
           를 엔드포인트로 지정할 수 있도록 설정해줘야 한다.
         # VPC 내부의 private subnet 이 외부로 나가기 위해서 필요한 건 NAT 를 통해 IGW 로 나가는
           방법이고, 이게 반드시 외부 네트워크의 연결성을 보장해준다고 할수는 없다.
-    - VPN connect without connect to public network
+    - VPN connect without through out of public network
         # VPC 내부 트래픽이 공인망을 거치지않고 다른 사이트의 접근을 위해서는 VPN 연결을 통해 가능하다.
           이를 위해서 내부 서브넷들은 NAT 를 통해 IP 를 변환시켜 VPN 연결을 진행하면 되고,
           공인망의 트래픽은 VPC 내부로 접근할 수 없는 상태가 된다.
@@ -208,8 +208,8 @@
         # EC2 인스턴스에 IAM 정책을 적용시켜 특정 사용자 혹은 그룹이 접근 요청하는걸 제어할 수 있고,
           아니면 EC2 인스턴스 시 설정한 태그 정보에 따라 접근 제어하는 IAM 정책을 생성할 수도 있다!
     - Cost
-        # 인스턴스가 리부팅 되는 경우는 요금이 부과되지 않는다.
-          그러나 정지 후 재가동 하는 경우 요금이 부과될 수 있다...
+        # 인스턴스가 리부팅(rebooting) 되는 경우는 요금이 부과되지 않는다.
+          그러나 정지 후 재가동(stop and restart) 하는 경우 요금이 부과될 수 있다...
     - Auto-Recovery
         # EC2 인스턴스 자동 복구 기능을 사용하려면 EBS 볼륨만을 사용하고, 인스턴스 Tenancy 를 기본으로
           설정해줘야 한다.
@@ -224,7 +224,7 @@
 * Auto Scaling Group
     - Cooldown period
         # Desired Capacity 에 의해 한 번 스케일링이 끝나고 다음 스케일링을 진행하기까지 기다리는 시간
-          으로 이 시간동안은 CloudWatch Alarm 등으로 값이 변동되지 않는다.
+          으로 이 시간 동안은 CloudWatch Alarm 등으로 값이 변동되지 않는다.
     - Aggregate Statistics
         # 동일 그룹 내 존재하는 모든 EC2 인스턴스에 대한 집계된 통계를 확인할 수 있다.
           모든 리전에서 수집되므로, CloudWatch 의 단일 리전 내 통계보다 광범위하다.
@@ -340,6 +340,8 @@
           볼륨 크기(100, 기본단위 1G = 1) * 30 = 최대 IOPS(3000 IOPS)
         # 그 밖에 성능에 영향을 줄 수 있는 요소들은 네트워크(10G 이상), EC2 인스턴스가 EBS 최적 제품인지,
           어플리케이션의 성능 등이 있다.
+    - EBS Volume create limitation
+        # AWS 계정 당 EBS 볼륨 생성 갯수 제한은 5000 개다!
     - Snapshot
         # 스냅샷 생성이 진행중일 때에도 EBS 볼륨은 계속 사용이 가능하다.
 
@@ -358,7 +360,8 @@
         # S3 버전을 통해서 각 객체를 따로 관리할 수 있으며, 사용자 혹은 서버 측에서 암호화를 진행할 수 있다.
           서버 측 암호화는 데이터를 받는 서비스에 의해 암호화하여 데이터가 저장되는 방식이고,
           사용자 측 암호화는 데이터가 S3 로 전달될 때 해당 로컬에서 암호화하는 방식이다.
-        # S3 Key 를 사용한 AES-256 방식의 SSE-S3 은 비용이 없으며, KMS key 를 사용한 SSE-KMS 은 비용이 있다.
+        # S3 Key 를 사용한 AES-256 방식의 SSE(Server-side-encryption)-S3 은 비용이 없으며,
+          KMS key 를 사용한 SSE-KMS 은 비용이 발생한다.
           사용자 제공 Key 를 사용한 SSE-C 도 있다.
         # 사용자의 SSE-C 키를 S3 가 받아서 사용하기 위해선 S3 버킷 버전 관리를 활성화해야만 한다!
           그리고 사용자의 키를 S3 버킷은 저장해두질 않으므로 사용자는 매번 키를 변경해야한다.
@@ -460,7 +463,7 @@
 
 * CloudWatch
     - Default metric
-        # CPI, DISK I/O, Data Transfer 는 기본 지표값이다.
+        # CPU, DISK I/O, Data Transfer 는 기본 지표값이다.
             ~ Linux 환경에서 Monitoring sciprt 를 사용하면 인스턴스의 MEM, Disk Usage 를 확인할 수 있다.
             ~ 권장 방식은 Monitoring Agent 를 인스턴스에 설치하여 사용하는 것이다.
     - Custom metric
@@ -514,7 +517,7 @@
         # Health Dashboard 는 최근 이벤트를 표시해 활성 이벤트를 관리하고, 미리 알림을 표시해서 예정된
           활동을 계획할 수 있도록 도와준다. AWS 리소스에 영향을 줄 수 있는 변경 사항에 대해 확인하고
           문제 진단과 해결의 지침을 잡을 수 있다.
-        # Health Dashboard 의 RSS 피드를 사용자의 대시보드로 통합시켜서 사용할 수 있다!
+        # Health Dashboard 의 RSS 피드를 사용자의 개별대시보드로 통합시켜서 사용할 수 있다!
 
 * AWS SWF(Simple WorkFlow)
     - 클라우드 어플리케이션들의 작업 조율 및 상태 관리 서비스
@@ -523,10 +526,6 @@
     - 빅데이터 처리/분석 관리형 클러스터 플랫폼 서비스
         # 데이터 집약적(Data-intensive) 작접 수행을 위해 원하는 만큼의 용량을 프로비저닝 할 수 있다.
             ~ data-mining, machine-learning, log analysis, scientific simulation 등
-
-* AWS Config
-    - Compliance check
-        # AWS 리소스들의 설정 등이 적합한 규정을 준수하고 있는지 점검할 수 있는 서비스
 
 * Security Group
     - Default
@@ -543,7 +542,6 @@
             ~ IAM 사용자 혹은 그룹에 영향받지 않는다.
         # 대시보드를 통해서 계정 상태를 파악하고 싶다면 모니터링 기능이 있는 계정을 사용해야한다.
           (Monitor-linked account)
-        # 그룹 내 특정 부서의 리소스를 허용/제한 시키려면 service control 정책을 사용하면 된다!
     - Password policy
         # 루트 사용자가 사용자들이 각자의 패스워드를 변경할 수 있도록 설정할 수 있다.
     - Customer managed Policy
@@ -551,8 +549,9 @@
           연결시키면 된다. 사용자 혹은 그룹은 한개 이상의 정책과 연결될 수 있다.
     - Security policy for privileged users
         # 다단계 인증 방식을 사용하고, 권한 계정을 위한 사용자를 생성하여 사용하면 좋다.
-    - Service control policies(SCPs) 를 통해 Organizations 내 특정 리소스에 접근하거나 행동을 하지
-      못하도록 제한할 수 있다.
+    - Service control policies(SCPs)
+        # 서비스 컨트롤 정책을 통해 Organizations 내 특정 리소스에 접근하거나 행동을 하지못하도록
+          제한할 수 있다.
     - Permission
         # IAM Role 을 통해 사용자가 접근 가능한 리소스를 설정하는 것이 가장 관리 좋은 방법이다.
         # 특정 인스턴스에 제한을 주고 싶다면, 인스턴스 생성 시 부여할 수 있는 '태그'를 통해서

@@ -23,6 +23,8 @@
         # health-check 를 통해서 인스턴스의 건강 상태를 점검할 수 있다.
           만약 건강하지 못한 인스턴스를 감지했을 경우 알람을 발생시키고 싶다면,
           AWS/ApplicationELB UnhealthyHostCount >= 1 (1 이상) 으로 조건을 설정하면 된다!
+    - EBS Volume create limitation
+        # AWS 계정 당 EBS 볼륨 생성 갯수 제한은 5000 개다!
     - Activity monitoring
         # CloudWatch Metrics, S3 버킷에 저장된 ELB Logs, API 호출을 통한 CloudTrail 을 통해
           사용자는 ELB 활동에 대한 모니터링 정보를 수집할 수 있다.
@@ -406,6 +408,9 @@
         # RDS 는 자동 백업 기능이 있어 장애 발생 시 백업본을 통해 빠르게 복원할 수 있다.
           보관 기간은 1일이다. (스냅샷이 아니라 그냥 백업!)
     - Failover switch to standby replicas
+        # RDS 에서는 Multi-AZ 배포를 통해 고가용성을 보장할 수 있다.
+          main DB 와 replica DB 를 각각의 AZ 에 배포시키면, main DB -> replica DB 로 데이터를 실시간으로
+          복제시켜 동일하게 맞춰놓는다.
         # Main DB 와 replica DB 로 운영 시 오직 Main DB 만 운영되고, 장애 발생 시 replica 가 Main 이 된다.
           하지만 데이터는 동기화되어 문제없다!
         # DNS 서비스를 통해 장애 발생 시 기존 DB 인스턴스에서 백업 DB(replicas)로 라우팅이 조정된다.
@@ -484,9 +489,12 @@
         # AWS 서비스에 대한 이벤트를 감지하고 감지된 이벤트에 대해 특정 이벤트를 발생시킬 수 있는
           서비리스 서비스
         # EventBus 를 통해 이벤트를 지정하여 특정 리소스에 대한 이벤트 발생 트리거를 지정할 수 있다.
-    - Graph display
+    - Graph display on CloudWatch console
         # 사용자 지표 혹은 AWS 서비스를 통해서 생성된 데이터 지표를 그래프 형식으로 볼 수 있다.
           CloudWatch 콘솔에서 URL 혹은 북마크를 제공한다!
+        # CloudWatch 콘솔에서 특정 시간에 대한 지표 등을 확인하고 싶으면 상단의 custom 을 눌러
+          절대(Absolute) 탭에서 시간에 대한 값을 변경하면 원하는 날짜의 알람을 확인할
+          수 있다.
         # Y 축 지표를 바꾸고 싶다면 Switch 를 통해서 바꾸면 된다.
     - Test alarm with CLI
         # 사용자는 CLI 를 통해서 알람 상태를 임시적으로 변경하여 테스트해볼 수 있다.
@@ -498,7 +506,8 @@
         # 사용자가 CloudWatch 에서 요금 계산 추적 기능을 활성화하면 예상 요금이 계산되어 지표 형태의
           데이터(Metric Data)로 매일 여러 차례 전송되며 이런 지표 데이터는 14일 간 저장된다.
           모든 서비스에 대한 예상 요금 + 전체 예상 요금이 포함되며 이러한 지표를 통해 결제 알람을
-          구성할 수 있다. 사용자는 이런 알람 경보에 대한 임계값을 지정하고 수정할 수 있다.
+          구성할 수 있다. 이 지표 데이터에 대한 값은 전 세계 모든 리전에 대한 통합 비용이다.
+          이사용자는 이런 알람 경보에 대한 임계값을 지정하고 수정할 수 있다.
 
 * AWS Service Health Dashboard
     - Has visibility into maintencance event perfomed by AWS

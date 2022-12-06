@@ -1,0 +1,85 @@
+[패키지]
+    * 사운드
+        - OSS 
+        - ALSA
+        - totem : 미디어 플레이어
+    * 스캐너
+        - SANE, XSANE
+    * 프린터
+        - CUPS
+        - LPRng
+        - systemV 
+    * PDF
+        - evince
+    * 이미지
+        - eog : 이미지 뷰어
+        - GIMP : 이미지 편집/생성/변환
+        - ImageMagicK : 비트맵 이미지 뷰어, 생성/편집 가능
+        - gwenview
+    * 파일 관리
+        - nautilus(GNOME 기반), dolpin
+        - konqueror(KDE 기반)
+    * 라이브러리
+        - QT, GTK+
+        - Xlib : X 서버와 대화 가능한 C 언어로 구현된 라이브러리, 저수준
+        - XCB : X 프로토콜 접근 가능, Xlib 보다 향상된 제품
+    * 온라인 패키지 관리
+        - debian : apt-get
+        - redhat : yum
+        - suse : zypper
+    * 오프라인 패키지 관리
+        - debian : dpkg
+        - redhat : rpm
+        - suse : YaST
+
+[디스크]
+    * LVM(PV -> VG -> LV)
+        - PE : PV 가 나누어진 블록 단위, 4mb
+        - LE : LV 가 나누어진 블록 단위, PE 와 1:1
+        - PV : 물리 볼륨 -> 논리 볼륨으로 LVM 에서 사용할 수 있게 변환
+        - VG : PV 를 모아 만든 논리적 그룹
+        - LV : VG 의 볼륨을 사용자가 필요한 만큼 할당해 만들어지는 논리적 볼륨
+    * RAID
+
+[명령어]
+    * 사운드
+        - alsactl : 사운드 카드 설정
+    * 프린터
+    <systemV>
+        - Ip : 작업 요청
+        - Ipstat : 작업 queue 확인
+        - cancel : 작업 취소
+    <Unix>
+        - Ipr : 
+        - Ipc : 
+        - Ipq : 
+        - Iprm : 
+    * 패키지
+    <rpm; redhat>
+        - rpm -e : 패키지 삭제
+            # --nodeps : 의존성 무시 삭제
+        - rpm -U : 패키지 설치 및 업그레이드
+        - rpm -V : 무결성 검사
+    <yum; redhat>
+        - yum list : 전체 패키지 정보 확인
+        - yum history : 작업 이력 확인
+        - yum grouplist : 그룹별 정보 확인
+        - yum groupinfo : 그룹명과 관련된 패키지 정보
+    * 아카이브
+        - tar tvf : 아카이브 내용 확인
+        - tar cvf : 아카이브 생성
+        - tar xvf : 아카이브 해제
+            # .zx : j
+            # .xz : J
+            # .gz : z
+            # .zip : Z
+        - tar -c : 파일/디렉토리 묶어서
+        - tar -C : 디렉토리 변경
+    * 컴파일
+        - configure : 소스 파일 설정
+            # 작업 후 생성되는 파일은 'Makefile'
+        - make : 소스 파일을 컴파일
+            # MySQL 은 cmake 으로 컴파일
+        - make clean : 이전 컴파일 내용 삭제
+        - make disclean : automake 에서 자동 분류되지 않은 나머지 파일 삭제
+        - make install : 컴파일된 파일로 설치

@@ -604,6 +604,12 @@
             # for_each : resource 내에서 리소스 및 inline 블록을 반복
             # for : list 와 map 반복
         - create_before_destroy 같은 lifecycle 블록
-            # 
         - 3항 연산자
         - 다양한 함수들
+9. 테라폼 조건문
+    * jinja2 방식의 if 조건문으로 boolean 형태의 표현식
+        - %{ if 조건}표현식1%{ else }표현식2%{ endif }
+            # key 에 대한 value 를 조건문으로 작성 가능
+                ~ (조건 ? 3 : 1)
+                ~ 조건식이 참이면 3, 거짓이면 1
+            # 조건이 참이면 표현식1, 반대면 표현식2

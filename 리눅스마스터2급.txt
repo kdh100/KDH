@@ -65,7 +65,7 @@
         - ps -l : 백그라운드 프로세스의 우선순위 확인
 
     * 시그널
-        - kill -9 %2 : 9번 시그널을 2번 백그라운드 잡에 보냄
+        - kill %2 : 기본값으로 15번 시그널을 2번 백그라운드 잡에 보냄
             # 1(SIGHUP) : 재시작
             # 2(SIGINT) : 프로세스 종료, Ctrl + C
             # 3(SIGQUIT) : 종료, Ctrl + \
@@ -101,6 +101,8 @@
         - (오프라인) rpm
             # rpm -e sendmail : sendmail 패키지를 제거하는 명령
             # rpm -U sendmail : sendmail 패키지를 설치하거나 기존 패키지 업그레이드
+                ~ -i : 설치
+                ~ -F : 기존 패키지가 있는 경우에만 설치
             # rpm -V sendmail : 파일이 침입자에 의해 권한 획득이나 변조가 되었는지 검사
                 ~ --nodeps : 의존성 무시
 
@@ -135,8 +137,8 @@
 [시스템]
 
     * 프로세스
-        - CentOS 7 이전 : init
-        - CentOS 8 이상 : systemd
+        - CentOS 6 이하 : init
+        - CentOS 7 이상 : systemd
 
     * 운영체제
         - 리눅스 기반
@@ -147,8 +149,8 @@
 
     * 환경변수
         - '~/.bash_profile' 에 PATH 등록하여 사용
-        - env : 글로벌 변수 조회
-        - set : 현재 변수 조회
+        - env : 글로벌 쉘 변수 조회
+        - set : 현재 쉘 변수 조회
 
     * 권한
         - 기본 파일 권한 : 0644(-rw-r--r--)
@@ -165,6 +167,8 @@
         - Striping : 연속된 데이터를 여러 디스크에 나눠 저장
         - /etc/fstab : 파일시스템 정보를 가지고 있는 파일
             # <파일시스템 장치> <마운트 포인트> <파일시스템> <옵션> <덤프> <파일점검 옵션>
+        - 파일시스템 점검 및 복구
+            # xfs_repair
     
     * LVM (Logical Volume Manager)
         - PE : PV에서 나누어 사용하는 일종의 블록, 4MB로 할당

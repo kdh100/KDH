@@ -591,8 +591,8 @@ while number != 4:
     print(prompt)
     number = int(input("Enter number : "))
 
-left_coffee = 5     # 남은 커피 수
-left_money = 2000   # 남은 돈
+left_coffee = 50     # 남은 커피 수
+left_money = 10000   # 남은 돈
 coffee_price = 300  # 커피 한개의 가격
 needs = 0           # 사용자가 커피를 살 때 필요한 돈
 while True:
@@ -609,26 +609,44 @@ while True:
         left_coffee = left_coffee - input_coffee_num
         # 커피 자판기에 남은 돈 = 남은 돈 - 커피 살 돈
         left_money = left_money - output_left_money
+        # 커피 자판기의 남은 돈이나 남은 커피의 양이 부족한 경우 몽땅 돌려주기
+        if left_money <= 0 or left_coffee <= 0:
+            print("+---------------------------------------------------")
+            print("| 커피 자판기에는 남은 돈이 없거나 남은 커피가 없습니다.")
+            print("| 관리자에게 문의 하세요.")
+            print("+----------------------------------------------------")
+            print("넣은 돈을 몽땅 돌려 드릴께요. : %d" % input_money)
+            break
+        # 커피 자판기가 줘야할 잔돈이 남은 돈보다 클 경우 
+        elif output_left_money > left_money:
+            print("+------------------------------------------------")
+            print("잔돈이 부족합니다. 관리자에게 문의하세요.")
+            print("넣은 돈을 몽땅 돌려 드릴께요. : %d" % input_money)
+            print("+------------------------------------------------")
+            break
+        # 커피 자판기가 줘야할 커피가 남은 커피보다 클 경우
+        elif output_coffee > left_coffee:
+            print("+------------------------------------------------")
+            print("커피가 부족합니다. 관리자에게 문의하세요.")
+            print("넣은 돈을 몽땅 돌려 드릴께요. : %d" % input_money)
+            print("+------------------------------------------------")
+            break
+        # 정상적으로 사용자에게 줘야 하는 부분
+        else:
+            print("커피를 %d 개 줍니다. 그리고 거스름 돈은 %d 입니다." % (output_coffee, output_left_money))
+            # 자판기의 상태를 나타내는 부분
+            print("+--------------------------------")
+            print("| 남은 커피 수량: %d" % left_coffee)
+            print("| 남은 돈: %d" % left_money)
+            print("+---------------------------------\n")
     # 2) 커피 살 돈을 부족하게 넣은 경우
     elif input_money < needs:
         lack_of_money = needs - input_money
-        print("커피 살 돈이 부족합니다. %d 만큼 더 넣어 주세요.\n" % lack_of_money)
-        continue
-    # 사용자에게 주어야 하는 부분
-    print("커피를 %d개 줍니다. 그리고 거스름 돈은 %d입니다." % (output_coffee, output_left_money))
-    # 자판기의 상태를 나타내는 부분
-    print("+--------------------------------")
-    print("| 남은 커피 수량: %d" % left_coffee)
-    print("| 남은 돈: %d" % left_money)
-    print("+---------------------------------\n")
-    # 커피 자판기의 남은 돈이나 남은 커피의 양이 부족한 경우 몽땅 돌려주기
-    if left_money < 0 or left_coffee < 0:
-        print("+---------------------------------------------------")
-        print("| 커피 자판기에는 남은 돈이 없거나 남은 커피가 없습니다.")
-        print("| 관리자에게 문의 하세요.")
-        print("+----------------------------------------------------")
+        print("+-----------------------------------------------")
+        print("커피 살 돈 %d 만큼 부족합니다." % lack_of_money)
         print("넣은 돈을 몽땅 돌려 드릴께요. : %d" % input_money)
-        break
+        print("+-----------------------------------------------")
+        continue
 
 encbook = {'a': '#', 'p': 's', 'l': '?', 'e': 'k'}
 decbook = {}  # {(v: k) for (k, v) in encbook.items()}

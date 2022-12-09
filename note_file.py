@@ -605,10 +605,6 @@ while True:
         output_left_money = input_money - needs
         # 줄 커피 개수 = 고객이 입력한 거피 개수
         output_coffee = input_coffee_num
-        # 커피 자판기에 남은 커피 개수 = 남은 커피 개수 - 고객이 요청한 커피 개수
-        left_coffee = left_coffee - input_coffee_num
-        # 커피 자판기에 남은 돈 = 남은 돈 - 커피 살 돈
-        left_money = left_money - output_left_money
         # 커피 자판기가 줘야할 잔돈이 남은 돈보다 클 경우 
         if output_left_money > left_money:
             print("+------------------------------------------------")
@@ -625,6 +621,10 @@ while True:
             break
         # 정상적으로 사용자에게 줘야 하는 부분
         else:
+            # 커피 자판기에 남은 커피 개수 = 남은 커피 개수 - 고객이 요청한 커피 개수
+            left_coffee = left_coffee - input_coffee_num
+            # 커피 자판기에 남은 돈 = 남은 돈 - 커피 살 돈
+            left_money = left_money - output_left_money
             print("커피를 %d 개 줍니다. 그리고 거스름 돈은 %d 입니다." % (output_coffee, output_left_money))
             # 자판기의 상태를 나타내는 부분
             print("+----------------------------------")

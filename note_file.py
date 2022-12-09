@@ -739,9 +739,8 @@ for y in citys:
 for z in long_citys:
     print("Long Name City : " + z)
 print("Short Name City :", end=" ")  # 출력 종료 후 아래 조건문 출력이 이어서 출력
-for z in short_citys:
-    print(z, end= " ")
-print("\n")
+for a in short_citys:
+    print(a, end= " ",)
 
 !# Function(함수)
 

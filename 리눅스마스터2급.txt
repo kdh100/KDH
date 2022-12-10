@@ -4,17 +4,17 @@
         - OSS(hannu) : 리눅스,유닉스 계열 사운드 카드 지원 시스템
         - ALSA(jaroslav) : 사운드 카드용 장치 드라이버, 자동 구성 및 관리
             # alsactl : 사운드 카드 컨트롤 CMD
-        - totem : 미디어 플레이어
+        - totem : GNOME 기반, 미디어 플레이어
     
     * 이미지
-        - eog : 이미지 뷰어
-        - GIMP : 이미지 편집/생성/변환
+        - eog : GNOME 기반, 이미지 뷰어
+        - GIMP : GNOME 기반, 이미지 편집/생성/변환
         - ImageMagicK : 비트맵 이미지 뷰어
-        - Gwenview : 
+        - Gwenview : KDE 기반, 이미지 뷰어
     
     * 스캐너
         - SANE : 스캐너, 비디오 캠 등 이미지 관련 API
-        - XSANE : 
+        - XSANE : X-윈도우 기반 스캐너, GTK+ 라이브러리로 만들어짐
     
     * 프린트
         - CUPS : 애플 계열 프린팅 시스템
@@ -25,19 +25,18 @@
             # cancel : 작업 취소
         - Unix :
             # Ipr : 작업 요청
-            # Ipc : 프린트 컨트롤 프로그램
+            # Ipc : 프린트 인쇄 가능 상태 확인
             # Ipq : 프린트 큐 확인
-            # Iprm : 
+            # Iprm : 프린트 큐 삭제
     
     * 파일관리
-        - evince : PDF 확인
+        - evince : GNOME 기반, PDF 확인
         - nautilus : GNOME 기반
-        - dolpin : 
-        - konqueror : 
+        - dolpin : KDE 기반, 에뮬레이터
+        - konqueror : KDE 기반, 웹브라우저 및 파일 관리 프로그램
     
     * 라이브러리
-        - GT : 
-        - GTK+ : 
+        - GTK+ : GUI 환경을 다루기 위한 라이브러리
         - Xlib : X 서버와 대화 가능한 C 언어로 구현된 라이브러리, 저수준
         - XCB : X 프로토콜 접근 가능, Xlib 보다 상위 제품
     
@@ -139,7 +138,7 @@
 
 [편집기]
 
-    * pico(아보일) --> nano()
+    * pico(아보일) --> nano(알레그레타)
     * vi(빌 조이) : 가장 먼저 개발된 편집기
         - -r : 비정상 종료된 .SWAP 파일 복구(스왑파일 편집)
         - set list : 개행문자($), TAB문자(^|) 등 특수문자 표시
@@ -182,7 +181,6 @@
     * 환경설정
         - /etc/profile : 시스템 전역(모든 사용자) 환경설정, 
         - /etc/bashrc : 시스템 전역(모든 사용자) 환경설정, bash 실행 시 적용
-        - 
         - '~/.bash_profile' 에 PATH 등록하여 사용
         - env : 글로벌 환경 변수 조회
         - set : 현재 쉘 변수 조회

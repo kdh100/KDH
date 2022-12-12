@@ -313,6 +313,11 @@
     - Encryption
         # EFS 파일시스템을 암호화 하고 싶다면 신규 암화화된 EFS 파일시스템을 생성하고 기존의 EFS
           파일시스템에서 데이터를 복사해와야 한다.
+    - Consistency, Read frequently, Lifecycle to age and content type
+        # EFS 는 다중 인스턴스에서 동시 접근이 가능하며, 파일 잠금 기능을 통해 동시 접근 시 충돌에
+          방지할 수 있으며, 높은 IOPS 와 처리량(PPS) 를 보장하는 스토리지 서비스다.
+          lifecycle management 를 통해서 일정 기간동안 접근하지 않은 데이터에 대해서 IA 스토리지로
+          마이그레이션을 자동으로 처리하는 기능을 가지고 있다!
 
 * EBS
     - Out of space
@@ -565,6 +570,13 @@
           생성하여 접근할 수 있게 하면 된다.
     - Limitation
         # 사용자 당 그룹제한 10개, 계정 당 사용자제한 5000개, 그룹제한 100개, 역할제한 250개
+    - Temporary security credential
+        # MFA 인증을 통한 API 호출 보안 설정이 가능하다.
+          IAM 정책에서 MFA 토큰을 확인하지 못할 경우 AWS 서비스 접근이 불가능한 것으로 정책을 설정
+          할 수 있는데, API 호출 또한 막을 수 있다.
+          사용자는 CLI 를 통해서 get-session-token 명령어를 통해 임시 자격 증명을 받아와야한다.
+          이렇게 받아온 임시 자격 증명은 기본 900초(15분), 최대 36시간의 만료 시간을 가지며,
+          기본값으로는 12시간이다.
     - Mobile user calls to AWS
         # 모바일을 통한 AWS 동작 요청 등은 IAM 사용자 또는 역할 등으로 제한하지말고 인증 제공자
           (Google, Amazon, Facebook 등)를 통해서 로그인 등으로 인증하는 방식을 추천한다.

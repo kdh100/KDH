@@ -119,6 +119,10 @@
     - Reusable, repeatable, safe template
        # 재사용 가능하며 안전하게 반복 사용이 가능한 단일 템플릿을 구성하기 위해선
          parameter(매개변수)를 통해서 리소스를 프로비저닝 하면 된다.
+    - Stall while in create a stack
+        # 설치 도중에 만약 멈추거나 지체되어 하염없이 기다리게 되면 문제가 되므로,
+          템플릿 작성시 CreationPolicy 구문으로 timeout 항목을 넣어 전체 설치에 대한 제한 시간을
+          걸어 제한 시간안에 설치가 완료되지 않으면 전체 롤백이 될 수 있게 설정할 수 있다!
 
 * OpsWorks
     - Configuration management
@@ -308,6 +312,15 @@
     - Failing activation
         # 스토리지 게이트웨이를 정상적으로 실행시키지 못한다면,
           업로드 버퍼가 설정되어있지 않거나, 정확한 시간이 설정되어있지 않을때 실행되지 않을 수 있다!
+
+* AWS Direct Connect(DX)
+    - Access from on-premises apps to AWS services
+        # 전용 회선 서비스로 세 가지의 가상 인터페이스(VIF)를 제공하는데,
+          AWS 공용 서비스(S3, RDS 등)에 접근하기 위한 Public 가상 인터페이스,
+          AWS VPC 내 리소스에 접근하기 위한 Private 가상 인터페이스,
+          AWS VPC 내 Transit Gateway(IGW, VGW)와 통신을 위한 Transit 가상 인터페이스가 있다.
+        # 온프레미스 환경에서 AWS 로의 접근은 AWS DX 국사와 온프레미스 라우터간의 Dot1Q Vlan 연결
+          로 통신하며, AWS DX 국사는 VIF 를 통해서 AWS 에 접근한다.
 
 * EFS
     - Encryption
@@ -514,12 +527,23 @@
     - Disable alarm with CLI/API
         # 사용자가 알람이 발생하는것을 일시적으로 피하기 위해서 CLI 에서 mon-disable-alarm-actions,
           API 에서 DisableAlarmActions 을 실행해서 잠시 끌 수 있다.
+    - Set alarm when EC2 service limits are close to being reached
+        # Trusted Advisor 를 사용해서 알람을 발생시킬 수도 있다.
+          AWS Lambda 를 통해 Trusted Advisor 서비스 확인을 지속적으로 새로고침하고,
+
     - Monitoring of estimated charges(Billing Alarm)
         # 사용자가 CloudWatch 에서 요금 계산 추적 기능을 활성화하면 예상 요금이 계산되어 지표 형태의
           데이터(Metric Data)로 매일 여러 차례 전송되며 이런 지표 데이터는 14일 간 저장된다.
           모든 서비스에 대한 예상 요금 + 전체 예상 요금이 포함되며 이러한 지표를 통해 결제 알람을
           구성할 수 있다. 이 지표 데이터에 대한 값은 전 세계 모든 리전에 대한 통합 비용이다.
           이사용자는 이런 알람 경보에 대한 임계값을 지정하고 수정할 수 있다.
+
+* AWS Trusted Advisor
+    - Set alarm EC2 service limit being reached
+        # Trusted Advisor 의 제한 모니터링 기능을 통해서 EC2 서비스에 대한 상태 확인 및 알람 발생이
+          가능하다. AWS Lambda 를 사용해서 지속적으로 상태 확인을 시키고, Trusted Advisor 는 계산을
+          통해서 상태에 대한 평가(OK, WARN, ERROR)를 내린다. 또한 알람을 발생시키기 위한 자원들을
+          자동으로 프로비저닝하여 손쉽게 중앙 관리식 자원 모니터링 시스템을 배포할 수 있다.
 
 * AWS Service Health Dashboard
     - Has visibility into maintencance event perfomed by AWS

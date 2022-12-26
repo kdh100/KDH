@@ -8,6 +8,8 @@
         # 100 MB 이상의 데이터를 빠르게 업로드
     - Amazon Athena
         # S3 에 저장된 로그 분석
+    - AWS Glue
+        # 데이터를 검색/수집/시각화하기 위한 서비스, 크롤러를 사용하여 데이터를 수집, 테이블 형식으로 저장
     - aws:PrincipalOrgID
         # 버킷 정책에 추가 + 조직 ID 에 대한 참조로 조직 한정 접근 제한 가능
     - Gateway VPC endpoint

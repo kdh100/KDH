@@ -13,6 +13,13 @@
     - Data Stream : 메시지(데이터) 수집 특화
     - Data Firehose : 메시지(데이터) -> S3 전송/저장
 
+* AWS SQS
+    - duplicated message
+        # FIFO 를 통한 선입선출 설정을 하면 방지할 수 있으며,
+          FIFO 가 아닌 API 를 통해서는 ChangeMessageVisibility 를 통해서 제한 시간을 늘리고 삭제하면 된다.
+            ~ SQS 의 메시지가 구독자에 의해 처리될 때, 다른 구독자의 처리 프로세스에 의해 재처리 되지 않도록
+              메시지가 삭제될 수 있도록 표시되는 제한 시간을 늘려주면 됨
+
 * AWS Lambda
     - single lambda -> split into two lambda
         # 단일 람다 함수로 처리하기에 부하량이 많을 경우, 두개의 람다 함수로 나누어 기능을 분배시켜
@@ -30,6 +37,12 @@
     - 머신러닝을 통해 이미지 또는 동영상같은 미디어 데이터로부터 원하는 정보/데이터를 식별/분석해주는 서비스
         # Augmented AI(A2I) 를 통해서 human review workflow 를 활성화 시켜 자동 분석된 데이터에 대해
           사람이 직접 분석된 데이터를 검증할 수 있도록 만들 수 있음
+
+* AWS Textract
+    - 텍스트 파일에서 특정 문자열 등의 데이터를 추출하기 위한 서비스
+
+* AWS Comprehend Medical
+    - 텍스트 파일에서 의학 관련 문자열 등의 의학 데이터를 추출/분석하기 위한 서비스
 
 * AWS AppFlow
     - Appflow 는 SaaS 어플리케이션들과 AWS 서비스들을 연동시킬 수 있는 서비스
@@ -55,7 +68,7 @@
     - aws:PrincipalOrgID
         # 버킷 정책에 추가 + 조직 ID 에 대한 참조로 조직 한정 접근 제한 가능
     - Gateway VPC endpoint
-        # EC2 인스턴스에 퍼블릭 인터넷 연결 없이 접근 가능
+        # EC2 인스턴스에 퍼블릭 인터넷 연결 없이 접근 가능, 비용 절감 효과
     - File Gateway
         # 온프레미스 환경의 데이터를 S3 에 연동하여 사용 가능
     - End-user install utility for access S3
@@ -69,12 +82,26 @@
 * AWS EFS
     - 동시 처리 : 사용자가 동시에 다른 데이터 접근/처리 가능
 
-* AWS Aurora
-    - 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
+* AWS RDS
+    - AWS Aurora
+        # 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
+    - Proxy instance
+        # 말그대로 DB 인스턴스 앞에 별도의 프록시 인스턴스를 둬서 DB 에 대한 접속 관리를 해주는 것
+          DB 인스턴스의 장애로 인한 다운타임 혹은 서비스 저하를 최소한으로 줄여주는 장점이 있음
+
+* AWS DynamoDB
+    - capacity mode
+        # 트래픽 예측이 가능한 경우 -> provisioning mode
+          트래픽 예측이 불가능한 경우 -> on-demand mode, auto-scaling 기능 있음
+    - point-to-time recovery
+        # 특정 시간대로 DB 테이블을 복원시킬 수 있는(되돌릴 수 있는) 기능
 
 * AWS FSx
     - for Windows File Server
         # 윈도우 파일 공유 서버와 호환할 수 있는 서비스
+
+* AWS Backup
+    - AWS 서비스에 대한 백업 기능 제공 서비스, 백업된 데이터는 별도의 백업볼트에 저장됨
 
 * AWS Network Firewall
     - 트래픽 검사 및 트래픽 필터링 : VPC 에 대한 규칙 생성하여 가능
@@ -103,7 +130,9 @@
         # API Gateway 에 인증서를 연결하고,
           해당 API Gateway endpoint 를 도메인 이름과 연결시킨 뒤,
           Route 53 에 해당 도메인 이름에 대한 A record 를 생성하면,
-          API calls '도메인이름' -> API Gateway(with 인증서 = SSL(HTTPS)) -> 백엔드 도달      
+          API calls '도메인이름' -> API Gateway(with 인증서 = SSL(HTTPS)) -> 백엔드 도달
+        # ELB 에 적용시켜 SSL/TLS 인증을 통한 보안 통신이 가능
+            ~ 이 경우, Security Policy 적용이 필요함.
 
 * AWS Config
     - detect not-properly configured Resource

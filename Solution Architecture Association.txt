@@ -6,7 +6,10 @@
     - S3 에 저장된 로그 등을 분석하고 보고서 작성에 필요한 데이터를 추출, 작성 가능한 서비스
 
 * AWS Glue
-    - 데이터를 검색/수집/시각화하기 위한 서비스, 크롤러를 사용하여 데이터를 수집, 테이블 형식으로 저장
+    - 데이터를 수집(Extract)/변환(transform)/출력 및 저장(load)하기 위한 서비스, 크롤러를 통해 데이터 수집
+        # 예약된 작업의 Job 실행 가능
+        # Bookmark 기능을 사용하여, Job 이 이전에 처리했던 데이터를 중복 처리하지 않게 방지
+            ~ 이전 처리했던 데이터를 기점으로 추가된 신규 데이터에 대해서만 처리(증분식 처리)
 
 * AWS Kinesis
     - Data Analytics : 메시지(데이터) 수집/처리/분석 가능
@@ -14,13 +17,18 @@
     - Data Firehose : 메시지(데이터) -> S3 전송/저장
 
 * AWS SQS
-    - duplicated message
-        # FIFO 를 통한 선입선출 설정을 하면 방지할 수 있으며,
-          FIFO 가 아닌 API 를 통해서는 ChangeMessageVisibility 를 통해서 제한 시간을 늘리고 삭제하면 된다.
-            ~ SQS 의 메시지가 구독자에 의해 처리될 때, 다른 구독자의 처리 프로세스에 의해 재처리 되지 않도록
-              메시지가 삭제될 수 있도록 표시되는 제한 시간을 늘려주면 됨
+    - duplicated message proceed
+        # FIFO 를 통한 선입선출 설정을 하면 방지하거나,
+          ChangeMessageVisibility 를 통해서 제한 시간을 늘려 다른 람다 함수에게 중복 처리되는 것을 방지 가능.
+    - multiple message proceed
+        # ReceiveMessageWaitTime 을 통해서 메시지를 수신받는 시간을 늘려 짧은 시간에 여러번 처리되는 걸
+          방지할 수 있다. 기본값은 0초, 최대 20초까지 설정 가능.
+            ~ SQS 는 메시지를 요청한만큼(ReceiveMessage API call) 요금이 처리되서 설정하는게 좋다.
 
 * AWS Lambda
+    - serverless workload
+        # 리소스 기반 정책을 lambda:InvokeFunction 함수에 추가하고, EventBridge 에서 정의한 특정 이벤트를
+          기본으로 서비스를 동작하게 매칭시킨다.
     - single lambda -> split into two lambda
         # 단일 람다 함수로 처리하기에 부하량이 많을 경우, 두개의 람다 함수로 나누어 기능을 분배시켜
           확장성과 기능향상을 높힐 수 있음
@@ -78,6 +86,9 @@
     - Object-Lock
         # 객체 잠금 설정을 통해서 객체를 특정 기간동안 변경/삭제 불가하게 설정 가능
           governance(조건적 변경가능), compliance(절대 변경 불가) 모드 중 선택
+    - Cross-region replication
+        # 다른 리전의 S3 버킷에 현재 버킷 혹은 버킷 내 프리픽스의 데이터를 복제할 수 있다.
+          Versioning 기능을 활성화해야 사용 가능.
 
 * AWS EFS
     - 동시 처리 : 사용자가 동시에 다른 데이터 접근/처리 가능
@@ -85,6 +96,7 @@
 * AWS RDS
     - AWS Aurora
         # 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
+        # cloning 을 통해 운영중인 DB 클러스터에 대한 볼륨을 복제하여 복제본을 만들 수 있다.
     - Proxy instance
         # 말그대로 DB 인스턴스 앞에 별도의 프록시 인스턴스를 둬서 DB 에 대한 접속 관리를 해주는 것
           DB 인스턴스의 장애로 인한 다운타임 혹은 서비스 저하를 최소한으로 줄여주는 장점이 있음
@@ -99,6 +111,10 @@
 * AWS FSx
     - for Windows File Server
         # 윈도우 파일 공유 서버와 호환할 수 있는 서비스
+
+* AWS DataSync
+    - 스토리지 시스템과 서비스 간의 데이터 이동 혹은 마이그레이션을 도와주는 서비스
+        # NFS, SMB, S3, EFS, FSx 등으로 데이터를 전송시킬 수 있음.
 
 * AWS Backup
     - AWS 서비스에 대한 백업 기능 제공 서비스, 백업된 데이터는 별도의 백업볼트에 저장됨

@@ -12,11 +12,18 @@
     - Data Analytics : 메시지(데이터) 수집/처리/분석 가능
     - Data Stream : 메시지(데이터) 수집 특화
     - Data Firehose : 메시지(데이터) -> S3 전송/저장
+        # CloudWatch 의 로그 그룹에 저장된 로그들을 AWS OpenSearch(Elasticsearch; 로그 분석 서비스) 로
+          이동시키는 것도 가능하다. cloudwatch 를 kinesis data firehose delivery 소스로,
+          opensearch 를 delivery 목적지로 설정하면 된다.
 
 * AWS Lambda
     - single lambda -> split into two lambda
         # 단일 람다 함수로 처리하기에 부하량이 많을 경우, 두개의 람다 함수로 나누어 기능을 분배시켜
           확장성과 기능향상을 높힐 수 있음
+
+* AWS MQ
+    - 다양한 메시지를 수신하고 전달해주는 메시지 브로커와 AWS 리소스의 호환성을 위한 서비스
+        # EC2 인스턴스 위에서 가동, 고가용성을 위한 active/standby 구성 가능
 
 * AWS CloudFront
     -  S3 의 오리진 데이터를 읽어 들여 배포해 성능 개선 및 대기 시간 감소 효과
@@ -63,8 +70,10 @@
     - Intelligent-Tiering
         # 객체 혹은 프리픽스 단위로 사용 빈도에 따라 클래스를 자동으로 변환시켜줌, 생명주기에서 설정 가능
     - Object-Lock
-        # 객체 잠금 설정을 통해서 객체를 특정 기간동안 변경/삭제 불가하게 설정 가능
+        # object lock 을 통해서 객체를 특정 기간동안 변경/삭제 불가하게 설정 가능
           governance(조건적 변경가능), compliance(절대 변경 불가) 모드 중 선택
+        # legal hold 를 통해서도 객체 변경/삭제 제한 가능(object-lock 의 기한과 독립적, 기한 제한 없음)
+          s3:PutObjectLegalHold IAM 역할이 필요
 
 * AWS EFS
     - 동시 처리 : 사용자가 동시에 다른 데이터 접근/처리 가능

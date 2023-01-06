@@ -77,6 +77,19 @@
 * AWS Fargate
     - ECS, EKS 에서 필요로하는 컨테이너를 올리기 위한 서버리스 컴퓨팅 리소스 제공 서비스
 
+* AWS Route 53
+    - Route Policy
+        # simple, weighted, geolocation, latency, failover, multivalue 의 정책들이 있다.
+          simple 은 기본, weighted 는 라우팅 비율을 가중치로 컨트롤,
+          geolocation 은 쿼리 발생 위치 기반 라우팅,
+          latency 는 지연 시간 기반, failover 는 말 그대로 active/standby 형태의 HA 기능,
+          multivalue 는 로드밸런싱처럼 요청에 따른 각각 다른 리소스 응답의 라우팅 제공.
+        # 글로벌하게 서비스 하는 어플리케이션에 대한 저지연 구성에서는 latency 가 최적.
+
+* AWS Global Acceleration
+    - 여러 AWS 리전의 엔드포인트를 지원하는 트래픽 가속 전달 서비스
+        # GA 로 접근 가능한 2 개의 Static IP 를 제공하여, 각 리전의 엣지 로케이션의 엔드포인트로 활용.
+
 * AWS VPC
     - PrivateLink
         # VPC 와 AWS 서비스, VPC 와 다른 AWS 계정의 서비스, 혹은 서드파티 VPC 와의 통신 연결 서비스.
@@ -87,11 +100,11 @@
         # 동적(dynamic) 조정 정책 중 하나로 CloudWatch 지표와 특정 비율의 목표치를 설정해야한다.
           예를 들어, AS 그룹의 CPU 사용률을 50% 에 가깝게 유지시키도록 목표로 설정 가능하다.
 
-* EC2
+* AWS EC2
     - capacity reservation
         # 온디멘드 용량 예약을 통해서 특정 리전, 특정 AZ 에 사용할 EC2 인스턴스에 대한 예약 가능
 
-* S3
+* AWS S3
     - Transfer Acceleration
         # 모든 글로벌 사이트의 데이터를 단일 S3 버킷에 빠르게 집계
     - Multi-part Upload

@@ -1,6 +1,10 @@
-* Billing and Cost Management
+* AWS Billing and Cost Management
     - Dashboard
         # 비용 요금 관리 대시보드에서 특정 기간 동안의 AWS 리소스에 대한 비용 비교를 그래프 형태로 확인 가능
+
+* AWS Organizations
+    - alternate contact
+        # AWS 조직 대시보드 혹은 CLI 에서 조직 내 모든 사용자들에 대한 대체 연락처를 설정해줄 수 있다.
 
 * AWS Athena
     - S3 에 저장된 로그 등을 분석하고 보고서 작성에 필요한 데이터를 추출, 작성 가능한 서비스
@@ -15,6 +19,9 @@
     - Data Analytics : 메시지(데이터) 수집/처리/분석 가능
     - Data Stream : 메시지(데이터) 수집 특화
     - Data Firehose : 메시지(데이터) -> S3 전송/저장
+        # CloudWatch 의 로그 그룹에 저장된 로그들을 AWS OpenSearch(Elasticsearch; 로그 분석 서비스) 로
+          이동시키는 것도 가능하다. cloudwatch 를 kinesis data firehose delivery 소스로,
+          opensearch 를 delivery 목적지로 설정하면 된다.
 
 * AWS SQS
     - duplicated message proceed
@@ -36,9 +43,14 @@
 * AWS CloudWatch
     - composite alarm
         # 복합 경고를 통해서 A 조건과 B 조건이 모두 부합하는 경우에만 알람이 발생하도록 설정할 수 있다.
+* AWS MQ
+    - 다양한 메시지를 수신하고 전달해주는 메시지 브로커와 AWS 리소스의 호환성을 위한 서비스
+        # EC2 인스턴스 위에서 가동, 고가용성을 위한 active/standby 구성 가능
 
 * AWS CloudFront
     -  S3 의 오리진 데이터를 읽어 들여 배포해 성능 개선 및 대기 시간 감소 효과
+        # OAI(origin access identity)를 생성하여 cloudfront 배포에 할당시키고,
+          s3 버킷 정책에서 정확한 OAI 값에 대한 접근 및 읽기 권한을 부여해주면 된다.
     -  API Gateway 를 통해서 Cloudfront 의 요청을 S3 에 직접 받지 않고 대신 받게 하고,
        lambda 함수 호출을 통해 백엔드 API 호출을 진행
 
@@ -66,13 +78,36 @@
           AD 호환성이 필요하기만 할 때는 Simple AD 를 사용
 
 * AWS Fargate
-    - ECS, EKS 에서 필요로하는 컨테이너를 올리기 위한 컴퓨팅 리소스를 제공하는 서비리스 서비스
+    - ECS, EKS 에서 필요로하는 컨테이너를 올리기 위한 서버리스 컴퓨팅 리소스 제공 서비스
 
-* EC2
+* AWS Route 53
+    - Route Policy
+        # simple, weighted, geolocation, latency, failover, multivalue 의 정책들이 있다.
+          simple 은 기본, weighted 는 라우팅 비율을 가중치로 컨트롤,
+          geolocation 은 쿼리 발생 위치 기반 라우팅,
+          latency 는 지연 시간 기반, failover 는 말 그대로 active/standby 형태의 HA 기능,
+          multivalue 는 로드밸런싱처럼 요청에 따른 각각 다른 리소스 응답의 라우팅 제공.
+        # 글로벌하게 서비스 하는 어플리케이션에 대한 저지연 구성에서는 latency 가 최적.
+
+* AWS Global Acceleration
+    - 여러 AWS 리전의 엔드포인트를 지원하는 트래픽 가속 전달 서비스
+        # GA 로 접근 가능한 2 개의 Static IP 를 제공하여, 각 리전의 엣지 로케이션의 엔드포인트로 활용.
+
+* AWS VPC
+    - PrivateLink
+        # VPC 와 AWS 서비스, VPC 와 다른 AWS 계정의 서비스, 혹은 서드파티 VPC 와의 통신 연결 서비스.
+          IGW, NAT 등이 전혀 필요하지 않으며, 접속하려는 대상의 VPC 엔드포인트만 있으면 된다.
+
+* AWS Auto Scaling
+    - target tracking scale policy
+        # 동적(dynamic) 조정 정책 중 하나로 CloudWatch 지표와 특정 비율의 목표치를 설정해야한다.
+          예를 들어, AS 그룹의 CPU 사용률을 50% 에 가깝게 유지시키도록 목표로 설정 가능하다.
+
+* AWS EC2
     - capacity reservation
         # 온디멘드 용량 예약을 통해서 특정 리전, 특정 AZ 에 사용할 EC2 인스턴스에 대한 예약 가능
 
-* S3
+* AWS S3
     - Transfer Acceleration
         # 모든 글로벌 사이트의 데이터를 단일 S3 버킷에 빠르게 집계
     - Multi-part Upload
@@ -88,8 +123,10 @@
     - Intelligent-Tiering
         # 객체 혹은 프리픽스 단위로 사용 빈도에 따라 클래스를 자동으로 변환시켜줌, 생명주기에서 설정 가능
     - Object-Lock
-        # 객체 잠금 설정을 통해서 객체를 특정 기간동안 변경/삭제 불가하게 설정 가능
+        # object lock 을 통해서 객체를 특정 기간동안 변경/삭제 불가하게 설정 가능
           governance(조건적 변경가능), compliance(절대 변경 불가) 모드 중 선택
+        # legal hold 를 통해서도 객체 변경/삭제 제한 가능(object-lock 의 기한과 독립적, 기한 제한 없음)
+          s3:PutObjectLegalHold IAM 역할이 필요
     - Cross-region replication
         # 다른 리전의 S3 버킷에 현재 버킷 혹은 버킷 내 프리픽스의 데이터를 복제할 수 있다.
           Versioning 기능을 활성화해야 사용 가능.
@@ -98,6 +135,11 @@
     - 동시 처리 : 사용자가 동시에 다른 데이터 접근/처리 가능
 
 * AWS RDS
+    - unencrypted DB instance -> encryption
+        # DB 인스턴스 스냅샷의 복사본을 암호화하고 암호화된 복사본으로 DB 인스턴스를 교체 복구 시키면 됨.
+
+* AWS Aurora
+    - 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
     - AWS Aurora
         # 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
         # cloning 을 통해 운영중인 DB 클러스터에 대한 볼륨을 복제하여 복제본을 만들 수 있다.
@@ -116,6 +158,14 @@
     - for Windows File Server
         # 윈도우 파일 공유 서버와 호환할 수 있는 서비스
 
+* AWS DMS(database migration service)
+    - 온프레미스 DB 와 AWS DB 간의 마이그레이션을 위한 레플리카 복제/전송 지원 서비스
+        # 소스 DB 의 레플리카를 생성하여 대상 DB 로 해당 레플리카 데이터를 전송시키는 방식으로 진행
+            ~ 소스 DB 는 지속적으로 사용(online) 가능
+
+* AWS SCT(schema conversion tool)
+    - 원본 DB 데이터 스키마를 대상 DB 데이터 스키마로 변환시켜주는 서비스
+        # DB 마이그레이션 진행 시 사용
 * AWS DataSync
     - 스토리지 시스템과 서비스 간의 데이터 이동 혹은 마이그레이션을 도와주는 서비스
         # NFS, SMB, S3, EFS, FSx 등으로 데이터를 전송시킬 수 있음.

@@ -6,8 +6,11 @@
     - alternate contact
         # AWS 조직 대시보드 혹은 CLI 에서 조직 내 모든 사용자들에 대한 대체 연락처를 설정해줄 수 있다.
 
+* AWS Control Tower
+    - 모든 조직, 계정에 대한 대규모 보안 거버넌시 적용이 가능한 서비스
+
 * AWS Athena
-    - S3 에 저장된 로그 등을 분석하고 보고서 작성에 필요한 데이터를 추출, 작성 가능한 서비스
+    - S3 등 저장소에 저장된 파일을 분석하고 보고서 작성에 필요한 데이터를 추출, 작성 가능한 서비스
 
 * AWS Glue
     - 데이터를 수집(Extract)/변환(transform)/출력 및 저장(load)하기 위한 서비스, 크롤러를 통해 데이터 수집
@@ -31,6 +34,8 @@
         # ReceiveMessageWaitTime 을 통해서 메시지를 수신받는 시간을 늘려 짧은 시간에 여러번 처리되는 걸
           방지할 수 있다. 기본값은 0초, 최대 20초까지 설정 가능.
             ~ SQS 는 메시지를 요청한만큼(ReceiveMessage API call) 요금이 처리되서 설정하는게 좋다.
+    - dead-letter queue
+        # DLQ 라는 배달하지 못한 메시지만을 위한 별도의 큐를 만들어 보관/처리할 수 있다.
 
 * AWS Lambda
     - serverless workload
@@ -157,6 +162,8 @@
 * AWS FSx
     - for Windows File Server
         # 윈도우 파일 공유 서버와 호환할 수 있는 서비스
+    - for Lustre integrated with S3
+        # 고성능 컴퓨팅(HPC)에 적합한 파일시스템인 러스터를 위해 S3 버킷과 연동하여 사용 가능
 
 * AWS DMS(database migration service)
     - 온프레미스 DB 와 AWS DB 간의 마이그레이션을 위한 레플리카 복제/전송 지원 서비스
@@ -172,12 +179,20 @@
 
 * AWS Backup
     - AWS 서비스에 대한 백업 기능 제공 서비스, 백업된 데이터는 별도의 백업볼트에 저장됨
+        # 백업된 데이터에 대해 특정 기간동안 백업본을 보유하고 있을 지 지정 가능
+        # lifecycle 정책을 통해서 백업된 데이터에 대한 수명 정책을 설정할 수 있음
 
 * AWS Network Firewall
     - 트래픽 검사 및 트래픽 필터링 : VPC 에 대한 규칙 생성하여 가능
 
 - AWS Shield
     - advanced : 유료, DDoS 탐지/방어 가능, Cloudfront/Route53/ELB 와 통합 가능
+
+- AWS WAF
+    - 웹 보안 방화벽 서비스, ACL 형태로 제한 정책 설정
+        # cloudfront 앞에 배치하여 s3 오리진 컨텐츠 배포를 대신할 수 있음
+          enable cloudfront distribution 체크.
+        # 특정 리전/IP 대역에 대한 허용/거부 정책 설정 가능
 
 * AWS SSO
     - Single-Sign-on

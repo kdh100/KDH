@@ -9,6 +9,21 @@
 * AWS Control Tower
     - 모든 조직, 계정에 대한 대규모 보안 거버넌시 적용이 가능한 서비스
 
+* AWS Connect
+    - 고객 지원 솔루션을 구성하기 위한 흐름 구성/제어를 제공하는 서비스
+        # AWS Pinpoint 를 같이 사용하면 사용한 특정 이벤트에 대한 통합 메시지 전송이 가능하다.
+          SMS, Email, 음성메시지 등을 통해 유효성 결과 등에 대한 안내 메시지 전달에 유용하다.
+
+* AWS Cognito
+    - AWS 의 웹, 모바일에 대한 사용자들의 인증/권한부여 및 관리를 제공하는 서비스
+        # user pool, identity pool 총 2개의 풀을 가지고 있으며,
+          사용자 풀은 인증하려는 대상자의 정보를 담은 일종의 디렉토리 형태로 관리되고,
+          자격증명 풀은 인증된 사용자들에게 임시적으로 AWS 자격증명 토큰을 발행하여 접근할 수 있도록 한다.
+        # cognito 혹은 facebook, google 등 서드파티 idP 를 통해서도 인증 가능
+    - 사용자 풀에서 인증받은 사용자들에 대해 API Gateway 에 대한 REST API 호출을 위한 토큰을 발행할 수 있다.
+        # 사용자 풀에서 authorizer(권한부여자)에 대해 API Gateway 에 대한 요청을 확인하고 적합성을
+          체크할 수 있도록 설정해줄 수 있음.
+
 * AWS Athena
     - S3 등 저장소에 저장된 파일을 분석하고 보고서 작성에 필요한 데이터를 추출, 작성 가능한 서비스
 
@@ -25,6 +40,14 @@
         # CloudWatch 의 로그 그룹에 저장된 로그들을 AWS OpenSearch(Elasticsearch; 로그 분석 서비스) 로
           이동시키는 것도 가능하다. cloudwatch 를 kinesis data firehose delivery 소스로,
           opensearch 를 delivery 목적지로 설정하면 된다.
+
+* AWS Elastic Beanstalk
+    - 작성된 웹 어플리케이션을 배포 및 관리하기 위해 필요한 리소스를 자동으로 프로비저닝해주는 서비스
+        # 작성된 어플리케이션 코드를 업로드하면 나머지 필요한 AWS 리소스를 알아서 배치/구성해주고,
+          cloudformation 을 통해서 자동으로 배포.
+        # 어플리케이션 환경에 따라 web-tier, worker-tier 로 구분되며,
+          웹 티어는 HTTP 요청을 처리하는 웹 API 기반으로 구성되고, 작업자 티어는 SQS 를 통해서 대기열에 대한
+          작업을 백엔드에서 가져와서 처리하는 방식으로 구성됨.
 
 * AWS SQS
     - duplicated message proceed
@@ -85,6 +108,14 @@
 * AWS Comprehend Medical
     - 텍스트 파일에서 의학 관련 문자열 등의 의학 데이터를 추출/분석하기 위한 서비스
 
+* AWS Translate
+    - 텍스트를 AI 기반 자동 번역해주는 서비스
+
+* AWS Transcribe
+    - 오디오를 AI 기반으로 자동으로 텍스트로 변환해주는 서비스
+        # 텍스트 번역 서비스인 Translate 와 Textract, Comprehend 등의 텍스트 추출 서비스와 혼합하여
+          특정 오디오를 원하는 종류의 데이터 형태로 변환해서 저장할 수 있다.
+
 * AWS AppFlow
     - Appflow 는 SaaS 어플리케이션들과 AWS 서비스들을 연동시킬 수 있는 서비스
 
@@ -96,6 +127,19 @@
 
 * AWS Fargate
     - ECS, EKS 에서 필요로하는 컨테이너를 올리기 위한 서버리스 컴퓨팅 리소스 제공 서비스
+
+* AWS ECS
+    - 컨테이너 오케스트레이션 툴 중 도커를 사용한 컨테이너 관리를 위한 프레임워크 서비스
+    - ECS 에서 컨테이너를 가동시키기 위해 Task Definition 을 통해서 구동될 작업의 파라미터 값을 설정해줘야 함.
+        # Docker 이미지, CPU/MEM 용량, 호스팅 OS, 네트워크 모드 등 설정에 필요한 파라미터를 JSON/YAML 형식
+          으로 작성하여 구동시킴.
+        # S3 와 연동을 위한 권한 설정 시 S3 권한에 대한 IAM 역할을 생성하고,
+          Task Definition 에서 taskRoleArn 에서 생성한 IAM 역할의 ARN 을 작성해주면 됨.
+
+* AWS Direct Connect
+    - AWS 자체 네트워크 라우터와 온프레미스 라우터와의 물리적 광 회선 연결을 통해 직연동하게 해주는 서비스.
+        # private virtual interface 를 통해서 AWS VPC 의 virtual private gateway 와 연동하여 통신 가능
+          public virtual interface 를 통해서 AWS 의 S3 등 서비스, 리소스에 연동하여 통신 가능
 
 * AWS Route 53
     - Route Policy
@@ -166,12 +210,23 @@
           DB 인스턴스의 장애로 인한 다운타임 혹은 서비스 저하를 최소한으로 줄여주며,
           급등하는 트래픽에 대해서도 접속(poll) 관리 덕에 timeout 등의 서비스 품질 저하를 방지해줌.
 
+* AWS ElastiCache
+    - 데이터 캐싱을 통한 사용자의 사용 경험 향상에 도움을 주는 서비스
+        # for Redis 캐싱을 통해 기존의 웹 어플리케이션에 대한 세션 데이터 관리가 가능하다.
+          세션 데이터가 저장되는 값을 기본값인 웹서버측 보관에서 저장 엔드포인트를 redis 캐시 ARN 으로 지정
+          하면 가능하다.
+
 * AWS DynamoDB
     - capacity mode
         # 트래픽 예측이 가능한 경우 -> provisioning mode
           트래픽 예측이 불가능한 경우 -> on-demand mode, auto-scaling 기능 있음
     - point-to-time recovery
         # 특정 시간대로 DB 테이블을 복원시킬 수 있는(되돌릴 수 있는) 기능
+    - TTL attribute
+        # 테이블에 저장된 데이터에 대해 TTL 속성을 부여해서 특정 기간이 지난 후 48시간 이내 데이터가
+          자동적으로 삭제될 수 있도록 설정할 수 있다.
+        # 데이터가 테이블에 저장될 때 timestamp 속성을 원하는 기간을 현재 시간에 더한 값으로 추가하면
+          TTL 설정에 맞물려 자동적으로 데이터를 특정 기간동안만 보관하고 삭제하게 할 수 있음.
     - DAX(DynamoDB Accelerator)
         # 캐시 메모리를 통한 성능 향상 기능
 
@@ -180,6 +235,13 @@
         # 윈도우 파일 공유 서버와 호환할 수 있는 서비스
     - for Lustre integrated with S3
         # 고성능 컴퓨팅(HPC)에 적합한 파일시스템인 러스터를 위해 S3 버킷과 연동하여 사용 가능
+
+* AWS Transfer Family
+    - SFTP, FTPS, FTP, AS2 를 통해 파일을 S3, EFS 로 보안 전송할 수 있는 서비스
+        # transfer family 에서 사용할 파일 전송 프로토콜에 맞춘 서버를 생성하고,
+          그 서버를 통해서 S3, EFS 로 파일을 전송.
+        # 고가용성을 위해 서버가 생성되는 VPC 내 NLB 를 생성하고 NLB 를 엔드포인트로,
+          NLB 리스너 포트를 22번으로 설정하여 연동시킬 수 있다.
 
 * AWS DMS(database migration service)
     - 온프레미스 DB 와 AWS DB 간의 마이그레이션을 위한 레플리카 복제/전송 지원 서비스

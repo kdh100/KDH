@@ -45,6 +45,11 @@
         # 단일 람다 함수로 처리하기에 부하량이 많을 경우, 두개의 람다 함수로 나누어 기능을 분배시켜
           확장성과 기능향상을 높힐 수 있음
 
+* AWS API Gateway
+    - API(Application Program Interface) 단일 진입점을 제공하는 서비스
+        # HTTP 기반의 웹소켓 API 혹은 RESTful(Representational State Transfer; 상태/조건 기반 전송) API
+          을 생성/유지하고 AWS <-> 외부 API 호출에 대한 처리 및 모니터링 지원
+
 * AWS CloudWatch
     - composite alarm
         # 복합 경고를 통해서 A 조건과 B 조건이 모두 부합하는 경우에만 알람이 발생하도록 설정할 수 있다.
@@ -53,11 +58,18 @@
         # EC2 인스턴스 위에서 가동, 고가용성을 위한 active/standby 구성 가능
 
 * AWS CloudFront
-    -  S3 의 오리진 데이터를 읽어 들여 배포해 성능 개선 및 대기 시간 감소 효과
+    -  S3 의 오리진 데이터를 읽어 들여(cache) 배포해 성능 개선 및 대기 시간 감소 효과
         # OAI(origin access identity)를 생성하여 cloudfront 배포에 할당시키고,
           s3 버킷 정책에서 정확한 OAI 값에 대한 접근 및 읽기 권한을 부여해주면 된다.
     -  API Gateway 를 통해서 Cloudfront 의 요청을 S3 에 직접 받지 않고 대신 받게 하고,
        lambda 함수 호출을 통해 백엔드 API 호출을 진행
+    - 추가 보안 설정
+        # signed url 은 민감한 데이터 등에 접근하기 위한 별도의 url 을 프라이빗 키로 서명하여 요청한
+          사용자에게 제공하고, 접근중인 민감한 데이터에 대한 서명된 url 에 대해 cloudfront 가 퍼블릭 키
+          를 사용하여 유효성 검사를 진행하여 접근 관리.
+        # field-level encryption 은 HTTPS 형식의 데이터 전송에 추가적인 보안 설정으로,
+          cloudfront 가 퍼블릭 키로 각 전송 구간(사용자 - cloudfront - 오리진)에서 필드 레벨 암호화를
+          걸면, 사용자 혹은 종단 어플리케이션은 프라이빗 키를 통해서만 해독하고 확인할 수 있게 된다.
 
 * AWS Macie
     - S3 에 저장된 민감한 데이터에 대해서 머신러닝을 통해 색출하고 보호할 수 있는 서비스
@@ -145,12 +157,14 @@
 
 * AWS Aurora
     - 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
-    - AWS Aurora
         # 고가용성 및 읽기 워크로드 충족 : MySQL 호환, 다중 AZ 에 읽기 전용 복제본 배포
         # cloning 을 통해 운영중인 DB 클러스터에 대한 볼륨을 복제하여 복제본을 만들 수 있다.
+
+* AWS RDS Proxy
     - Proxy instance
-        # 말그대로 DB 인스턴스 앞에 별도의 프록시 인스턴스를 둬서 DB 에 대한 접속 관리를 해주는 것
-          DB 인스턴스의 장애로 인한 다운타임 혹은 서비스 저하를 최소한으로 줄여주는 장점이 있음
+        # DB 인스턴스 앞에 별도의 프록시 인스턴스를 둬서 DB 에 대한 접속 관리를 해주는 것.
+          DB 인스턴스의 장애로 인한 다운타임 혹은 서비스 저하를 최소한으로 줄여주며,
+          급등하는 트래픽에 대해서도 접속(poll) 관리 덕에 timeout 등의 서비스 품질 저하를 방지해줌.
 
 * AWS DynamoDB
     - capacity mode
@@ -158,6 +172,8 @@
           트래픽 예측이 불가능한 경우 -> on-demand mode, auto-scaling 기능 있음
     - point-to-time recovery
         # 특정 시간대로 DB 테이블을 복원시킬 수 있는(되돌릴 수 있는) 기능
+    - DAX(DynamoDB Accelerator)
+        # 캐시 메모리를 통한 성능 향상 기능
 
 * AWS FSx
     - for Windows File Server
@@ -179,7 +195,7 @@
 
 * AWS Backup
     - AWS 서비스에 대한 백업 기능 제공 서비스, 백업된 데이터는 별도의 백업볼트에 저장됨
-        # 백업된 데이터에 대해 특정 기간동안 백업본을 보유하고 있을 지 지정 가능
+        # 백업된 데이터에 대한 다른 리전으로 옮기거나, 특정 기간동안의 백업본 보유 기간 설정 가능
         # lifecycle 정책을 통해서 백업된 데이터에 대한 수명 정책을 설정할 수 있음
 
 * AWS Network Firewall
@@ -201,7 +217,8 @@
 
 * AWS System Manager
     - Parameter Store
-        # DB 접속 시 필요한 USERNAME/PASSWORD 정보를 관리 가능
+        # DB 접속 시 필요한 USERNAME/PASSWORD 정보를 관리 가능.
+          저장된 민감한 값에 대해 암호화/복호화를 하기 위해서 KMS 키를 사용하여 가능.
     - Run command
         # 서드파티 제품을 사용한 하이브리드 인프라의 경우 사용하는 명령어가 다를 수 있기 때문에
           일괄 관리가 필요할 경우 run command 에서 명령어를 사용

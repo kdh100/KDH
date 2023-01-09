@@ -35,7 +35,7 @@
 
 * AWS Kinesis
     - Data Analytics : 메시지(데이터) 수집/처리/분석 가능
-    - Data Stream : 메시지(데이터) 수집 특화
+    - Data Stream : 실시간 메시지(데이터) 수집 특화
     - Data Firehose : 메시지(데이터) -> S3 전송/저장
         # CloudWatch 의 로그 그룹에 저장된 로그들을 AWS OpenSearch(Elasticsearch; 로그 분석 서비스) 로
           이동시키는 것도 가능하다. cloudwatch 를 kinesis data firehose delivery 소스로,

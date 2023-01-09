@@ -76,6 +76,7 @@
 * AWS CloudWatch
     - composite alarm
         # 복합 경고를 통해서 A 조건과 B 조건이 모두 부합하는 경우에만 알람이 발생하도록 설정할 수 있다.
+
 * AWS MQ
     - 다양한 메시지를 수신하고 전달해주는 메시지 브로커와 AWS 리소스의 호환성을 위한 서비스
         # EC2 인스턴스 위에서 가동, 고가용성을 위한 active/standby 구성 가능

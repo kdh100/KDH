@@ -1,0 +1,42 @@
+Zadara Storage(VPSA)
+    * 사용량 기반 요금 정책의 클라우드 형태 서비스(STaaS; Storage as a Service)
+        - 각 서비스 당 최대 100개의 노드, 64 PB 용량 운용 가능
+        - 물리적 스토리지 장비를 통합하여 가상 스토리지 장비를 생성
+            # 고객 별 가상 스토리지의 스펙 조정 가능(CPU, MEM 등)
+                ~ IOPS 효율성 및 최대화 기대 가능
+            # H/A 기능 및 Control Core(Engine) 이중화(A-S) 기능 구현
+    * 클라우드 형태 서비스
+        - 단독(직연동; Direct) 클라우드 및 멀티 클라우드 연결 지원
+            # B2C 부터 다중 CSP <-> 클라우드 간 연결 가능
+    * 장비 스펙
+        - 볼륨 당 최대 150,000 IOPS
+        - Snapshot-Clone, Mirroring, Online-Migration 지원
+
+VPSA(Virtual Private Storage Array)
+    * SAN(Storage Area Network)
+        - 구성방식
+            # FC(클라우드 인프라에서는 사용 X)
+            # iSCSI(네트워크)
+        - 특징
+            # 빠름 & 고비용
+                ~ DB, Tranaction
+            # 공유 X(1:1 연결)
+                ~ 로컬 호스트 연결(Volume Mount)
+                ~ Cluster 솔루션을 통한 H/A 구현 시 1:2 가능
+    * NAS(Network Attached Storage)
+        - 구성방식
+            # NFS
+                ~ 리눅스 기반 OS
+            # CIFS(SMB)
+                ~ 윈도우 기반 OS
+        - 특징
+            # 공유 O(1:N 연결)
+                ~ TCP/IP 기반의 인터넷 연결(Private)
+    * Object-Storage
+        - 구성방식
+            # 느림 & 저비용
+            # 객체에 대한 개별적 위치를 URL 로 제공
+                ~ TCP/IP 기반의 인터넷 연결(Public)
+            # API 기반
+            
+

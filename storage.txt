@@ -72,3 +72,9 @@ RAID(Redundant Array of Inexpensive/Independent Disk)
             # 최소 디스크 8개 이상
                 ~ 전체 용량 : (디스크 수-4) X 디스크 용량
             # R/W 성능 준수, 내결함성 상
+
+플래시 스토리지
+    * SSD 를 사용하는 스토리지 어레이 군
+        - 기존의 원판과 엑추에이터로 R/W 를 하는 HDD 와 다르게 플래시 메모리로 구성
+            # 전기를 통해 R/W 를 하기 때문에 HDD 보다 약 4배 정도 빠름
+

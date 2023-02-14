@@ -11,6 +11,16 @@ Zadara Storage(VPSA)
     * 장비 스펙
         - 볼륨 당 최대 150,000 IOPS
         - Snapshot-Clone, Mirroring, Online-Migration 지원
+    * 장비군
+        - Storage Array
+            # HDD, SSD
+        - Flash Array
+            # SSD
+            # 특징
+                ~ 데이터 중복제거(data reduction based on inline duplication)
+                ~ 데이터 압축을 통한 공간 활용
+                ~ 온라인 상태의 볼륨 볼륨 축소 가능(Scale-down)
+                ~ IO 빈도수에 따른 hot/cold 데이터 tiering 가능(Disk or S3/Azure)
 
 VPSA(Virtual Private Storage Array)
     * SAN(Storage Area Network)
@@ -74,7 +84,26 @@ RAID(Redundant Array of Inexpensive/Independent Disk)
             # R/W 성능 준수, 내결함성 상
 
 플래시 스토리지
-    * SSD 를 사용하는 스토리지 어레이 군
+    * SSD 를 사용하는 스토리지 어레이
         - 기존의 원판과 엑추에이터로 R/W 를 하는 HDD 와 다르게 플래시 메모리로 구성
             # 전기를 통해 R/W 를 하기 때문에 HDD 보다 약 4배 정도 빠름
 
+Thick Volume
+    * 할당된 용량 중 미사용 용량까지 모두 스토리지 풀에서 사용 용량으로 확보
+    * zeroing
+        - 블록 공간 안의 데이터를 초기화하는 작업
+            # lazy zeroing
+                ~ write 작업 발생 시 zeroing 과정을 진행
+                ~ zeroing 과정에서 로드 발생하여 write 성능 저하
+            # eager zeroing
+                ~ 사전에 zeroing 과정을 진행
+Thin Volume(On-Demand Provisioning)
+    * 가상으로 용량을 할당하고 실제 사용하는 용량만 스토리지 풀에서 사용 용량으로 확보
+        - 가상화 기술을 통해 물리적 스토리지 풀 이상으로 공간 할당 가능
+    * space reclamation
+        - 볼륨 내 데이터가 삭제되어 미사용 용량이 되면 스토리지 풀로 반환 처리
+            # 호스트에 부하 발생시킴
+
+Static Volume
+    * 기존에 존재하는 공간에서 볼륨을 생성하여 용량 확보
+        - Thick, Thin 과 다르게 Snapshot, Tiering 기능 X

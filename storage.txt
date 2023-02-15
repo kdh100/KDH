@@ -22,33 +22,6 @@ Zadara Storage(VPSA)
                 ~ 온라인 상태의 볼륨 볼륨 축소 가능(Scale-down)
                 ~ IO 빈도수에 따른 hot/cold 데이터 tiering 가능(Disk or S3/Azure)
 
-VPSA(Virtual Private Storage Array)
-    * SAN(Storage Area Network)
-        - 구성방식
-            # FC(클라우드 인프라에서는 사용 X)
-            # iSCSI(네트워크)
-        - 특징
-            # 빠름 & 고비용
-                ~ DB, Tranaction
-            # 공유 X(1:1 연결)
-                ~ 로컬 호스트 연결(Volume Mount)
-                ~ Cluster 솔루션을 통한 H/A 구현 시 1:2 가능
-    * NAS(Network Attached Storage)
-        - 구성방식
-            # NFS
-                ~ 리눅스 기반 OS
-            # CIFS(SMB)
-                ~ 윈도우 기반 OS
-        - 특징
-            # 공유 O(1:N 연결)
-                ~ TCP/IP 기반의 인터넷 연결(Private)
-    * Object-Storage
-        - 구성방식
-            # 느림 & 저비용
-            # 객체에 대한 개별적 위치를 URL 로 제공
-                ~ TCP/IP 기반의 인터넷 연결(Public)
-            # API 기반
-            
 RAID(Redundant Array of Inexpensive/Independent Disk)
     * 무중단 구현(안정성) or 고성능 구현(효율성)을 목적으로 하는 디스크 사용 기술
     * RAID 단일 모드 종류
@@ -107,3 +80,81 @@ Thin Volume(On-Demand Provisioning)
 Static Volume
     * 기존에 존재하는 공간에서 볼륨을 생성하여 용량 확보
         - Thick, Thin 과 다르게 Snapshot, Tiering 기능 X
+
+VPSA(Virtual Private Storage Array)
+    * SAN(Storage Area Network)
+        - 구성방식
+            # FC(클라우드 인프라에서는 사용 X)
+            # iSCSI(네트워크)
+        - 특징
+            # 빠름 & 고비용
+                ~ DB, Tranaction
+            # 공유 X(1:1 연결)
+                ~ 로컬 호스트 연결(Volume Mount)
+                ~ Cluster 솔루션을 통한 H/A 구현 시 1:2 가능
+    * NAS(Network Attached Storage)
+        - 구성방식
+            # NFS
+                ~ 리눅스 기반 OS
+            # CIFS(SMB)
+                ~ 윈도우 기반 OS
+        - 특징
+            # 공유 O(1:N 연결)
+                ~ TCP/IP 기반의 인터넷 연결(Private)
+    * Object-Storage
+        - 구성방식
+            # 느림 & 저비용
+            # 객체에 대한 개별적 위치를 URL 로 제공
+                ~ TCP/IP 기반의 인터넷 연결(Public)
+            # API 기반
+
+VPSA Creation Steps
+1. RAID
+    * RAID 1/6, Stripe-Size, Hot-Spare, Drive
+        - 레이드 모드 및 블록 사이즈 선택(default : 64kb)
+        - 예비 드라이브로 장애 드라이브 자동 교체 진행 여부 선택
+        - 레이드 그룹에 속할 드라이브 개수 선택
+    * Options
+        - Media Scan
+            # 레이드 그룹 내 패리티에 대한 데이터 무결성 체크 및 자동 보완
+        - Force Recovery
+            # 장애 드라이브에 대한 수동 복구 진행
+                ~ Media Scan 이 선행되어야 함
+        - Replacing Drive
+            # 드라이브 교체
+                ~ 하나의 SN(storage node)에서 2개 이상의 드라이브를 가져올 수 없음
+        - Shredding Drive
+            # 드라이브 내 데이터를 최소 3회 이상의 랜덤 데이터로 덮어서 지움
+2. Pool
+    * Array-Type, Cache, Striped
+        - Storage/Flash/Object 타입 및 적합한 서비스 형태(Spec Diff.) 선택
+            # Storage 는 상거래, 저장소, 아카이빙
+            # Flash 는 IOPS/Throughput 최적화, 밸런스형
+        - SSD 를 통한 캐싱 기능 선택
+            # HDD 기반의 풀에서 만들어진 볼륨들의 성능 향상 기대
+                ~ SSD 기반의 풀은 캐싱 기능 선택 X
+        - 선택한 2개 이상의 레이드 그룹을 연동(RAID 0; Stripe) 선택
+            # 성능 향상 기대
+                ~ Flash Array 풀은 항상 연동되어 있어 선택 X
+        - 레이드 그룹 or 드라이브를 선택하여 풀 생성 가능
+            # 드라이브 선택 생성 시 레이드 그룹은 자동으로 생성
+    * Option
+        - Expanding
+            # 온라인으로 풀 확장을 위해 용량 추가 가능
+                ~ 레이드 그룹의 추가된 용량을 풀로 가져와서 확장
+        - Shrinking
+            # 온라인으로 풀 축소를 위해 용량 축소 가능(단, Flash Array 만 가능)
+                ~ 미사용중인 레이드 그룹을 풀에서 삭제하여 용량 축소
+                ~ 축소된 용량, 드라이브는 VPSA 로 반환되거나, VPSA 에서 탈장
+        - Enable/Disable Caching
+            # SSD 캐싱 기능을 토글 형식으로 활성화/비활성화 가능
+        - Delete(Recycle bin)
+            # 풀 내 볼륨 삭제 시 휴지통에서 7일동안 보관되며 이후 영구 삭제됨
+                ~ 관리자가 수동으로 삭제/복원 가능
+3. Volume
+    * 
+
+VPSA Monitoring
+    * Meter
+        - 20 invervals in 1s(10s)/1m(10m)/1h
+    * Logs

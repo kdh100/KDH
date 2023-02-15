@@ -148,13 +148,34 @@ VPSA Creation Steps
                 ~ 축소된 용량, 드라이브는 VPSA 로 반환되거나, VPSA 에서 탈장
         - Enable/Disable Caching
             # SSD 캐싱 기능을 토글 형식으로 활성화/비활성화 가능
+                ~ HDD 가 캐싱 데이터에 의해 영향받으므로 부하량 상승 원인
+                ~ Random IO 의 경우 캐싱에 의한 성능 상승 O
+                  Sequencial IO 의 경우 성능 상승 X
         - Delete(Recycle bin)
             # 풀 내 볼륨 삭제 시 휴지통에서 7일동안 보관되며 이후 영구 삭제됨
                 ~ 관리자가 수동으로 삭제/복원 가능
 3. Volume
     * 
 
-VPSA Monitoring
-    * Meter
-        - 20 invervals in 1s(10s)/1m(10m)/1h
-    * Logs
+Monitoring
+    * 스토리지 주요 성능 관제 포인트
+        - IOPS
+            # 초 당 입출력 프로세스율
+                ~ 속도
+        - Throughput
+            # 프로세스 처리량
+                ~ 파워
+        - Latency
+            # Volume
+                ~ 볼륨에 대한 지연율은 볼륨과 관련되어있는 각각의 리소스에 영향을 받으므로 상대적인 지표
+            # Disk
+                ~ 디스크 지연율은 실제 스토리지의 성능을 직관적으로 확인해볼 수 있는 지표
+                ~ 대략적으로 HDD 는 50~60 ms, SSD 는 10 ms 미만의 지연율이 확보되야 보통
+            # CPU/MEM(VC; Engine)
+                ~ 시스템 리소스의 경우, 볼륨/디스크의 지연 상관성을 확인해볼 수 있는 지표
+
+Troubleshooting
+    * HDD Latency
+        - 드라이브 추가를 통해 스핀들(디스크 작업 성능) 상승 기대
+            # RAID 0(Stripe)
+        - SSD 드라이브로 교체하여 베이스 성능 상승 기대

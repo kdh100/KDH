@@ -156,6 +156,36 @@ VPSA Creation Steps
                 ~ 관리자가 수동으로 삭제/복원 가능
 3. Volume
     * 
+4. Server
+    * 볼륨 타입에 따라 제공받을 서버(클라이언트)에서 패키지, 방화벽(Port) 등 사전 작업 진행
+        # Port
+            ~ 3260/TCP
+        # On Linux
+            ~ iscsi-initiator-util(iSCSI 블록 드라이브 연결을 위한 패키지)
+              sudo vi /etc/iscsi/initiatorname.iscsi -> 서버의 IQN(iSCSI 에서 사용할 서버 이름) 설정
+            ~ lsscsi(iSCSI 연결성 확인 패키지)
+        # On Windows
+            ~ 검색 창에 iSCSI 초기자 실행하여 서비스 가동
+            ~ iSCSI 초기자 설정 > 구성 탭 -> 서버의 IQN 설정
+    * ADD
+        # Auto
+            ~ Linux 는 제공되는 스크립트를 순차적으로 실행시키고,
+              Windows 는 제공되는 파일을 실행
+            ~ Refresh 를 통해 연결된 서버 확인
+        # Manual
+5. Attach & Mount
+    * Resources > Volumes 에서 Servers 선택 후 Attach/Detach to Server 으로 볼륨 제공/제거
+        - Block(iSCSI)
+            # Linux 에서 lsscsi 를 통해 iSCSI target 으로부터 확인된 블록 정보 확인
+                ~ fdisk 등을 통해 확인된 블록을 초기화
+                ~ mkfs 를 통해 파일시스템(ext4) 설정
+                ~ 마운트 포인트(디렉토리) 생성 및 마운트
+                ~ /etc/fstab 에 해당 iSCSI 마운트 정보를 입력하여 부팅 시 자동 마운트 설정
+                  등록 시 옵션 값에 _netdev 로 설정하여 네트워크 연결 후 마운트 순서 설정
+            # Windows 에서 iSCSI 초기자 설정 > 볼륨 및 장치 > 자동 구성 선택
+                ~ 실행 > diskmgmt.msc
+                ~ 디스크 온라인 및 초기화 진행 후 볼륨 설정하여 마운트
+                ~ 해당 볼륨에 대해 적절한 권한 설정 후 사용
 
 Monitoring
     * 스토리지 주요 성능 관제 포인트

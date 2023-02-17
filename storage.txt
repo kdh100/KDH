@@ -197,7 +197,7 @@ VPSA Creation Steps
     * Resources > Volumes 에서 Servers 선택 후 Attach/Detach to Server 으로 볼륨 제공/제거
         - Block(iSCSI)
             # Linux 에서 lsscsi 를 통해 iSCSI target 으로부터 확인된 블록 정보 확인
-                ~ fdisk 등을 통해 확인된 블록을 초기화
+                ~ parted(2TB 이상), fdisk(2TB 미만) 등을 통해 확인된 블록을 초기화
                 ~ mkfs 를 통해 파일시스템(ext4) 설정
                 ~ 마운트 포인트(디렉토리) 생성 및 마운트
                 ~ /etc/fstab 에 해당 iSCSI 마운트 정보를 입력하여 부팅 시 자동 마운트 설정
@@ -219,6 +219,14 @@ VPSA Creation Steps
                 ~ Guest Access 허용 시 Anonymous 형태로 로그인 가능
                   하지만 윈도우 로컬 정책에서 게스트 로그인 정책 사용 설정해줘야 가능
                   gpedit.msc > 컴퓨터 관리템플릿 > 네트워크 > lanman 워크스테이션 > 설정 확인
+6. Expand
+    * Resource > Volumes 에서 Expand 선택 후 용량 증가
+        - Block(iSCSI)
+            # Linux 에서 lsblk, df -h 를 통해서 추가된 볼륨 용량 확인
+                ~ sudo growpart(용량 확장 패키지) <iSCSI 볼륨> <파티션번호> 으로 용량 확장
+                ~ sudo resize2fs <iSCSI 볼륨 파티션> 으로 파일시스템 확장(resizing)
+            # Windows 에서 디스크 관리에서 추가된 볼륨 용량 확인
+                ~ 디스크 볼륨에 대한 미사용 용량 확인 후 사용중인 볼륨 우클릭 > 확장 진행
 
 Monitoring
     * 스토리지 주요 성능 관제 포인트

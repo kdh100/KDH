@@ -155,7 +155,7 @@ VPSA Creation Steps
             # 풀 내 볼륨 삭제 시 휴지통에서 7일동안 보관되며 이후 영구 삭제됨
                 ~ 관리자가 수동으로 삭제/복원 가능
 3. Volume
-    * Block/NAS, Snapshot-Policy
+    * Block/NAS, Snapshot-Policy, SMB File-History
         - Block(iSCSI)
             # iSCSI 방식의 네트워크 연동을 통한 블록 볼륨
                 ~ 용량, 풀, 암호화, 성능제한(IOPS, Throughput) 설정 가능
@@ -163,6 +163,12 @@ VPSA Creation Steps
         - NAS Share(NFS/SMB)
             # NFS/SMB 방식의 네트워크 연동을 통한 파일시스템 볼륨
                 ~ 용량, 풀, 노출
+    * Snapshot-Policy
+        - Cron 기반으로 사용자 정의 일정에 맞춰 스냅샷 생성 가능
+            # 옵션에 따라 empty 스냅샷 생성 가능(이전 데이터와 동일할 경우 내용이 없는 빈 스냅샷)
+    * SMB File-History
+        - Windows OS 에서 NAS(SMB) 볼륨 내 파일에 대한 버전 관리 기능(스냅샷처럼 동작)
+            # Snapshot-Policy 를 동일하게 사용함
 4. Server
     * 볼륨 타입에 따라 제공받을 서버(클라이언트)에서 패키지, 방화벽(Port) 등 사전 작업 진행
         - Block(iSCSI)

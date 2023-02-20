@@ -179,6 +179,11 @@ VPSA Creation Steps
                   VC IQN 및 서비스포트 등 정보 확인 진행
                 ~ iscsiadm -m node
                   iSCSI 타겟인 VPSA 정보 정상 여부 확인
+                ~ iscsiadm -m node -T <VC IQN> -p <VC IP> -o update \
+                  -n node.session.authmethod -v CHAP \
+                  -n node.session.username -v <VPSA CHAP ID> \
+                  -n node.session.password -v <VPSA CHAP PW>
+                  VC 에 대한 CHAP 방식 인증 정보 업데이트 진행
             # Windows
                 ~ 검색 창에 iSCSI 초기자 선택 후 서비스 시작
                   iSCSI 초기자 설정 > 구성 탭 -> 서버의 IQN 설정
@@ -245,11 +250,25 @@ Monitoring
                 ~ 시스템 리소스의 경우, 볼륨/디스크의 지연 상관성을 확인해볼 수 있는 지표
 
 Troubleshooting
+공통
     * HDD Latency
         - 드라이브 추가를 통해 스핀들(디스크 작업 성능) 상승 기대
             # RAID 0(Stripe)
         - SSD 드라이브로 교체하여 베이스 성능 상승 기대
+리눅스
     * iSCSI 리눅스 연동해제
         - iscsiadm -m node -T <VPSA IQN> -p <Active VC IP> -u(logout) 진행
             # 정상적으로 진행이 안될 경우(database failure 등)
                 ~ 5~10 분 정도 대기 후 로그아웃, 타겟 디스커버리, 로그인/로그아웃 과정 재진행 요망
+    * NAS 연동했던 마운트포인트 ???? 표시로 삭제할 수 없을 때
+        - sudo umount <디렉토리> 후에 sudo rm -rf <디렉토리> 진행
+윈도우
+    * 연동된 NAS 드라이브를 관리자 권한 프로그램을 통해서 경로가 확인되지 않는 경우
+        - UAC(User Access Control; 윈도우 사용자 계정 컨트롤) 이 켜져있는 환경에서 사용자/관리자 세션이
+          네트워크 드라이브에 대한 영역은 공유하지 않기 때문에 발생하는 문제
+            # CMD 창을 관리자 권한/사용자 권한으로 열어 'net use' 를 통해 공유가 안되는 현상 확인 가능
+            # 실행 > regedit > 
+              HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System 선택 후
+              빈칸에 우클릭 > DWORD(32비트) 생성 > 'EnableLinkedConnections' 생성 및 값 1로 수정
+            # 리부팅 후 현상 재확인
+                            

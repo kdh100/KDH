@@ -76,7 +76,6 @@ Thin Volume(On-Demand Provisioning)
     * space reclamation
         - 볼륨 내 데이터가 삭제되어 미사용 용량이 되면 스토리지 풀로 반환 처리
             # 호스트에 부하 발생시킴
-
 Static Volume
     * 기존에 존재하는 공간에서 볼륨을 생성하여 용량 확보
         - Thick, Thin 과 다르게 Snapshot, Tiering 기능 X

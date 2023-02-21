@@ -271,4 +271,23 @@ Troubleshooting
               HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System 선택 후
               빈칸에 우클릭 > DWORD(32비트) 생성 > 'EnableLinkedConnections' 생성 및 값 1로 수정
             # 리부팅 후 현상 재확인
-                            
+
+Service
+KT 천안CDC -> CloudStack 기반
+    * Public Zone
+        - KT Central A
+        - KT Central B
+        - KT M1(실 사용 고객은 목동, 장비만 천안)
+    * G Cloud(공공)
+        - KT G G1
+        - KT G D1
+            # Zadara Object Storage(Public-Service)
+        - KT G DMZ
+        - KT G Private
+        - KT G KIPO(특허청) -> OpenStack 기반
+KT 목동 -> OpenStack 기반
+    * 1센터
+        - KT D1
+    * 2센터
+        - KT M2
+            # Zadara Object Storage(Public-Service)

@@ -1,4 +1,7 @@
 Useful URLs
 
 - Zadara documentation
-http://guides.zadarastorage.com/
+https://guides.zadarastorage.com/
+https://support.zadarastorage.com/
+https://www.zadara.com/resources/
+https://www.zadara.com/resources/terms/

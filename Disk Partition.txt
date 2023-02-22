@@ -30,4 +30,35 @@
 4. 마운트
 	* /etc/fstab : 부팅 시 마운트 정보가 저장된 파일
 		- 디스크 작업 후 해당 파일에 경로 추가해야 부팅 시 정상 마운트 됨
-	
+5. LVM
+    * Logical Volume Manager : 논리적으로 물리적인 볼륨들을 그룹화하여 하나의 덩어리로 만들어 관리
+    * 구성 과정
+        - sudo yum install -y lvm2
+            # 필요 패키지 설치
+        - pvcreate /dev/sda1
+        - pvs
+            # 물리적 볼륨 확인
+        - vgcreate <vg 이름> /dev/sda1
+        - vgs
+            # 볼륨 그룹 확인
+        - lvcreate -n <lv 이름> -l +100%FREE <vg 이름>
+            # -n : 이름
+              -l : 사이즈 퍼센트 지정
+              -L : 사이즈 단위 지정(K,M,G,T)
+        - lvs
+            # 논리적 볼륨 확인
+        - mkfs -t <fs 타입> /dev/<vg 이름>/<lv 이름>
+        - mount /dev/<vg 이름>/<lv 이름> <마운트포인트>
+    * 확장/감소 과정
+        - lsblk, df 를 통한 추가 디스크 확인 및 fdisk 를 통한 초기화
+        - pvcreate /dev/sdb1
+        - pvs
+        - vgextend | vgreduce <vg 이름> /dev/sdb1
+        - vgs
+        - lvextend -l +100%FREE | lvreduce -L -500G /dev/<vg 이름>/<lv 이름>
+        - lvs
+        - resize2fs | xfs_growfx /dev/<vg 이름>/<lv 이름>
+            # 볼륨 조정에 이은 파일시스템 resize 작업
+                ~ resize2fs : ext4
+                  xfs_growfx : xfs
+

@@ -228,7 +228,7 @@ VPSA Creation Steps
         - Block(iSCSI)
             # Linux 에서 lsblk, df -h 를 통해서 추가된 볼륨 용량 확인
                 ~ sudo growpart(용량 확장 패키지) <iSCSI 볼륨> <파티션번호> 으로 용량 확장
-                ~ sudo resize2fs <iSCSI 볼륨 파티션> 으로 파일시스템 확장(resizing)
+                ~ sudo { resize2fs | xfs_growfx } <iSCSI 볼륨 파티션> 으로 파일시스템 확장(resizing)
             # Windows 에서 디스크 관리에서 추가된 볼륨 용량 확인
                 ~ 디스크 볼륨에 대한 미사용 용량 확인 후 사용중인 볼륨 우클릭 > 확장 진행
 
@@ -290,3 +290,5 @@ KT 목동 -> OpenStack 기반
     * 2센터
         - KT M2
             # Zadara Object Storage(Public-Service)
+
+Network

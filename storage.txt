@@ -297,3 +297,69 @@ KT 목동 -> OpenStack 기반
             # Zadara Object Storage(Public-Service)
 
 Network
+
+Reference
+리눅스
+    * LVM 생성
+        - sudo yum install -y lvm2
+        - pvcreate /dev/sda1
+        - pvs
+        - vgcreate <vg 이름> /dev/sda1
+        - vgs
+        - lvcreate -n <lv 이름> -l +100%FREE <vg 이름>
+            # -n : 이름
+              -l : 사이즈 퍼센트 지정
+              -L : 사이즈 단위 지정(K,M,G,T)
+        - lvs
+        - mkfs -t <fs 타입> /dev/<vg 이름>/<lv 이름>
+        - mount /dev/<vg 이름>/<lv 이름> <마운트포인트>
+    * LVM 확장/감소
+        - lsblk, df 를 통한 추가 디스크 확인 및 fdisk 를 통한 초기화
+        - pvcreate /dev/sdb1
+        - pvs
+        - vgextend | vgreduce <vg 이름> /dev/sdb1
+        - vgs
+        - lvextend -l +100%FREE | lvreduce -L -500G /dev/<vg 이름>/<lv 이름>
+        - lvs
+        - resize2fs | xfs_growfx /dev/<vg 이름>/<lv 이름>
+            # resize2fs : ext4
+              xfs_growfx : xfs
+    * MPIO(Multipath)
+        - 다중 세션에 의한 IO 경로 확장으로 디스크 성능 overload 가능(세션이 너무 많을 경우 효용성 감소)
+        - yum install -y device-mapper-multipath
+        - systemctl enable --now multipathd
+        - vi /etc/multipath.conf  //다중경로 설정파일
+        ==============================================
+        defaults {  //전체 다중경로에 대한 기본 옵션
+          checker_timeout 600
+          user_friendly_names yes  //alias 사용
+        }
+        blacklist {  //다중경로에 해당되지 않는 경우 정의
+          device {
+            vendor "QEMU"
+            product '*'
+          }
+        }
+        # The below section will handle Zadara volumes
+        devices {
+          device {  //다중경로 해당되는 장비별 정의
+            vendor "Zadara"
+            product "VPSA"
+         path_grouping_policy multibus
+            path_checker tur
+         # You can try different path selectors
+            path_selector "round-robin 0"
+            # path_selector "queue-length 0"
+            # path_selector "service-time 0"
+         failback manual
+         rr_min_io 1
+            no_path_retry 20
+          }
+        }
+        multipaths {  //다중경로에 대한 특성 설정
+          multipath {
+            wwid 23465623261653636  //다중경로 내 WWID 에 대한 지정
+            alias miscsi1  //지정된 WWID 에 대한 alias 지정, lsblk 에서 해당 alias 명으로 확인
+          }
+        }
+        ==============================================

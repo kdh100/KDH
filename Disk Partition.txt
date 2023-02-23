@@ -61,4 +61,45 @@
             # 볼륨 조정에 이은 파일시스템 resize 작업
                 ~ resize2fs : ext4
                   xfs_growfx : xfs
+6. MPIO(Multipath IO)
+    * 다중 세션에 의한 IO 경로 확장으로 디스크 성능 overload 가능(세션이 너무 많을 경우 효용성 감소)
+        - yum install -y device-mapper-multipath
+        - systemctl enable --now multipathd
+        - vi /etc/multipath.conf  //다중경로 설정파일
+            defaults {  //전체 다중경로에 대한 기본 옵션
+              checker_timeout 600
+              user_friendly_names yes  //alias 사용
+            }
+            blacklist {  //다중경로에 해당되지 않는 경우 정의
+              device {
+                vendor "QEMU"
+                product '*'
+              }
+            }
 
+            # The below section will handle Zadara volumes
+            devices {
+              device {  //다중경로 해당되는 장비별 정의
+                vendor "Zadara"
+                product "VPSA"
+
+                path_grouping_policy multibus
+                path_checker tur
+
+                # You can try different path selectors
+                path_selector "round-robin 0"
+                # path_selector "queue-length 0"
+                # path_selector "service-time 0"
+
+                failback manual
+
+                rr_min_io 1
+                no_path_retry 20
+              }
+            }
+            multipaths {  //다중경로에 대한 특성 설정
+              multipath {
+                wwid 23465623261653636  //다중경로 내 WWID 에 대한 지정
+                alias miscsi1  //지정된 WWID 에 대한 alias 지정, lsblk 에서 해당 alias 명으로 확인
+              }
+            }

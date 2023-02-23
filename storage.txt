@@ -200,7 +200,7 @@ VPSA Creation Steps
 5. Attach & Mount
     * Resources > Volumes 에서 Servers 선택 후 Attach/Detach to Server 으로 볼륨 제공/제거
         - Block(iSCSI)
-            # Linux 에서 lsscsi 를 통해 iSCSI target 으로부터 확인된 블록 정보 확인
+            # Linux 에서 lsscsi --scsi_id 를 통해 iSCSI target 으로부터 확인된 블록 정보 확인
                 ~ parted(2TB 이상), fdisk(2TB 미만) 등을 통해 확인된 블록을 초기화
                 ~ mkfs 를 통해 파일시스템(ext4) 설정
                 ~ 마운트 포인트(디렉토리) 생성 및 마운트
@@ -260,6 +260,11 @@ Troubleshooting
         - iscsiadm -m node -T <VPSA IQN> -p <Active VC IP> -u(logout) 진행
             # 정상적으로 진행이 안될 경우(database failure 등)
                 ~ 5~10 분 정도 대기 후 로그아웃, 타겟 디스커버리, 로그인/로그아웃 과정 재진행 요망
+    * iSCSI 볼륨 탈장 후 lsscsi 에 남아있는 디스크 정보 삭제
+        - 기본적으로 리부팅하면 블록 정보를 rescan 해서 정리할 수 있으나 권장되지는 않음
+        - su - //루트 권한 필요
+          echo 1 >/sys/block/<제거할 iscsi 디스크>/device/delete
+        - lsscsi 로 제거 확인
     * NAS 연동했던 마운트포인트 ???? 표시로 삭제할 수 없을 때
         - sudo umount <디렉토리> 후에 sudo rm -rf <디렉토리> 진행
 윈도우

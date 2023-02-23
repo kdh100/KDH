@@ -13,3 +13,7 @@ set nu ai ts=2 sw=2
 
 dd if=text.txt conv=u(upper)|l(lower)case of=modified.txt
 dd if=/dev/zero bs=1M count=1000 of=testblockfile
+
+4. repository
+
+yum install -y epel epel-release

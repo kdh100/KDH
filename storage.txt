@@ -173,7 +173,7 @@ VPSA Creation Steps
         - Block(iSCSI)
             # Port : 3260/TCP
             # Linux
-                ~ iscsi-initiator-util(iSCSI 블록 드라이브 연결을 위한 패키지)
+                ~ iscsi-initiator-utils(iSCSI 블록 드라이브 연결을 위한 패키지)
                   sudo vi /etc/iscsi/initiatorname.iscsi -> 서버의 IQN 설정
                 ~ iscsiadm -m discovery -t st -p <Active VC IP>
                   VC IQN 및 서비스포트 등 정보 확인 진행

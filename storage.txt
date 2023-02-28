@@ -279,24 +279,42 @@ Troubleshooting
 
 Service
 KT 천안CDC -> CloudStack 기반
-    * Public Zone
+    * Public Zone  //kt-01
         - KT Central A
         - KT Central B
         - KT M1(실 사용 고객은 목동, 장비만 천안)
     * G Cloud(공공)
-        - KT G-G1
-            # DMZ, Private
-        - KT G-D1
-            # Zadara Object Storage(Public-Service)
-        - KT G-KIPO(특허청) -> OpenStack 기반
+        - KT G-G1(DMZ, Private)  //kt-gcloud-01,02
+        - KT G-D1 -> OpenStack 기반  //kt-gcloud-d1
+            # Zadara Object Storage(Public-Service)  //kt-g-object-01
+        - KT G-KIPO(특허청) -> OpenStack 기반  //kt-g-kipo-01
 KT 목동 -> OpenStack 기반
     * 1센터
-        - KT D1
+        - KT D1  //kt-d1
     * 2센터
-        - KT M2
+        - KT M2  //kt-m2
             # Zadara Object Storage(Public-Service)
 
 Network
+CloudStack 기반
+    * VR(Virtual Router) 를 기반으로 하는 L3 라우팅 통신
+        - VPSA - VR - VM 구조로 다른 네트워크 대역을 사용하는 고객들도 자유롭게 연동 가능
+            # CIP 를 통한 직연동 구성 포함(VPSA - VM)
+    * Shared 구성 방식
+        - 기본적으로 L3 통신이라 Shared 가 가능함
+            # 내부적으로 고객들은 단일 VC IP 를 바라보며, 고객들은 각각 공인 IP 를 VM 에 할당하여 연동
+                ~ 공인 IP 라도 인터넷 통신 목적이 아니므로 외부 통신 X
+OpenStack 기반
+    * VLAN 을 기반으로 하는 L2 라우팅 통신
+        - 현재 자다라 클라우드 스토리지 대표 구성
+        - VPSA - MLNX Switch - FortiGate F/W(mgmt 포함) - CSP Switch 의 박스형 구성
+            # 고객 별 VLAN 나누고, VNI(SVI 와 동일개념)에 IP 대역 할당
+            # MLNX 업링크 Trunk 구성으로 하위 VLAN 정보에 대해 통신 진행
+    * Shared 구성 방식
+        - 서로 다른 VLAN, IP 대역의 VNI 를 동일 계정으로 생성했을 경우 VPSA 에 연동시킬 수 있음
+            # VPSA 엔진의 종류(200,400,600...)에 따라 연동 VNI 개수 달라짐
+            # 내부적으로 고객들은 단일 VC IP 를 바라보며, 고객들은 각각 할당된 VNI IP 대역으로 연동
+                ~ VPSA 에 연동된 VNI 정보를 통해 다른 VLAN 과의 네트워크 통신 가능(라우터 역할)
 
 Reference
 리눅스

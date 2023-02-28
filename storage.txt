@@ -293,7 +293,7 @@ KT 목동 -> OpenStack 기반
         - KT D1  //kt-d1
     * 2센터
         - KT M2  //kt-m2
-            # Zadara Object Storage(Public-Service)
+            # Zadara Object Storage(Public-Service)  //kt-object-01
 
 Network
 CloudStack 기반

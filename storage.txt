@@ -276,6 +276,12 @@ Troubleshooting
               HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System 선택 후
               빈칸에 우클릭 > DWORD(32비트) 생성 > 'EnableLinkedConnections' 생성 및 값 1로 수정
             # 리부팅 후 현상 재확인
+    * NAS 볼륨의 파일 권한 문제
+        - 윈도우에서 생성된 NAS 볼륨 내 파일에 대해서는 생성자(NAS User/Group)가 권한을 가져감
+            # 리눅스에서 동일한 계정/그룹으로 접근하려고 해도 윈도우에서 해당 파일에 대한 권한 설정값에 따라
+              접근이 가능
+            # 기본적으로 리눅스에서는 루트 권한으로 파일을 읽을 수 있으며, 일반 사용자로는 위에서 설명한
+              방식대로 권한 문제가 처리됨
 
 Service
 KT 천안CDC -> CloudStack 기반

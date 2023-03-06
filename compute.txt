@@ -1,9 +1,19 @@
-Identity and Access
+H/W
+    * gen3 장비부터 중복 제거 기능 제공
+        - 다우IDC 설치할 장비도 gen3
 
-Compute
+
+Computing
+
 
 Networking
 
-Load Balancing
 
-Certificates
+Identification
+
+
+Container
+
+
+Feature
+

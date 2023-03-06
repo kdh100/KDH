@@ -1,8 +1,8 @@
 H/W
-    * resource limitation
+    * resource limitation per compute VPSA
 
 Computing
-
+    * Windows Server 2012/2016/2019 performance decreased over KVM
 
 Networking
 
@@ -20,6 +20,6 @@ Billing
 
 
 Question
-    * DR 구현 방법?
-    * account/username 프로세스?
+    * DR Workaround?
+    * account/username process?
     * 

@@ -1,7 +1,5 @@
 H/W
-    * gen3 장비부터 중복 제거 기능 제공
-        - 다우IDC 설치할 장비도 gen3
-
+    * resource limitation
 
 Computing
 
@@ -17,3 +15,11 @@ Container
 
 Feature
 
+
+Billing
+
+
+Question
+    * DR 구현 방법?
+    * account/username 프로세스?
+    * 

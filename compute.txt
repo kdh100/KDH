@@ -20,6 +20,7 @@ Billing
 
 
 Question
-    * DR Workaround?
-    * account/username process?
+    * DR architecture, workaround?
+    * terraform deployment samples, workaround?
+    * VPC peering by vpc? user? project? account?
     * 

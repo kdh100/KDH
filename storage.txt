@@ -231,6 +231,22 @@ VPSA Creation Steps
                 ~ sudo { resize2fs | xfs_growfx } <iSCSI 볼륨 파티션> 으로 파일시스템 확장(resizing)
             # Windows 에서 디스크 관리에서 추가된 볼륨 용량 확인
                 ~ 디스크 볼륨에 대한 미사용 용량 확인 후 사용중인 볼륨 우클릭 > 확장 진행
+7. Function
+    * NAS 볼륨(File-system)의 보안 감사(Audit) 로그 기능
+        - 글로벌 설정(Setting) > Security > File Access Audit 수정 후 활성화
+            # 감사될 작업 대상 지정, 감사 대상 pool 지정, object storage 로 감사 로그 추출 지정
+                ~ 대상 볼륨에 대한 사용자 로그온/오프, 파일 권한/설정 변경 및 생성/삭제 로그
+        - Resources > Volumes > 대상 NAS 볼륨 선택 > Audit Log
+            # 활성화/비활성화, 감사 로그 파일 다운로드(.tar/.gz) 가능
+                ~ 압축해제 2번 해야함
+    * NAS 볼륨(File-system)의 File History 기능
+        - 볼륨 내 파일에 대한 섀도 복사본을 스냅샷 정책에 맞춰 생성하여, 윈도우 OS 에서 이전 버전 복원 가능
+            # Resources > Volumes > 대상 NAS 볼륨 선택 > Data Services > Attach File History Policy
+                ~ 스냅샷 정책과 동일
+                ~ 최소 1시간 이상 정책만 적용 가능
+    * File Lifecycle 기능
+        - VPSA 생성 시 기능 활성화가 진행되어야 하며, 이후 글로벌 설정(Setting) 에서 기능 활성화
+            # 
 
 Monitoring
     * 스토리지 주요 성능 관제 포인트

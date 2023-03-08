@@ -240,10 +240,13 @@ VPSA Creation Steps
             # 활성화/비활성화, 감사 로그 파일 다운로드(.tar/.gz) 가능
                 ~ 압축해제 2번 해야함
     * NAS 볼륨(File-system)의 File History 기능
-        - 볼륨 내 파일에 대한 섀도 복사본을 스냅샷 정책에 맞춰 생성하여, 윈도우 OS 에서 이전 버전 복원 가능
+        - 볼륨 내 파일에 대한 섀도 복사본을 스냅샷 정책에 맞춰 생성하여 이전 버전 복원 가능
             # Resources > Volumes > 대상 NAS 볼륨 선택 > Data Services > Attach File History Policy
                 ~ 스냅샷 정책과 동일
                 ~ 최소 1시간 이상 정책만 적용 가능
+            # 윈도우 OS 에서는 대상 파일 선택 > 이전 버전으로... 선택하여 복원 가능
+            # 리눅스 OS 에서는 대상 볼륨 마운트 포인트에 '.snapshots' 폴더에 스냅샷 시간에 맞춰 디렉토리 생성됨
+              해당 디렉토리에서 이전 버전에 대한 파일 정보 확인 및 복원 가능
     * File Lifecycle 기능
         - VPSA 생성 시 기능 활성화가 진행되어야 하며, 이후 글로벌 설정(Setting) 에서 기능 활성화
             # 

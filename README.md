@@ -1,9 +1,14 @@
 1. .bashrc
 
+# Export variables
 export PS1='\e[0;31m[\u @ \e[0;33m\h \w]\$ \e[m'
 export PATH=$PATH:/home/<username>
+export DATE=`date`
+
+# Alias
 alias c='clear'
 alias vi='/usr/bin/vim'
+alias date='date "+%Y.%m.%d %H:%M:%S"'
 
 2. .vimrc
 

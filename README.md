@@ -17,10 +17,12 @@ dd if=/dev/zero bs=1M count=1000 of=testblockfile
 4. repository
 
 yum install -y epel epel-release remi-release
-    If, repolist count doesnt match unexpectedly,
+    * If, repolist count doesnt match unexpectedly,
         -> "vi /etc/yum.repos.d/remi.repo > enabled=1" check
 
 5. useful package
 
-yum install -y python3 python3-devel
-pip3 install bpytop
+jq : display .json files in json format
+    * sudo yum install -y epel-release
+    * sudo yum install -y jq
+        - cat <file.json> | jq

@@ -7,6 +7,7 @@ export DATE=`date`
 
 # Alias
 alias c='clear'
+alias ll='ls -al --time-style="+%Y.%m.%d %H:%M:%S"'
 alias vi='/usr/bin/vim'
 alias date='date "+%Y.%m.%d %H:%M:%S"'
 

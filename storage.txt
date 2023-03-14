@@ -287,6 +287,9 @@ Troubleshooting
     * NAS 연동했던 마운트포인트 ???? 표시로 삭제할 수 없을 때
         - sudo umount <디렉토리> 후에 sudo rm -rf <디렉토리> 진행
 윈도우
+    * 익명 사용자들의 접근을 허용하는 SMB 'guess access' 옵션에 대한 윈도우 기본 정책 변경
+        - 실행 > regedit > HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters
+          'AllowInsecureGuestAuth' 값을 1로 수정 후 리부팅
     * 연동된 NAS 드라이브를 관리자 권한 프로그램을 통해서 경로가 확인되지 않는 경우
         - UAC(User Access Control; 윈도우 사용자 계정 컨트롤) 이 켜져있는 환경에서 사용자/관리자 세션이
           네트워크 드라이브에 대한 영역은 공유하지 않기 때문에 발생하는 문제

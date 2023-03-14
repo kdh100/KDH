@@ -184,6 +184,10 @@ VPSA Creation Steps
                   -n node.session.username -v <VPSA CHAP ID> \
                   -n node.session.password -v <VPSA CHAP PW>
                   VC 에 대한 CHAP 방식 인증 정보 업데이트 진행
+                ~ sudo vi /etc/iscsi/iscsid.conf 설정에서 for initiator 의
+                  authmethod, username, password 주석 제거 및 VPSA Server 정보에서
+                  리눅스 CHAP 정보로 확인해서 수정 후 서비스 재시작(systemctl restart iscsid)
+                ~ iscsiadm -m node -T <VC IQN> -p <VC IP> -l 으로 로그인(세션 연결)
             # Windows
                 ~ 검색 창에 iSCSI 초기자 선택 후 서비스 시작
                   iSCSI 초기자 설정 > 구성 탭 -> 서버의 IQN 설정

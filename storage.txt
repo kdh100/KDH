@@ -179,11 +179,6 @@ VPSA Creation Steps
                   VC IQN 및 서비스포트 등 정보 확인 진행
                 ~ iscsiadm -m node
                   iSCSI 타겟인 VPSA 정보 정상 여부 확인
-                ~ iscsiadm -m node -T <VC IQN> -p <VC IP> -o update \
-                  -n node.session.authmethod -v CHAP \
-                  -n node.session.username -v <VPSA CHAP ID> \
-                  -n node.session.password -v <VPSA CHAP PW>
-                  VC 에 대한 CHAP 방식 인증 정보 업데이트 진행
                 ~ sudo vi /etc/iscsi/iscsid.conf 설정에서 for initiator 의
                   authmethod, username, password 주석 제거 및 VPSA Server 정보에서
                   리눅스 CHAP 정보로 확인해서 수정 후 서비스 재시작(systemctl restart iscsid)
@@ -255,7 +250,6 @@ VPSA Creation Steps
               해당 디렉토리에서 이전 버전에 대한 파일 정보 확인 및 복원 가능
     * File Lifecycle 기능
         - VPSA 생성 시 기능 활성화가 진행되어야 하며, 이후 글로벌 설정(Setting) 에서 기능 활성화
-            # 
 
 Monitoring
     * 스토리지 주요 성능 관제 포인트
@@ -281,6 +275,14 @@ Troubleshooting
             # RAID 0(Stripe)
         - SSD 드라이브로 교체하여 베이스 성능 상승 기대
 리눅스
+    * iSCSI 리눅스 수동 연결(/etc/iscsi/iscsid.conf 파일 수정이 불가할 경우)
+        - iscsiadm -m node -T <VC IQN> p <VC IP> -o new
+            # iscsiadm 노드 DB 신규 생성
+        - iscsiadm -m node -T <VC IQN> -p <VC IP> -o update \
+          -n node.session.authmethod -v CHAP \
+          -n node.session.username -v <VPSA CHAP ID> \
+          -n node.session.password -v <VPSA CHAP PW>
+            # VC 에 대한 CHAP 방식 인증 정보를 노드 DB 에 업데이트 진행
     * iSCSI 리눅스 연동해제
         - iscsiadm -m node -T <VPSA IQN> -p <Active VC IP> -u(logout) 진행
             # 정상적으로 진행이 안될 경우(database failure 등)

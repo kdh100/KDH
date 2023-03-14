@@ -361,6 +361,14 @@ OpenStack 기반
 
 Reference
 리눅스
+    * SMB(CIFS) 사용하기
+        - sudo yum install -y samba
+        - sudo vi /etc/samba/smb.conf
+            # /etc/samba/smb.conf.example 참고하여 작성
+                ~ global, share(설정파일 하위에 새로 작성) 2개만 있어도 충분함
+        - sudo testparm
+            # 설정 파일 정상여부 체크
+        - sudo systemctl enable --now smb
     * LVM 생성
         - sudo yum install -y lvm2
         - pvcreate /dev/sda1
@@ -424,3 +432,6 @@ Reference
           }
         }
         ==============================================
+윈도우
+    * NFS 사용하기
+        - 기능 추가 > NFS 기능 사용

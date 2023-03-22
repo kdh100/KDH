@@ -414,14 +414,14 @@ Reference
           device {  //다중경로 해당되는 장비별 정의
             vendor "Zadara"
             product "VPSA"
-         path_grouping_policy multibus
+            path_grouping_policy multibus
             path_checker tur
          # You can try different path selectors
             path_selector "round-robin 0"
             # path_selector "queue-length 0"
             # path_selector "service-time 0"
-         failback manual
-         rr_min_io 1
+            failback manual
+            rr_min_io 1
             no_path_retry 20
           }
         }

@@ -394,7 +394,7 @@ Reference
             # resize2fs : ext4
               xfs_growfx : xfs
     * MPIO(Multipath)
-        - 다중 세션에 의한 IO 경로 확장으로 디스크 성능 overload 가능(세션이 너무 많을 경우 효용성 감소)
+        - 다중 세션에 의한 IO 경로 확장으로 디스크 성능 overload 가능(자다라 권장 세션 4, 이 이상 세션이 많을 경우 효율성 떨어짐)
         - yum install -y device-mapper-multipath
         - systemctl enable --now multipathd
         - vi /etc/multipath.conf  //다중경로 설정파일

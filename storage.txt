@@ -199,7 +199,7 @@ VPSA Creation Steps
 5. Attach & Mount
     * Resources > Volumes 에서 Servers 선택 후 Attach/Detach to Server 으로 볼륨 제공/제거
         - Block(iSCSI)
-            # Linux 에서 lsscsi --scsi_id 를 통해 iSCSI target 으로부터 확인된 블록 정보 확인
+            # Linux 에서 lsscsi --scsi_id 를 통해 iSCSI target 으로부터 확인된 WWID 블록 정보 확인
                 ~ parted(2TB 이상), fdisk(2TB 미만) 등을 통해 확인된 블록을 초기화
                 ~ mkfs 를 통해 파일시스템(ext4) 설정
                 ~ 마운트 포인트(디렉토리) 생성 및 마운트

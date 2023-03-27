@@ -1,16 +1,11 @@
-provider "aws" {
-  access_key = var.access_key
-  secret_key = var.secret_key
-}
-
-# Creating VPC
+# Create VPC
 
 resource "aws_vpc" "vpc1_kdh" {
   cidr_block         = "10.0.0.0/16"
   enable_dns_support = true
 }
 
-# Creating Subnet
+# Create Subnet
 
 resource "aws_subnet" "private_subnet" {
   cidr_block = "10.0.1.0/24"

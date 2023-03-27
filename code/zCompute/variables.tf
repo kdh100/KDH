@@ -3,11 +3,11 @@ variable "zCompute_ip" {
 }
 
 variable "access_key" {
-  default = "cc6771dc04c645f9ba08a5f1070a8534"
+  default = ""
 }
 
 variable "secret_key" {
-  default = "f3dd95749bee4c9f9cc37715865ebb0a"
+  default = ""
 }
 
 variable "image_ami" {

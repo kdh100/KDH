@@ -1,5 +1,5 @@
 # Credential
-variable "zCompute_ip" {
+variable "zcompute_ip" {
   default = "115.71.6.118"
 }
 variable "access_key" {

@@ -14,3 +14,7 @@ variable "image_ami" {
   description = "Ubuntu OS"
   default     = "ami-80f02613a66a4e58a758f98d182f9489"
 }
+
+variable "instance_type" {
+  default = "t3.medium"
+}

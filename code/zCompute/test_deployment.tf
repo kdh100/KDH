@@ -33,12 +33,19 @@ resource "aws_default_route_table" "rt_kdh" {
   }
 }
 
-# # Associate DHCP option with VPC
-# 
-# resource "aws_vpc_dhcp_options_association" "dhcprule_association" {
-#   vpc_id          = aws_vpc.vpc1_kdh.id
-#   dhcp_options_id = aws_vpc_dhcp_options.dhcprule.id
-# }
+# Create DHCP option
+
+resource "aws_vpc_dhcp_options" "dhcprule" {
+  domain_name = "symphony.local"
+  domain_name_servers = ["8.8.8.8"]
+}
+
+# Associate DHCP option with VPC
+
+resource "aws_vpc_dhcp_options_association" "dhcprule_association" {
+  vpc_id          = aws_vpc.vpc1_kdh.id
+  dhcp_options_id = aws_vpc_dhcp_options.dhcprule.id
+}
 
 # Create Security Group
 

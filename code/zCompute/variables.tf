@@ -1,5 +1,5 @@
 variable "zCompute_ip" {
-  default = "115.71.6.118"
+  default = ""
 }
 
 variable "access_key" {

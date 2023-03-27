@@ -1,11 +1,16 @@
+# zCompute 생성되는 리소스 이름 부여하는 방법 확인 중
+# 인스턴스 생성 안되는 이유 확인 중
+
 # Create VPC
 
 resource "aws_vpc" "vpc1_kdh" {
   cidr_block         = "10.0.0.0/16"
   enable_dns_support = true
-  tags = {
-    Name = "vpc1_kdh"
-  }
+  tags = merge(
+    { "Name" = var.name},
+    var.tags,
+    var.vpc_tags,
+  )
 }
 
 # Create Subnet
@@ -13,26 +18,12 @@ resource "aws_vpc" "vpc1_kdh" {
 resource "aws_subnet" "private_subnet1" {
   cidr_block = "10.0.1.0/24"
   vpc_id     = aws_vpc.vpc1_kdh.id
-  tags = {
-    Name = "private_subnet1"
-  }
-}
-
-resource "aws_subnet" "public_subnet1" {
-  cidr_block = "10.0.2.0/24"
-  vpc_id     = aws_vpc.vpc1_kdh.id
-  tags = {
-    Name = "public_subnet1"
-  }
 }
 
 # Create IGW
 
 resource "aws_internet_gateway" "igw_kdh" {
   vpc_id = aws_vpc.vpc1_kdh.id
-  tags = {
-    Name = "igw_kdh"
-  }
 }
 
 # Associate IGW including default route with VPC
@@ -50,9 +41,6 @@ resource "aws_default_route_table" "rt_kdh" {
 resource "aws_vpc_dhcp_options" "dhcprule1" {
   domain_name = "symphony.local"
   domain_name_servers = ["8.8.8.8"]
-  tags = {
-    Name = "dhcprule1"
-  }
 }
 
 # Associate DHCP option with VPC
@@ -83,22 +71,9 @@ resource "aws_security_group" "sg1_kdh" {
 
 # Create two instances
 
-resource "aws_instance" "privm1" {
+resource "aws_instance" "vm1" {
   ami                    = var.image_ami
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.private_subnet1.id
-  vpc_security_group_ids = [ "aws_security_group.sg1_kdh.id" ]
-  tags = {
-    Name = "privm1"
-  }
-}
-
-resource "aws_instance" "pubvm1" {
-  ami                    = var.image_ami
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.public_subnet1.id
-  vpc_security_group_ids = [ "aws_security_group.sg1_kdh.id" ]
-  tags = {
-    Name = "pubvm1"
-  }
+  vpc_security_group_ids = [aws_security_group.sg1_kdh.id]
 }

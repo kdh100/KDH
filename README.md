@@ -16,14 +16,18 @@ alias date='date "+%Y.%m.%d %H:%M:%S"'
 syntax on
 set nu ai ts=2 sw=2
 
-3. dd
+3. /etc/sudoers
 
-dd if=/dev/zero bs=1M count=1000 of=testblockfile
-dd if=text.txt conv=u(upper)|l(lower)case of=modifiedtext.txt
+permission to users to CMD without verifying password
+
+sudo vi /etc/sudoers
+(username) ALL=NOPASSWD: ALL
+    * append this config at the bottom of file context
 
 4. repository
 
-yum install -y epel-release
+sudo yum install -y epel-release
+sudo apt update && sudo apt upgrade
 
 5. useful package
 
@@ -33,3 +37,10 @@ jq : display .json files in json format
 
 bpytop : resource monitoring tool
     * sudo pip3 install -y psutil bpytop
+
+6. useful command
+
+dd : 
+
+dd if=/dev/zero bs=1M count=1000 of=testblockfile
+dd if=text.txt conv=u(upper)|l(lower)case of=modifiedtext.txt

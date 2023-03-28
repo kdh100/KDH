@@ -30,3 +30,6 @@ yum install -y epel-release
 jq : display .json files in json format
     * sudo yum install -y jq
         - cat <file.json> | jq
+
+bpytop : resource monitoring tool
+    * sudo pip3 install -y psutil bpytop

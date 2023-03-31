@@ -1,7 +1,0 @@
-Zadara API
-    * AWS API 호출 기반
-        - Zadara API Guide 참고하여 호출값 확인 가능
-        - AWS SDK(boto3)을 사용하여 API 호출 코드 개발 가능
-
-
-    

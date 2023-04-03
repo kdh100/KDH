@@ -9,8 +9,8 @@ def upload_file(filename, bucketname, objectname):
         Key=objectname
     )
 
-filename = str(input("tpye filename with full direction : "))
-bucketname = str(input("type bucketname to uploaded point : "))
-objectname = str(input("type objectname to uploaded as be : "))
+filename = str(input("filename with full direction to upload for : "))
+bucketname = str(input("bucketname which be uploaded to : "))
+objectname = str(input("objectname as uploaded : "))
 
 upload_file(filename, bucketname, objectname)

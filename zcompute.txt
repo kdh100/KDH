@@ -1,9 +1,0 @@
-DHCP
-    * 서브넷 당 2개의 DHCP 서버 생성&운용(for redundancy)
-        - 사용 가능한 서브넷 범위 중 앞에서 2개의 IP 대역이 자동 할당됨
-    * non-zCompute device
-        - DHCP 서버 relay 불가
-        - zCompute 장치가 아닌 다른 장치들에 대해 DHCP 서버가 IP 할당해주지 않음
-            # 알아서 IP 할당해주던가, 각 장비마다 VNI 생성해서 할당해주면 MAC 주소 확인을 통해 IP 할당 가능
-    * 기능
-        - VM 을 위한 metadata server, dns server, test connectivity 기능 보유

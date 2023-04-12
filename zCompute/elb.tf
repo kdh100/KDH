@@ -1,5 +1,4 @@
 # create security group for load balance
-# configure for ingress, only 80/HTTP service traffic allowed
 resource "aws_security_group" "lb_sg_kdh" {
   name   = var.lb_sg_name
   vpc_id = aws_vpc.vpc1_kdh.id
@@ -27,7 +26,6 @@ resource "aws_lb" "lb_kdh" {
 }
 
 # create load balance target group
-# configure target's health-check schema to check connection & service status
 resource "aws_lb_target_group" "lb_tg_kdh" {
   name        = var.lb_tg_name
   vpc_id      = aws_vpc.vpc1_kdh.id
@@ -40,7 +38,6 @@ resource "aws_lb_target_group" "lb_tg_kdh" {
 }
 
 # attach load balance target group to actual target themself
-# it only attached published instance for secure matter
 resource "aws_lb_target_group_attachment" "lb_tg_attachment" {
   target_group_arn = aws_lb_target_group.lb_tg_kdh.arn
   target_id        = aws_instance.vm1.id

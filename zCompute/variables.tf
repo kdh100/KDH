@@ -27,14 +27,46 @@ variable "private_subnet_cidr" {
   default = "10.0.1.0/24"
 }
 
+variable "public_subnet_cidr" {
+  default = "10.0.2.0/24"
+}
+
 variable "dhcp_domain_name" {
   default = "symphony.local"
 }
 
-variable "dhcp_domain_name_server" {
+variable "dhcp_dns_resolver" {
   default = "8.8.8.8"
 }
 
-variable "security_group_name" {
-  default = "sg1_kdh"
+variable "vm_sg_name" {
+  default = "vm-sg-kdh"
+}
+
+variable "lb_sg_name" {
+  default = "lb-sg-kdh"
+}
+
+variable "lb_name" {
+  default = "lb-kdh"
+}
+
+variable "lb_tg_name" {
+  default = "lb-tg-kdh"
+}
+
+variable "launch_configuration_name" {
+  default = "lg-kdh"
+}
+
+variable "asg_name" {
+  default = "asg-kdh"
+}
+
+variable "asg_policy_name" {
+  default = "asg-policy-kdh"
+}
+
+variable "protocol_HTTP" {
+  default = "HTTP"
 }

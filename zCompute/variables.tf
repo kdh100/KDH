@@ -19,32 +19,22 @@ variable "instance_type" {
   default = "t3.medium"
 }
 
-variable "name" {
-  description = "Name to be used on all the resources as identifier"
-  type        = string
-  default     = ""
+variable "vpc_cidr" {
+  default = "10.0.0.0/16"
 }
 
-variable "tags" {
-  description = "A map of tags to add to all resources"
-  type        = map(string)
-  default     = {}
+variable "private_subnet_cidr" {
+  default = "10.0.1.0/24"
 }
 
-variable "vpc_tags" {
-  description = "Additional tags for the VPC"
-  type        = map(string)
-  default     = {}
+variable "dhcp_domain_name" {
+  default = "symphony.local"
 }
 
-# variable "public_subnet_tags" {
-#   description = "Additional tags for the public subnets"
-#   type        = map(string)
-#   default     = {}
-# }
-# 
-# variable "private_subnet_tags" {
-#   description = "Additional tags for the private subnets"
-#   type        = map(string)
-#   default     = {}
-# }
+variable "dhcp_domain_name_server" {
+  default = "8.8.8.8"
+}
+
+variable "security_group_name" {
+  default = "sg1_kdh"
+}

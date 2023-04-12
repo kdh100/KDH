@@ -12,6 +12,8 @@ provider "aws" {
   secret_key = var.secret_key
   endpoints {
     ec2 = "https://${var.zCompute_ip}/api/v2/aws/ec2"
+    elb = "https://${var.zCompute_ip}/api/v2/aws/elbv2"
+    efs = "https://${var.zCompute_ip}/api/v2/aws/efs"
     iam = "https://${var.zCompute_ip}/api/v2/aws/iam"
   }
   region                      = "us-east-1"
@@ -19,4 +21,9 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_credentials_validation = true
   skip_requesting_account_id  = true
+  default_tags {
+    tags = {
+      Owner = "KDH"
+    }
+  }
 }

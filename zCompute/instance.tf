@@ -10,6 +10,12 @@ resource "aws_subnet" "private_subnet1" {
   vpc_id     = aws_vpc.vpc1_kdh.id
 }
 
+# create public subnet
+resource "aws_subnet" "public_subnet1" {
+  cidr_block = var.public_subnet_cidr
+  vpc_id     = aws_vpc.vpc1_kdh.id
+}
+
 # create igw
 resource "aws_internet_gateway" "igw_kdh" {
   vpc_id = aws_vpc.vpc1_kdh.id
@@ -54,10 +60,17 @@ resource "aws_security_group" "sg1_kdh" {
   }
 }
 
-# create instance
-resource "aws_instance" "vm1" {
+# create instances
+resource "aws_instance" "vm0" {
   ami                    = var.image_ami
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.private_subnet1.id
+  vpc_security_group_ids = [aws_security_group.sg1_kdh.id]
+}
+
+resource "aws_instance" "vm1" {
+  ami                    = var.image_ami
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.public_subnet1.id
   vpc_security_group_ids = [aws_security_group.sg1_kdh.id]
 }

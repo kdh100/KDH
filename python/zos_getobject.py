@@ -9,8 +9,8 @@ def download_file(filename, bucketname, objectname):
         Key=objectname
     )
 
-filename = str(input("filename as downloaded : "))
-bucketname = str(input("bucketname to download from : "))
-objectname = str(input("objectname to be downloaded : "))
+filename = str(input("Type filename to be stored including dir path : "))
+bucketname = str(input("Type bucketname to downloading from : "))
+objectname = str(input("Type objectname to download : "))
 
 download_file(filename, bucketname, objectname)

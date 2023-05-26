@@ -21,7 +21,7 @@ set nu ai ts=2 sw=2
 permission to users to CMD without verifying password
 
 sudo vi /etc/sudoers
-(username) ALL=NOPASSWD: ALL
+(username) ALL=(ALL) NOPASSWD: ALL
     * append this config at the bottom of file context
 
 4. repository

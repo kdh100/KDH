@@ -1,7 +1,7 @@
 import time
 import requests
 
-token="gAAAAABkmcII4nWgWO7EwOt2-Wh6vwjJ9-Y7ZNQmIgu9Mwgmr8h24I_kNHSf9vUFdt_uZ5pE20KuVKePLMZcTaQjMWMBeo2tEUi2Oj69gUq0Va6sw_DavdYN5wJWuhQUSdynol1MmFsb9qCLXgof-liRZwixYcaB1YlbGV5_F99SbU8rXU3PA2A"
+token=""
 downloadURL="http://storage.gscdn.com/v1/AUTH_391eb629c4974ae59ff12b79ac78d760/ecpark12/metering_nimbus01_2023-02-23--05_49_25.zip"
 
 counter=1

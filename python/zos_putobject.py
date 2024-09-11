@@ -1,6 +1,7 @@
 import boto3
+from objectindicator import ngos
 
-s3_client = boto3.client('s3', endpoint_url="https://vsa-00000004-kt-object-01.zadarazios.com")
+s3_client = boto3.client('s3', endpoint_url=ngos)
 
 def upload_file(filename, bucketname, objectname):
     s3_client.upload_file(

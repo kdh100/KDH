@@ -1,0 +1,1 @@
+ngos = "https://vsa-00000024-kt-g-object-01.zadarazios.com"

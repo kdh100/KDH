@@ -1,6 +1,6 @@
 import boto3
 
-s3_client = boto3.client('s3', endpoint_url="https://vsa-00000004-kt-object-01.zadarazios.com")
+s3_client = boto3.client('s3', endpoint_url="https://vsa-00000024-kt-g-object-01.zadarazios.com")
 response = s3_client.list_buckets()
 
 ''' API 호출 결과값을 전체 출력 '''

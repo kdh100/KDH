@@ -1,3 +1,3 @@
 #!/usr/bin/bash
-
+# object storage API token variable
 TOKEN=gAAAAABm45tXJncvFeEXiAuEaK668KhrSPTFgsuVwANQjlPn1RVvTYL3JmIECArPgMt_QMTFCUlFkavyjAEsz2TltY31ZvS5sFGXFf1xBPF8f1luKFZ2BXgGJmutNi0w6v_GM04lB4hrxAlRZCMgbuzCLNHaIsP8u93PG_UuzX74G8cUpHOWHEY
